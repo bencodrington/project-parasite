@@ -19,11 +19,23 @@ public class PlayerCharacter : NetworkBehaviour {
 			return;
 		}
 
-		if (Input.GetKeyDown(KeyCode.S)) {
+		if (Input.GetKeyDown(KeyCode.W)) {
 			this.transform.Translate(0, 1, 0);
 		}
 
+		if (Input.GetKeyDown(KeyCode.A)) {
+			this.transform.Translate(-1, 0, 0);
+		}
+
+		if (Input.GetKeyDown(KeyCode.S)) {
+			this.transform.Translate(0, -1, 0);
+		}
+
 		if (Input.GetKeyDown(KeyCode.D)) {
+			this.transform.Translate(1, 0, 0);
+		}
+
+		if (Input.GetKeyDown(KeyCode.E)) {
 			CmdSetRandomColour();
 		}
 
