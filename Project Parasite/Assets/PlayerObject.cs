@@ -6,6 +6,7 @@ using UnityEngine.Networking;
 public class PlayerObject : NetworkBehaviour {
 
 	public GameObject PlayerCharacterPrefab;
+	public GameObject RoundManagerPrefab;
 
 	private GameObject playerCharacter;
 
@@ -23,7 +24,13 @@ public class PlayerObject : NetworkBehaviour {
 	// Update is called once per frame
 	void Update () {
 		// Runs on everyone's computer, regardless of whether they own this player object
-		
+		if (isLocalPlayer == false) {
+			return;
+		}
+
+		if (Input.GetKeyDown(KeyCode.E)) {
+			CmdStartGame();
+		}
 	}
 
 	// Commands => Special functions that are only executed on the server
@@ -33,5 +40,13 @@ public class PlayerObject : NetworkBehaviour {
 		playerCharacter = Instantiate(PlayerCharacterPrefab);
 		// Propogate to all clients
 		NetworkServer.SpawnWithClientAuthority(playerCharacter, connectionToClient);
+	}
+
+	[Command]
+	void CmdStartGame() {
+		foreach (RoundManager rm in FindObjectsOfType<RoundManager>()) {
+			Destroy(rm.gameObject);
+		}
+		GameObject rM = Instantiate(RoundManagerPrefab);
 	}
 }
