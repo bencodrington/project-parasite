@@ -20,6 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4542221950530442}
   - component: {fileID: 114902415468003166}
+  - component: {fileID: 114404508351462368}
   m_Layer: 0
   m_Name: RoundManager
   m_TagString: Untagged
@@ -40,6 +41,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114404508351462368
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1463329413419142}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfcd8ea5f45eacd4a887659f293e39ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NpcPrefab: {fileID: 1042352181666248, guid: 976a2aeaf893c1c449c3e03ae03c1eb9, type: 2}
 --- !u!114 &114902415468003166
 MonoBehaviour:
   m_ObjectHideFlags: 1

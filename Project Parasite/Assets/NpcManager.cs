@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class NpcManager : MonoBehaviour {
+public class NpcManager : NetworkBehaviour {
 
 	public GameObject NpcPrefab;
 	// TODO: convert to list of Npc C# scripts
-	List<GameObject> NpcList;
+	List<NonPlayerCharacter> NpcList;
 
 	// How many NPCs are being spawned each round
 	const int MIN_NPC_COUNT = 1;
@@ -18,14 +19,14 @@ public class NpcManager : MonoBehaviour {
 	const int SPAWN_RANGE_Y = 5;
 
 	void Start () {
-		NpcList = new List<GameObject>();
+		NpcList = new List<NonPlayerCharacter>();
 		SpawnNPCs();
 	}
 
-	void OnDestroy() {
+	public void DespawnNPCs() {
 		// Remove NPCs
-		foreach (GameObject npc in NpcList) {
-			Destroy(npc);
+		foreach (NonPlayerCharacter npc in NpcList) {
+			NetworkServer.Destroy(npc.gameObject);
 		}
 		NpcList.Clear();
 	}
@@ -33,7 +34,7 @@ public class NpcManager : MonoBehaviour {
 	void SpawnNPCs() {
 		int npcCount = Random.Range(MIN_NPC_COUNT, MAX_NPC_COUNT + 1);
 		Vector3 spawnPos;
-		GameObject npc;
+		NonPlayerCharacter npc;
 		Debug.Log("Spawning " + npcCount + " NPCs");
 		for (int i = 0; i < npcCount; i++) {
 			spawnPos = new Vector3(
@@ -41,12 +42,13 @@ public class NpcManager : MonoBehaviour {
 				Random.Range(-SPAWN_RANGE_Y, SPAWN_RANGE_Y),
 				0
 			);
-			npc = Instantiate(NpcPrefab, spawnPos, Quaternion.identity);
-			npc.GetComponentInChildren<SpriteRenderer>().color = Color.yellow;
-
+			npc = Instantiate(NpcPrefab, spawnPos, Quaternion.identity).GetComponentInChildren<NonPlayerCharacter>();
 			NpcList.Add(npc);
+
+			// Propogate to all clients
+			NetworkServer.Spawn(npc.gameObject);
+			npc.RpcSetColour();
 		}
-		Debug.Log("SPAWN: NPC LIST COUNT: " + NpcList.Count);
 
 		// TODO: spawn via server
 	}

@@ -45,9 +45,10 @@ public class PlayerObject : NetworkBehaviour {
 	[Command]
 	void CmdStartGame() {
 		foreach (RoundManager rm in FindObjectsOfType<RoundManager>()) {
+			rm.transform.GetComponentInChildren<NpcManager>().DespawnNPCs();
 			Destroy(rm.gameObject);
 		}
-		// Create RoundManager game object on the server
+		// Create new RoundManager game object on the server
 		Instantiate(RoundManagerPrefab);
 	}
 }
