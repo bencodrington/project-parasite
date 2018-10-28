@@ -36,16 +36,23 @@ public class PlayerCharacter : NetworkBehaviour {
 
 	// COMMANDS
 
-	// [Command]
-	// void CmdSetRandomColour() {
-	// 	colour = Random.ColorHSV();
-	// 	RpcOnColourChange(colour);
-	// }
-
 	// CLIENTRPC
 
 	[ClientRpc]
 	void RpcOnColourChange(Color colour) {
 		spriteRenderer.color = colour;
+	}
+
+	[ClientRpc]
+	public void RpcUpdatePlayerType(string playerType) {
+		// TODO: replace strings and colours with constants
+		Color newColour;
+		switch (playerType) {
+			case "PARASITE": 	newColour = Color.red; break;
+			case "HUNTER": 		newColour = Color.green; break;
+			case "NEUTRAL":		newColour = Color.yellow; break;
+			default: 			newColour = Color.white; break;
+		}
+		spriteRenderer.color = newColour;
 	}
 }

@@ -86,3 +86,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerCharacterPrefab: {fileID: 1279280894486818, guid: 84aaca7e9375d394bac673f3d2c785e6,
     type: 2}
+  RoundManagerPrefab: {fileID: 1463329413419142, guid: 64e476012ce7af140b598b86d5a34da9,
+    type: 2}

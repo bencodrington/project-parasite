@@ -33,7 +33,7 @@ public class PlayerObject : NetworkBehaviour {
 		}
 	}
 
-	// Commands => Special functions that are only executed on the server
+	// Commands
 	[Command]
 	void CmdSpawnPlayerCharacter() {
 		// Create PlayerCharacter game object on the server
@@ -47,6 +47,7 @@ public class PlayerObject : NetworkBehaviour {
 		foreach (RoundManager rm in FindObjectsOfType<RoundManager>()) {
 			Destroy(rm.gameObject);
 		}
+		// Create RoundManager game object on the server
 		GameObject rM = Instantiate(RoundManagerPrefab);
 	}
 }
