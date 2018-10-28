@@ -49,7 +49,6 @@ public class NpcManager : NetworkBehaviour {
 			NetworkServer.Spawn(npc.gameObject);
 			npc.RpcSetColour();
 		}
-
-		// TODO: spawn via server
 	}
+	
 }
