@@ -48,6 +48,6 @@ public class PlayerObject : NetworkBehaviour {
 			Destroy(rm.gameObject);
 		}
 		// Create RoundManager game object on the server
-		GameObject rM = Instantiate(RoundManagerPrefab);
+		Instantiate(RoundManagerPrefab);
 	}
 }

@@ -5,7 +5,6 @@ using UnityEngine;
 public class RoundManager : MonoBehaviour {
 
 	void Start () {
-		// Alert PlayerCharacters(PlayerObjects?) that the game has started
 		SelectParasite();
 	}
 
@@ -27,8 +26,5 @@ public class RoundManager : MonoBehaviour {
 			}
 		}
 	}
-	
-	void Update () {
-		
-	}
+
 }
