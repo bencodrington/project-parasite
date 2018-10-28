@@ -6,7 +6,6 @@ using UnityEngine.Networking;
 public class NpcManager : NetworkBehaviour {
 
 	public GameObject NpcPrefab;
-	// TODO: convert to list of Npc C# scripts
 	List<NonPlayerCharacter> NpcList;
 
 	// How many NPCs are being spawned each round
@@ -50,5 +49,5 @@ public class NpcManager : NetworkBehaviour {
 			npc.RpcSetColour();
 		}
 	}
-	
+
 }
