@@ -4,9 +4,12 @@ using UnityEngine;
 
 public class RoundManager : MonoBehaviour {
 
-	// Use this for initialization
 	void Start () {
 		// Alert PlayerCharacters(PlayerObjects?) that the game has started
+		SelectParasite();
+	}
+
+	void SelectParasite() {
 		// TODO: cache playercharacters on creation
 		// TODO: uncache on leave
 		PlayerCharacter[] playerCharacters = FindObjectsOfType<PlayerCharacter>();
@@ -25,7 +28,6 @@ public class RoundManager : MonoBehaviour {
 		}
 	}
 	
-	// Update is called once per frame
 	void Update () {
 		
 	}
