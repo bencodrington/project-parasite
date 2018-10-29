@@ -15,7 +15,7 @@ public class NpcManager : NetworkBehaviour {
 	// Each NPC will be spawned at position
 	// 	([-SPAWN_RANGE_X...SPAWN_RANGE_X], [-SPAWN_RANGE_Y...SPAWN_RANGE_Y])
 	const int SPAWN_RANGE_X = 6;
-	const int SPAWN_RANGE_Y = 5;
+	const int SPAWN_RANGE_Y = 2;
 
 	void Start () {
 		NpcList = new List<NonPlayerCharacter>();
