@@ -10,6 +10,10 @@ public class PlayerCharacter : NetworkBehaviour {
 
 	float movementSpeed = 10f;
 
+	[SyncVar]
+	Vector3 serverPosition;
+	Vector3 serverPositionSmoothVelocity;
+
 	// Use this for initialization
 	void Start () {
 		spriteRenderer = gameObject.GetComponentInChildren<SpriteRenderer>();
@@ -17,8 +21,11 @@ public class PlayerCharacter : NetworkBehaviour {
 	
 	void Update () {
 		// Called once per frame for each PlayerCharacter
-		if (!hasAuthority) {
-			return;
+		if (hasAuthority) {
+			HandleInput();
+		} else {
+			// Verify current position is up to date with server position
+			transform.position = Vector3.SmoothDamp(transform.position, serverPosition, ref serverPositionSmoothVelocity, 0.25f);
 		}
 
 		// if (Input.GetKeyDown(KeyCode.W)) {
@@ -34,16 +41,28 @@ public class PlayerCharacter : NetworkBehaviour {
 		// 	this.transform.Translate(1, 0, 0);
 		// }
 
-		HandleInput();
 
 	}
 
 	void HandleInput() {
+		// Movement
 		float movementX = Input.GetAxis("Horizontal") * movementSpeed * Time.deltaTime;
-		this.transform.Translate(movementX, 0, 0);
+		// Has authority, so translate immediately
+		transform.Translate(movementX, 0, 0);
+		// Update the server's position
+		// TODO: clump these updates to improve network usage?
+		CmdUpdatePosition(transform.position);
+
 	}
 
 	// COMMANDS
+
+	[Command]
+	void CmdUpdatePosition(Vector3 newPosition) {
+		// TODO: verify new position is legal
+		serverPosition = newPosition;
+
+	}
 
 	// CLIENTRPC
 
