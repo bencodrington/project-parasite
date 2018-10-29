@@ -14,10 +14,6 @@ public class RoundManager : MonoBehaviour {
 		PlayerCharacter[] playerCharacters = FindObjectsOfType<PlayerCharacter>();
 		int n = playerCharacters.Length;
 		int indexOfParasite = Random.Range(0, n);
-		Debug.Log("There are " +
-				   n +
-				   " players connected. The parasite will be player #" +
-				   indexOfParasite);
 		for (int i = 0; i < n; i++) {
 			if (i == indexOfParasite) {
 				playerCharacters[i].RpcUpdatePlayerType("PARASITE");

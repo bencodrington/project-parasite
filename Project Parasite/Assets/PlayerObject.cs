@@ -15,7 +15,6 @@ public class PlayerObject : NetworkBehaviour {
 			// Object belongs to another player
 			return;
 		}
-		Debug.Log("PlayerObject.Start(): isLocalPlayer, so commanding server to spawn PC");
 		// Instantiate only spawns on local machine
 		// Network.Spawn must be called to take advantage of NetworkIdentity
 		CmdSpawnPlayerCharacter();

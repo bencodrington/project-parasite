@@ -34,7 +34,6 @@ public class NpcManager : NetworkBehaviour {
 		int npcCount = Random.Range(MIN_NPC_COUNT, MAX_NPC_COUNT + 1);
 		Vector3 spawnPos;
 		NonPlayerCharacter npc;
-		Debug.Log("Spawning " + npcCount + " NPCs");
 		for (int i = 0; i < npcCount; i++) {
 			spawnPos = new Vector3(
 				Random.Range(-SPAWN_RANGE_X, SPAWN_RANGE_X),

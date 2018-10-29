@@ -8,6 +8,8 @@ public class PlayerCharacter : NetworkBehaviour {
 	private SpriteRenderer spriteRenderer;
 	private Color colour;
 
+	float movementSpeed = 10f;
+
 	// Use this for initialization
 	void Start () {
 		spriteRenderer = gameObject.GetComponentInChildren<SpriteRenderer>();
@@ -19,19 +21,26 @@ public class PlayerCharacter : NetworkBehaviour {
 			return;
 		}
 
-		if (Input.GetKeyDown(KeyCode.W)) {
-			this.transform.Translate(0, 1, 0);
-		}
-		if (Input.GetKeyDown(KeyCode.A)) {
-			this.transform.Translate(-1, 0, 0);
-		}
-		if (Input.GetKeyDown(KeyCode.S)) {
-			this.transform.Translate(0, -1, 0);
-		}
-		if (Input.GetKeyDown(KeyCode.D)) {
-			this.transform.Translate(1, 0, 0);
-		}
+		// if (Input.GetKeyDown(KeyCode.W)) {
+		// 	this.transform.Translate(0, 1, 0);
+		// }
+		// if (Input.GetKeyDown(KeyCode.A)) {
+		// 	this.transform.Translate(-1, 0, 0);
+		// }
+		// if (Input.GetKeyDown(KeyCode.S)) {
+		// 	this.transform.Translate(0, -1, 0);
+		// }
+		// if (Input.GetKeyDown(KeyCode.D)) {
+		// 	this.transform.Translate(1, 0, 0);
+		// }
 
+		HandleInput();
+
+	}
+
+	void HandleInput() {
+		float movementX = Input.GetAxis("Horizontal") * movementSpeed * Time.deltaTime;
+		this.transform.Translate(movementX, 0, 0);
 	}
 
 	// COMMANDS
