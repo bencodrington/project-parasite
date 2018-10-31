@@ -49,7 +49,8 @@ public class NpcManager : NetworkBehaviour {
 
 			// Propogate to all clients
 			NetworkServer.Spawn(npc.gameObject);
-			npc.RpcSetColour();
+
+			npc.RpcGeneratePhysicsEntity();
 		}
 	}
 

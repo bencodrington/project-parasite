@@ -9,19 +9,19 @@ public abstract class PlayerCharacter : NetworkBehaviour {
 	protected float height;
 	protected PhysicsEntity physicsEntity;
 	protected float movementSpeed;
-
 	protected string type = "undefined type";
 
 	[SyncVar]
-	Vector3 serverPosition;
+	protected Vector3 serverPosition;
 	Vector3 serverPositionSmoothVelocity;
 
 	
-	void Update () {
+	public virtual void Update () {
 		// Called once per frame for each PlayerCharacter
 		if (hasAuthority) {
 			HandleInput();
 			if (physicsEntity != null) {
+				Debug.Log("PE.UPDATE for entity of type " + type);
 				physicsEntity.Update();
 			}
 			// Update the server's position
@@ -48,9 +48,11 @@ public abstract class PlayerCharacter : NetworkBehaviour {
 
 	[ClientRpc]
 	public void RpcGeneratePhysicsEntity() {
+		Debug.Log("GENERATE PHYSICS ENTITY FOR: " + type + "?");
 		if (hasAuthority) {
 			// TODO: Consider importing stats for all characters on each client, if access to type is required
 			ImportStats();
+			Debug.Log("GENERATING PHYSICS ENTITY FOR: " + type);
 			// Add physics entity
 			physicsEntity = new PhysicsEntity(transform, height);
 		}
