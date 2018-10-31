@@ -10,14 +10,13 @@ public class Parasite : PlayerCharacter {
 	protected override void HandleInput()  {
 		// Movement
 		float movementX = Input.GetAxis("Horizontal") * movementSpeed * Time.deltaTime;
-		// TODO: check if on ground
-		if (Input.GetKeyDown(KeyCode.W)) {
+		if (Input.GetKeyDown(KeyCode.W) && physicsEntity.IsOnGround()) {
 			physicsEntity.AddVelocity(0, jumpVelocity);
 		}
 		// Has authority, so translate immediately
 		transform.Translate(movementX, 0, 0);
 	}
-	
+
 	public override void ImportStats() {
 		// TODO: get stats like this from imported files
 		height = .25f;

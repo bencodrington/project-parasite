@@ -21,7 +21,6 @@ public abstract class PlayerCharacter : NetworkBehaviour {
 		if (hasAuthority) {
 			HandleInput();
 			if (physicsEntity != null) {
-				Debug.Log("PE.UPDATE for entity of type " + type);
 				physicsEntity.Update();
 			}
 			// Update the server's position
@@ -48,11 +47,9 @@ public abstract class PlayerCharacter : NetworkBehaviour {
 
 	[ClientRpc]
 	public void RpcGeneratePhysicsEntity() {
-		Debug.Log("GENERATE PHYSICS ENTITY FOR: " + type + "?");
 		if (hasAuthority) {
 			// TODO: Consider importing stats for all characters on each client, if access to type is required
 			ImportStats();
-			Debug.Log("GENERATING PHYSICS ENTITY FOR: " + type);
 			// Add physics entity
 			physicsEntity = new PhysicsEntity(transform, height);
 		}
