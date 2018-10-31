@@ -34,6 +34,15 @@ public class NpcManager : NetworkBehaviour {
 		NpcList.Clear();
 	}
 
+	public void DespawnNpc(NetworkInstanceId npcNetId) {
+		Debug.Log(NpcList.Count);
+		NonPlayerCharacter npc = NpcList.Find((value) => {return value.netId == npcNetId;});
+		int index = NpcList.IndexOf(npc);
+		Debug.Log("INDEX: " + index);
+		NpcList.RemoveAt(index);
+		NetworkServer.Destroy(npc.gameObject);
+	}
+
 	void SpawnNPCs() {
 		int npcCount = Random.Range(MIN_NPC_COUNT, MAX_NPC_COUNT + 1);
 		Vector3 spawnPos;
