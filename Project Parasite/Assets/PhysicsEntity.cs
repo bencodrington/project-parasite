@@ -15,7 +15,7 @@ public class PhysicsEntity {
 	public PhysicsEntity(Transform transform, float height = 0.5f, float gravity = -1f, float maxSpeed = 5f) {
 		this.transform = transform;
 		this.height = height;
-		this.gravityAcceleration = gravity; 
+		this.gravityAcceleration = gravity;
 	}
 
 	public void Update () {

@@ -25,7 +25,11 @@ public class NpcManager : NetworkBehaviour {
 	public void DespawnNPCs() {
 		// Remove NPCs
 		foreach (NonPlayerCharacter npc in NpcList) {
-			NetworkServer.Destroy(npc.gameObject);
+			if (npc == null) {
+				Debug.Log("Attempting to destroy an NPC that is null");
+			} else {
+				NetworkServer.Destroy(npc.gameObject);
+			}
 		}
 		NpcList.Clear();
 	}

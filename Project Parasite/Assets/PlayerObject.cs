@@ -5,7 +5,8 @@ using UnityEngine.Networking;
 
 public class PlayerObject : NetworkBehaviour {
 
-	public GameObject PlayerCharacterPrefab;
+	public GameObject ParasitePrefab;
+	public GameObject HunterPrefab;
 	public GameObject RoundManagerPrefab;
 
 	private GameObject playerCharacter;
@@ -15,12 +16,8 @@ public class PlayerObject : NetworkBehaviour {
 			// Object belongs to another player
 			return;
 		}
-		// Instantiate only spawns on local machine
-		// Network.Spawn must be called to take advantage of NetworkIdentity
-		CmdSpawnPlayerCharacter();
 	}
-	
-	// Update is called once per frame
+
 	void Update () {
 		// Runs on everyone's computer, regardless of whether they own this player object
 		if (isLocalPlayer == false) {
@@ -32,19 +29,28 @@ public class PlayerObject : NetworkBehaviour {
 		}
 	}
 
+	public void DestroyCharacter() {
+		if (hasAuthority) {
+			NetworkServer.Destroy(playerCharacter);
+		}
+	}
+
 	// Commands
 	[Command]
-	void CmdSpawnPlayerCharacter() {
+	public void CmdSpawnPlayerCharacter(string characterType) {
+		GameObject playerCharacterPrefab = characterType == "PARASITE" ? ParasitePrefab : HunterPrefab;
 		// Create PlayerCharacter game object on the server
-		playerCharacter = Instantiate(PlayerCharacterPrefab);
+		playerCharacter = Instantiate(playerCharacterPrefab);
 		// Propogate to all clients
 		NetworkServer.SpawnWithClientAuthority(playerCharacter, connectionToClient);
+		// Initialize each player's character on their own client
+		playerCharacter.GetComponentInChildren<PlayerCharacter>().RpcGeneratePhysicsEntity();
 	}
 
 	[Command]
 	void CmdStartGame() {
 		foreach (RoundManager rm in FindObjectsOfType<RoundManager>()) {
-			rm.transform.GetComponentInChildren<NpcManager>().DespawnNPCs();
+			rm.EndRound();
 			Destroy(rm.gameObject);
 		}
 		// Create new RoundManager game object on the server

@@ -3,25 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class PlayerCharacter : NetworkBehaviour {
+public abstract class PlayerCharacter : NetworkBehaviour {
 
-	private SpriteRenderer spriteRenderer;
-	private Color colour;
+	protected SpriteRenderer spriteRenderer;
+	protected float height;
+	protected PhysicsEntity physicsEntity;
+	protected float movementSpeed;
 
-	private PhysicsEntity physicsEntity;
-
-	float movementSpeed = 10f;
-	float jumpVelocity = .25f;
+	protected string type = "undefined type";
 
 	[SyncVar]
 	Vector3 serverPosition;
 	Vector3 serverPositionSmoothVelocity;
 
-	// Use this for initialization
-	void Start () {
-		spriteRenderer = gameObject.GetComponentInChildren<SpriteRenderer>();
-		RpcGeneratePhysicsEntity();
-	}
 	
 	void Update () {
 		// Called once per frame for each PlayerCharacter
@@ -30,26 +24,17 @@ public class PlayerCharacter : NetworkBehaviour {
 			if (physicsEntity != null) {
 				physicsEntity.Update();
 			}
+			// Update the server's position
+			// TODO: clump these updates to improve network usage?
+			CmdUpdatePosition(transform.position);
 		} else {
 			// Verify current position is up to date with server position
-			transform.position = Vector3.SmoothDamp(transform.position, serverPosition, ref serverPositionSmoothVelocity, 0.25f);
+			transform.position = Vector3.SmoothDamp(transform.position, serverPosition, ref serverPositionSmoothVelocity, 0.1f);
 		}
-
 	}
 
-	void HandleInput() {
-		// Movement
-		float movementX = Input.GetAxis("Horizontal") * movementSpeed * Time.deltaTime;
-		// TODO: check if on ground
-		if (Input.GetKeyDown(KeyCode.W)) {
-			physicsEntity.AddVelocity(0, jumpVelocity);
-		}
-		// Has authority, so translate immediately
-		transform.Translate(movementX, 0, 0);
-		// Update the server's position
-		// TODO: clump these updates to improve network usage?
-		CmdUpdatePosition(transform.position);
-	}
+	public abstract void ImportStats();
+	protected abstract void HandleInput();
 
 	// COMMANDS
 
@@ -57,30 +42,30 @@ public class PlayerCharacter : NetworkBehaviour {
 	void CmdUpdatePosition(Vector3 newPosition) {
 		// TODO: verify new position is legal
 		serverPosition = newPosition;
-
 	}
 
 	// CLIENTRPC
 
 	[ClientRpc]
-	void RpcGeneratePhysicsEntity() {
+	public void RpcGeneratePhysicsEntity() {
 		if (hasAuthority) {
+			// TODO: Consider importing stats for all characters on each client, if access to type is required
+			ImportStats();
 			// Add physics entity
-			physicsEntity = new PhysicsEntity(transform);
+			physicsEntity = new PhysicsEntity(transform, height);
 		}
 	}
 
 	[ClientRpc]
 	public void RpcUpdatePlayerType(string playerType) {
 		// TODO: replace strings and colours with constants
-		Color newColour;
-		switch (playerType) {
-			// Only set colour to red if this character is the parasite & on the parasite player's client
-			case "PARASITE": 	newColour = hasAuthority ? Color.red : Color.yellow; break;
-			case "HUNTER": 		newColour = Color.green; break;
-			case "NEUTRAL":		newColour = Color.yellow; break;
-			default: 			newColour = Color.white; break;
-		}
-		spriteRenderer.color = newColour;
+		// Color newColour;
+		// switch (playerType) {
+		// 	// Only set colour to red if this character is the parasite & on the parasite player's client
+		// 	case "PARASITE": 	newColour = hasAuthority ? Color.red : Color.yellow; break;
+		// 	case "HUNTER": 		newColour = Color.green; break;
+		// 	case "NEUTRAL":		newColour = Color.yellow; break;
+		// 	default: 			newColour = Color.white; break;
+		// }
 	}
 }

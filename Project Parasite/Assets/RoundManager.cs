@@ -4,23 +4,33 @@ using UnityEngine;
 
 public class RoundManager : MonoBehaviour {
 
+	PlayerObject[] connectedPlayers;
+
 	void Start () {
+		// Cache Player Objects
+		// TODO: uncache on leave
+		connectedPlayers = FindObjectsOfType<PlayerObject>();
 		SelectParasite();
 	}
 
 	void SelectParasite() {
-		// TODO: cache playercharacters on creation
-		// TODO: uncache on leave
-		PlayerCharacter[] playerCharacters = FindObjectsOfType<PlayerCharacter>();
-		int n = playerCharacters.Length;
+		int n = connectedPlayers.Length;
 		int indexOfParasite = Random.Range(0, n);
 		for (int i = 0; i < n; i++) {
+			// TODO: Replace strings with constants
 			if (i == indexOfParasite) {
-				playerCharacters[i].RpcUpdatePlayerType("PARASITE");
+				connectedPlayers[i].CmdSpawnPlayerCharacter("PARASITE");
 			} else { // Player is a hunter
-				playerCharacters[i].RpcUpdatePlayerType("HUNTER");
+				connectedPlayers[i].CmdSpawnPlayerCharacter("HUNTER");
 			}
 		}
+	}
+
+	public void EndRound() {
+		foreach (PlayerObject player in connectedPlayers) {
+			player.DestroyCharacter();
+		}
+		transform.GetComponentInChildren<NpcManager>().DespawnNPCs();
 	}
 
 }

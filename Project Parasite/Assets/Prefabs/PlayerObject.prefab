@@ -84,7 +84,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 793f9fd0b3f34e94a859c7d3e4d611a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerCharacterPrefab: {fileID: 1279280894486818, guid: 84aaca7e9375d394bac673f3d2c785e6,
+  ParasitePrefab: {fileID: 1744548462298568, guid: 8c3e18920cf16344f9ab25cbd87907fc,
+    type: 2}
+  HunterPrefab: {fileID: 1404862278284056, guid: ffa472e8f9da3c84f800cbd41f67e177,
     type: 2}
   RoundManagerPrefab: {fileID: 1463329413419142, guid: 64e476012ce7af140b598b86d5a34da9,
     type: 2}
