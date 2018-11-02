@@ -21,7 +21,8 @@ public class Parasite : PlayerCharacter {
 			// TODO: restrict to layer mask
 			Collider2D npc = Physics2D.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition));
 			if (npc != null) {
-				CmdDestroyNpc(npc.transform.parent.GetComponent<NetworkIdentity>().netId);
+				CmdInfectNpc(npc.transform.parent.GetComponent<NetworkIdentity>().netId);
+				CmdDestroyParasite();
 			}
 		}
 
@@ -39,7 +40,12 @@ public class Parasite : PlayerCharacter {
 	// COMMANDS
 
 	[Command]
-	void CmdDestroyNpc(NetworkInstanceId npc) {
-		FindObjectOfType<NpcManager>().DespawnNpc(npc);
+	void CmdDestroyParasite() {
+		NetworkServer.Destroy(gameObject);
+	}
+
+	[Command]
+	void CmdInfectNpc(NetworkInstanceId npc) {
+		FindObjectOfType<NpcManager>().InfectNpc(npc);
 	}
 }

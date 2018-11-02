@@ -35,12 +35,15 @@ public class NpcManager : NetworkBehaviour {
 	}
 
 	public void DespawnNpc(NetworkInstanceId npcNetId) {
-		Debug.Log(NpcList.Count);
 		NonPlayerCharacter npc = NpcList.Find((value) => {return value.netId == npcNetId;});
 		int index = NpcList.IndexOf(npc);
-		Debug.Log("INDEX: " + index);
 		NpcList.RemoveAt(index);
 		NetworkServer.Destroy(npc.gameObject);
+	}
+
+	public void InfectNpc(NetworkInstanceId npcNetId) {
+		NonPlayerCharacter npc = NpcList.Find((value) => {return value.netId == npcNetId;});
+		npc.RpcSetColour(Color.magenta);
 	}
 
 	void SpawnNPCs() {

@@ -30,7 +30,7 @@ public class NonPlayerCharacter : PlayerCharacter {
     }
 
 	[ClientRpc]
-	public void RpcSetColour() {
-		GetComponentInChildren<SpriteRenderer>().color = Color.yellow;
+	public void RpcSetColour(Color newColour) {
+		GetComponentInChildren<SpriteRenderer>().color = newColour;
 	}
 }
