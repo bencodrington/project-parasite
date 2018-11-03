@@ -65,20 +65,10 @@ public abstract class PlayerCharacter : NetworkBehaviour {
 	}
 
 	[ClientRpc]
-	public void RpcUpdatePlayerType(string playerType) {
-		// TODO: replace strings and colours with constants
-		// Color newColour;
-		// switch (playerType) {
-		// 	// Only set colour to red if this character is the parasite & on the parasite player's client
-		// 	case "PARASITE": 	newColour = hasAuthority ? Color.red : Color.yellow; break;
-		// 	case "HUNTER": 		newColour = Color.green; break;
-		// 	case "NEUTRAL":		newColour = Color.yellow; break;
-		// 	default: 			newColour = Color.white; break;
-		// }
+	public void RpcSetCameraFollow() {
+		if (hasAuthority) {
+			FindObjectOfType<CameraFollow>().SetTarget(transform);
+		}
 	}
 
-	void OnServerPosChanged(Vector3 newPosition) {
-		serverPosition = newPosition;
-		Debug.Log("SPC: " + newPosition);
-	}
 }

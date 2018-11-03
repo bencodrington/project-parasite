@@ -60,6 +60,8 @@ public class PlayerObject : NetworkBehaviour {
 		// Initialize each player's character on their own client
 		playerCharacter.RpcGeneratePhysicsEntity();
 		playerCharacter.playerObject = this;
+		//  Set playerCharacter as new target of camera
+		playerCharacter.RpcSetCameraFollow();
 	}
 
 	[Command]
