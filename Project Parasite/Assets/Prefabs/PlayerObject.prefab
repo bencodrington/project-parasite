@@ -90,3 +90,5 @@ MonoBehaviour:
     type: 2}
   RoundManagerPrefab: {fileID: 1463329413419142, guid: 64e476012ce7af140b598b86d5a34da9,
     type: 2}
+  HealthPrefab: {fileID: 1893212046803936, guid: 97a745d3950348a4781f8b1d182954d5,
+    type: 2}

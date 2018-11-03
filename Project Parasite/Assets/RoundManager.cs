@@ -16,19 +16,22 @@ public class RoundManager : MonoBehaviour {
 	void SelectParasite() {
 		int n = connectedPlayers.Length;
 		int indexOfParasite = Random.Range(0, n);
+		string characterType;
 		for (int i = 0; i < n; i++) {
 			// TODO: Replace strings with constants
 			if (i == indexOfParasite) {
-				connectedPlayers[i].CmdSpawnPlayerCharacter("PARASITE", new Vector3());
+				characterType = "PARASITE";
 			} else { // Player is a hunter
-				connectedPlayers[i].CmdSpawnPlayerCharacter("HUNTER", new Vector3());
+				characterType = "HUNTER";
 			}
+			connectedPlayers[i].RpcSetCharacterType(characterType);
+			connectedPlayers[i].CmdSpawnPlayerCharacter(characterType, new Vector3());
 		}
 	}
 
 	public void EndRound() {
 		foreach (PlayerObject player in connectedPlayers) {
-			player.DestroyCharacter();
+			player.CmdEndRound();
 		}
 		transform.GetComponentInChildren<NpcManager>().DespawnNPCs();
 	}

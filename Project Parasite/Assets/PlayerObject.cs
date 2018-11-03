@@ -2,14 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class PlayerObject : NetworkBehaviour {
 
 	public GameObject ParasitePrefab;
 	public GameObject HunterPrefab;
 	public GameObject RoundManagerPrefab;
+	public GameObject HealthPrefab;
 
 	private GameObject playerCharacterGameObject;
+	private GameObject healthObject;
+
+	private string characterType;
+	private int health;
 
 	void Start () {
 		if (isLocalPlayer == false) {
@@ -29,13 +35,8 @@ public class PlayerObject : NetworkBehaviour {
 		}
 	}
 
-	public void DestroyCharacter() {
-		if (hasAuthority && playerCharacterGameObject != null) {
-			NetworkServer.Destroy(playerCharacterGameObject);
-		}
-	}
-
 	// Commands
+
 	[Command]
 	public void CmdSpawnPlayerCharacter(string characterType, Vector3 atPosition) {
 		GameObject playerCharacterPrefab = characterType == "PARASITE" ? ParasitePrefab : HunterPrefab;
@@ -58,5 +59,40 @@ public class PlayerObject : NetworkBehaviour {
 		}
 		// Create new RoundManager game object on the server
 		Instantiate(RoundManagerPrefab);
+	}
+
+	[Command]
+	public void CmdDestroyCharacter() {
+		if (hasAuthority && playerCharacterGameObject != null) {
+			NetworkServer.Destroy(playerCharacterGameObject);
+		}
+	}
+
+	[Command]
+	public void CmdEndRound() {
+		CmdDestroyCharacter();
+		RpcRemoveHud();
+	}
+
+	// Client RPCs
+
+	[ClientRpc]
+	public void RpcSetCharacterType(string newCharacterType) {
+		characterType = newCharacterType;
+		if (isLocalPlayer && newCharacterType == "PARASITE") {
+			// Generate HUD
+			health = 100;
+			healthObject = Instantiate(HealthPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
+			// TODO: replace Vector2.zero with a padding constant
+			healthObject.GetComponentInChildren<RectTransform>().anchoredPosition = Vector2.zero;
+			healthObject.GetComponentInChildren<Text>().text = health.ToString();
+		}
+	}
+
+	[ClientRpc]
+	void RpcRemoveHud() {
+		if (isLocalPlayer && healthObject != null) {
+			Destroy(healthObject);
+		}
 	}
 }
