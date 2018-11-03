@@ -75,4 +75,15 @@ public class NonPlayerCharacter : PlayerCharacter {
 			GetComponentInChildren<SpriteRenderer>().color = Color.magenta;
 		}
 	}
+
+	[ClientRpc]
+	public void RpcVerify() {
+		if (isInfected) {
+			// Turn Magenta
+			GetComponentInChildren<SpriteRenderer>().color = Color.magenta;
+		} else {
+			// Turn Green
+			GetComponentInChildren<SpriteRenderer>().color = Color.cyan;
+		}
+	}
 }
