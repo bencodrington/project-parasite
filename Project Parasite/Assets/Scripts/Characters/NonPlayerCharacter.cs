@@ -73,6 +73,9 @@ public class NonPlayerCharacter : PlayerCharacter {
 		if (hasAuthority) {
 			// Only update sprite if on the Parasite player's client
 			GetComponentInChildren<SpriteRenderer>().color = Color.magenta;
+		} else {
+			// On all other clients, un-verify
+			GetComponentInChildren<SpriteRenderer>().color = Color.white;
 		}
 	}
 
