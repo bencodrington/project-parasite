@@ -2,6 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ClientInformation : MonoBehaviour {
+public class ClientInformation {
 	public string clientType;
 }
