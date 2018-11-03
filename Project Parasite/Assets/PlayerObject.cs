@@ -41,10 +41,10 @@ public class PlayerObject : NetworkBehaviour {
 		SpawnPlayerCharacter(characterType);
 	}
 
-	public void SpawnPlayerCharacter(string characterType) {
+	public void SpawnPlayerCharacter(string characterType, Vector3 atPosition = new Vector3()) {
 		GameObject playerCharacterPrefab = characterType == "PARASITE" ? ParasitePrefab : HunterPrefab;
 		// Create PlayerCharacter game object on the server
-		playerCharacterGameObject = Instantiate(playerCharacterPrefab);
+		playerCharacterGameObject = Instantiate(playerCharacterPrefab, atPosition, Quaternion.identity);
 		// Propogate to all clients
 		NetworkServer.SpawnWithClientAuthority(playerCharacterGameObject, connectionToClient);
 		// Get PlayerCharacter script
