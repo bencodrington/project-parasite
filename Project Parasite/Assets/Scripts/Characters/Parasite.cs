@@ -62,6 +62,7 @@ public class Parasite : PlayerCharacter {
 		// TODO: delete physics entity off the server for performance?
 		// Set isInfected to true/update sprite on new authority's client
 		npc.RpcInfect();
+		npc.RpcSetCameraFollow();
 		// TODO: will likely need to remove the npc from the npcManager's list to have a proper count of uninfected NPCs
 	}
 }
