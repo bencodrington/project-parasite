@@ -10,7 +10,7 @@ public class NpcManager : NetworkBehaviour {
 
 	// How many NPCs are being spawned each round
 	const int MIN_NPC_COUNT = 1;
-	const int MAX_NPC_COUNT = 3;
+	const int MAX_NPC_COUNT = 8;
 
 	// Each NPC will be spawned at position
 	// 	([-SPAWN_RANGE_X...SPAWN_RANGE_X], [-SPAWN_RANGE_Y...SPAWN_RANGE_Y])
@@ -39,11 +39,6 @@ public class NpcManager : NetworkBehaviour {
 		int index = NpcList.IndexOf(npc);
 		NpcList.RemoveAt(index);
 		NetworkServer.Destroy(npc.gameObject);
-	}
-
-	public void InfectNpc(NetworkInstanceId npcNetId) {
-		NonPlayerCharacter npc = NpcList.Find((value) => {return value.netId == npcNetId;});
-		npc.RpcSetColour(Color.magenta);
 	}
 
 	void SpawnNPCs() {

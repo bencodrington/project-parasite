@@ -45,7 +45,23 @@ public class Parasite : PlayerCharacter {
 	}
 
 	[Command]
-	void CmdInfectNpc(NetworkInstanceId npc) {
-		FindObjectOfType<NpcManager>().InfectNpc(npc);
+	void CmdInfectNpc(NetworkInstanceId npcNetId) {
+		// Find NPC GameObject with matching NetId
+		GameObject npcGameObject = NetworkServer.FindLocalObject(npcNetId);
+		// Get NonPlayerCharacter script and NetworkIdentity component off of it
+		NonPlayerCharacter npc = npcGameObject.GetComponentInChildren<NonPlayerCharacter>();
+		NetworkIdentity networkIdentity = npcGameObject.GetComponentInChildren<NetworkIdentity>();
+		// Let it know it will be player controlled from now on
+		networkIdentity.localPlayerAuthority = true;
+		npc.RpcSetLocalPlayerAuthority(true);
+		// Store playerObject for eventual transfer back to parasite
+		npc.playerObject = playerObject;
+		// Give Parasite player authority over the NPC
+		networkIdentity.AssignClientAuthority(playerObject.connectionToClient);
+		npc.RpcGeneratePhysicsEntity();
+		// TODO: delete physics entity off the server for performance?
+		// Set isInfected to true/update sprite on new authority's client
+		npc.RpcInfect();
+		// TODO: will likely need to remove the npc from the npcManager's list to have a proper count of uninfected NPCs
 	}
 }

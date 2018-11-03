@@ -9,7 +9,7 @@ public class PlayerObject : NetworkBehaviour {
 	public GameObject HunterPrefab;
 	public GameObject RoundManagerPrefab;
 
-	private GameObject playerCharacter;
+	private GameObject playerCharacterGameObject;
 
 	void Start () {
 		if (isLocalPlayer == false) {
@@ -30,21 +30,28 @@ public class PlayerObject : NetworkBehaviour {
 	}
 
 	public void DestroyCharacter() {
-		if (hasAuthority) {
-			NetworkServer.Destroy(playerCharacter);
+		if (hasAuthority && playerCharacterGameObject != null) {
+			NetworkServer.Destroy(playerCharacterGameObject);
 		}
 	}
 
 	// Commands
 	[Command]
 	public void CmdSpawnPlayerCharacter(string characterType) {
+		SpawnPlayerCharacter(characterType);
+	}
+
+	public void SpawnPlayerCharacter(string characterType) {
 		GameObject playerCharacterPrefab = characterType == "PARASITE" ? ParasitePrefab : HunterPrefab;
 		// Create PlayerCharacter game object on the server
-		playerCharacter = Instantiate(playerCharacterPrefab);
+		playerCharacterGameObject = Instantiate(playerCharacterPrefab);
 		// Propogate to all clients
-		NetworkServer.SpawnWithClientAuthority(playerCharacter, connectionToClient);
+		NetworkServer.SpawnWithClientAuthority(playerCharacterGameObject, connectionToClient);
+		// Get PlayerCharacter script
+		PlayerCharacter playerCharacter = playerCharacterGameObject.GetComponentInChildren<PlayerCharacter>();
 		// Initialize each player's character on their own client
-		playerCharacter.GetComponentInChildren<PlayerCharacter>().RpcGeneratePhysicsEntity();
+		playerCharacter.RpcGeneratePhysicsEntity();
+		playerCharacter.playerObject = this;
 	}
 
 	[Command]

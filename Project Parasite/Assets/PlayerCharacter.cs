@@ -11,9 +11,11 @@ public abstract class PlayerCharacter : NetworkBehaviour {
 	protected float movementSpeed;
 	protected string type = "undefined type";
 
-	[SyncVar]
 	protected Vector3 serverPosition;
-	Vector3 serverPositionSmoothVelocity;
+	protected Vector3 serverPositionSmoothVelocity;
+
+	// Only initialized for PlayerCharacter objects on the server
+	public PlayerObject playerObject;
 
 	
 	public virtual void Update () {
@@ -38,12 +40,19 @@ public abstract class PlayerCharacter : NetworkBehaviour {
 	// COMMANDS
 
 	[Command]
-	void CmdUpdatePosition(Vector3 newPosition) {
+	protected void CmdUpdatePosition(Vector3 newPosition) {
 		// TODO: verify new position is legal
 		serverPosition = newPosition;
+		RpcUpdateServerPosition(serverPosition);
+		// TODO: only change serverPosition if newPosition is different, to reduce unnecessary SyncVar updates
 	}
 
 	// CLIENTRPC
+
+	[ClientRpc]
+	void RpcUpdateServerPosition(Vector3 newPosition) {
+		serverPosition = newPosition;
+	}
 
 	[ClientRpc]
 	public void RpcGeneratePhysicsEntity() {
@@ -66,5 +75,10 @@ public abstract class PlayerCharacter : NetworkBehaviour {
 		// 	case "NEUTRAL":		newColour = Color.yellow; break;
 		// 	default: 			newColour = Color.white; break;
 		// }
+	}
+
+	void OnServerPosChanged(Vector3 newPosition) {
+		serverPosition = newPosition;
+		Debug.Log("SPC: " + newPosition);
 	}
 }
