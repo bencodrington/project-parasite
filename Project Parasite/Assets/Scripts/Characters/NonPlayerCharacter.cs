@@ -81,6 +81,8 @@ public class NonPlayerCharacter : PlayerCharacter {
 
 	[ClientRpc]
 	public void RpcVerify() {
+		bool isParasitePlayer = FindObjectOfType<ClientInformation>().clientType == "PARASITE";
+		if (isParasitePlayer) { return;}
 		if (isInfected) {
 			// Turn Magenta
 			GetComponentInChildren<SpriteRenderer>().color = Color.magenta;

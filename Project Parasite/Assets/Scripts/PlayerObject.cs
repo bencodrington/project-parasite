@@ -99,7 +99,9 @@ public class PlayerObject : NetworkBehaviour {
 	[ClientRpc]
 	public void RpcSetCharacterType(string newCharacterType) {
 		characterType = newCharacterType;
-		if (isLocalPlayer && characterType == "PARASITE") {
+		if (!isLocalPlayer) { return; }
+		FindObjectOfType<ClientInformation>().clientType = newCharacterType;
+		if (characterType == "PARASITE") {
 			// Generate HUD
 			healthObject = Instantiate(HealthPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
 			// TODO: replace Vector2.zero with a padding constant

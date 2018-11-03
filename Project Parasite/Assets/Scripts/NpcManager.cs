@@ -10,12 +10,12 @@ public class NpcManager : NetworkBehaviour {
 
 	// How many NPCs are being spawned each round
 	const int MIN_NPC_COUNT = 1;
-	const int MAX_NPC_COUNT = 8;
+	const int MAX_NPC_COUNT = 5;
 
 	// Each NPC will be spawned at position
 	// 	([-SPAWN_RANGE_X...SPAWN_RANGE_X], [-SPAWN_RANGE_Y...SPAWN_RANGE_Y])
-	const int SPAWN_RANGE_X = 6;
-	const int SPAWN_RANGE_Y = 2;
+	const float SPAWN_RANGE_X = 6;
+	const float SPAWN_RANGE_Y = 2;
 
 	void Start () {
 		NpcList = new List<NonPlayerCharacter>();
