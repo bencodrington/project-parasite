@@ -25,7 +25,9 @@ public class PhysicsEntity {
 		// Check for collisions at new location
 		// If pixel below entity overlaps an obstacle
 		Vector2 newPosition = new Vector2(transform.position.x + velocityX, transform.position.y + velocityY);
-		Collider2D obstacle = Physics2D.OverlapPoint(newPosition + new Vector2(0, -height));
+		// Create layer mask by bitshifting 1 by the int that represents the obstacles layer
+		int layerMask = 1 << LayerMask.NameToLayer("Obstacles");
+		Collider2D obstacle = Physics2D.OverlapPoint(newPosition + new Vector2(0, -height), layerMask);
 		if (obstacle != null) {
 			// Entity is touching the ground
 			_isOnGround = true;

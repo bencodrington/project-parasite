@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4841046268019910}
   - component: {fileID: 212328357071181276}
   - component: {fileID: 61869279908636176}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -38,7 +38,7 @@ GameObject:
   - component: {fileID: 4918384227734420}
   - component: {fileID: 114459826924302886}
   - component: {fileID: 114852961006052036}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Parasite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
