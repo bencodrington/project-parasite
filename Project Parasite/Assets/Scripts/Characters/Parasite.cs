@@ -33,6 +33,7 @@ public class Parasite : PlayerCharacter {
 	public override void ImportStats() {
 		// TODO: get stats like this from imported files
 		height = .25f;
+		width = .5f;
 		movementSpeed = 15f;
 		type = "PARASITE";
 	}

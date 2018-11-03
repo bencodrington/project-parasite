@@ -28,6 +28,7 @@ public class NonPlayerCharacter : PlayerCharacter {
     public override void ImportStats()
     {
 		height = .5f;
+		width = .5f;
 		movementSpeed = 8f;
 		type = "NPC";
 		isInfected = false;

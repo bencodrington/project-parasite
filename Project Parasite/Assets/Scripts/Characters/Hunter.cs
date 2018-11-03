@@ -37,6 +37,7 @@ public class Hunter : PlayerCharacter {
 	
 	public override void ImportStats() {
 		height = .5f;
+		width = .5f;
 		movementSpeed = 10f;
 		type = "HUNTER";
 	}

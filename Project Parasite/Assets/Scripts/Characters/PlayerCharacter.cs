@@ -7,6 +7,7 @@ public abstract class PlayerCharacter : NetworkBehaviour {
 
 	protected SpriteRenderer spriteRenderer;
 	protected float height;
+	protected float width;
 	protected PhysicsEntity physicsEntity;
 	protected float movementSpeed;
 	protected string type = "undefined type";
@@ -60,7 +61,7 @@ public abstract class PlayerCharacter : NetworkBehaviour {
 			// TODO: Consider importing stats for all characters on each client, if access to type is required
 			ImportStats();
 			// Add physics entity
-			physicsEntity = new PhysicsEntity(transform, height);
+			physicsEntity = new PhysicsEntity(transform, height, width);
 		}
 	}
 
