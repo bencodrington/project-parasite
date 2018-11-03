@@ -37,11 +37,7 @@ public class PlayerObject : NetworkBehaviour {
 
 	// Commands
 	[Command]
-	public void CmdSpawnPlayerCharacter(string characterType) {
-		SpawnPlayerCharacter(characterType);
-	}
-
-	public void SpawnPlayerCharacter(string characterType, Vector3 atPosition = new Vector3()) {
+	public void CmdSpawnPlayerCharacter(string characterType, Vector3 atPosition) {
 		GameObject playerCharacterPrefab = characterType == "PARASITE" ? ParasitePrefab : HunterPrefab;
 		// Create PlayerCharacter game object on the server
 		playerCharacterGameObject = Instantiate(playerCharacterPrefab, atPosition, Quaternion.identity);

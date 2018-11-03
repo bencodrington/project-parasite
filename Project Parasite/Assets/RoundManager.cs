@@ -19,9 +19,9 @@ public class RoundManager : MonoBehaviour {
 		for (int i = 0; i < n; i++) {
 			// TODO: Replace strings with constants
 			if (i == indexOfParasite) {
-				connectedPlayers[i].CmdSpawnPlayerCharacter("PARASITE");
+				connectedPlayers[i].CmdSpawnPlayerCharacter("PARASITE", new Vector3());
 			} else { // Player is a hunter
-				connectedPlayers[i].CmdSpawnPlayerCharacter("HUNTER");
+				connectedPlayers[i].CmdSpawnPlayerCharacter("HUNTER", new Vector3());
 			}
 		}
 	}
