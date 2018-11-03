@@ -15,7 +15,15 @@ public class PlayerObject : NetworkBehaviour {
 	private GameObject healthObject;
 
 	private string characterType;
-	private int health;
+	private int _health;
+	
+	private int Health {
+		get { return _health; }
+		set {
+			_health = value;
+			healthObject.GetComponentInChildren<Text>().text = value.ToString();
+		}
+	}
 
 	void Start () {
 		if (isLocalPlayer == false) {
@@ -74,6 +82,13 @@ public class PlayerObject : NetworkBehaviour {
 		RpcRemoveHud();
 	}
 
+	[ClientRpc]
+	public void RpcTakeDamage(int damage) {
+		if (isLocalPlayer) {
+			Health -= damage;
+		}
+	}
+
 	// Client RPCs
 
 	[ClientRpc]
@@ -81,11 +96,10 @@ public class PlayerObject : NetworkBehaviour {
 		characterType = newCharacterType;
 		if (isLocalPlayer && characterType == "PARASITE") {
 			// Generate HUD
-			health = 100;
 			healthObject = Instantiate(HealthPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
 			// TODO: replace Vector2.zero with a padding constant
 			healthObject.GetComponentInChildren<RectTransform>().anchoredPosition = Vector2.zero;
-			healthObject.GetComponentInChildren<Text>().text = health.ToString();
+			Health = 100;
 		}
 	}
 

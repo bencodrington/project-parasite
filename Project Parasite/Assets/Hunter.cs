@@ -14,9 +14,9 @@ public class Hunter : PlayerCharacter {
 		// Attack
 		if (Input.GetMouseButtonDown(0)) {
 			// TODO: restrict to layer mask
-			Collider2D npc = Physics2D.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-			if (npc != null) {
-				CmdAttackNpc(npc.transform.parent.GetComponent<NetworkIdentity>().netId);
+			Collider2D target = Physics2D.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+			if (target != null) {
+				CmdAttackTarget(target.transform.parent.GetComponent<NetworkIdentity>().netId);
 			}
 		}
 	}
@@ -30,12 +30,16 @@ public class Hunter : PlayerCharacter {
 	// Commands
 
 	[Command]
-	void CmdAttackNpc(NetworkInstanceId npcNetId) {
-		GameObject npcGameObject = NetworkServer.FindLocalObject(npcNetId);
-		NonPlayerCharacter npc = npcGameObject.GetComponentInChildren<NonPlayerCharacter>();
-		if (!npc.isInfected) {
+	void CmdAttackTarget(NetworkInstanceId targetNetId) {
+		GameObject targetGameObject = NetworkServer.FindLocalObject(targetNetId);
+		PlayerCharacter npc = targetGameObject.GetComponentInChildren<PlayerCharacter>();
+		bool isNpc = npc is NonPlayerCharacter;
+		if (!isNpc || (isNpc && ((NonPlayerCharacter)npc).isInfected)) {
+			// Damage parasite
+			npc.playerObject.RpcTakeDamage(25);
+		} else if (isNpc) {
 			// Instant kill npcs
-			FindObjectOfType<NpcManager>().DespawnNpc(npcNetId);
+			FindObjectOfType<NpcManager>().DespawnNpc(targetNetId);
 		}
 	}
 }
