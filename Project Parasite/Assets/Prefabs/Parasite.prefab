@@ -89,7 +89,7 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
+    newSize: {x: 0.16, y: 0.16}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -140,7 +140,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c27cfb7e0b433c4798a106cfff28002, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerObject: {fileID: 0}
+  playerObject: {fileID: 114743023985419180, guid: c3d12b587d0975b4787bf47335c8913f,
+    type: 2}
 --- !u!212 &212328357071181276
 SpriteRenderer:
   m_ObjectHideFlags: 1

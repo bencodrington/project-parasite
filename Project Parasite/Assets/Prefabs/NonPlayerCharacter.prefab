@@ -108,7 +108,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3552f41dacfbe68438410ded51b606d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerObject: {fileID: 0}
+  playerObject: {fileID: 114743023985419180, guid: c3d12b587d0975b4787bf47335c8913f,
+    type: 2}
+  isInfected: 0
 --- !u!114 &114816632723410600
 MonoBehaviour:
   m_ObjectHideFlags: 1
