@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 // TODO: rename playercharacter?
 public class NonPlayerCharacter : PlayerCharacter {
 
-	private bool isInfected;
+	public bool isInfected;
 
 	public override void Update() {
 		if (isInfected && hasAuthority) {

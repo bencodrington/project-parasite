@@ -79,7 +79,7 @@ public class PlayerObject : NetworkBehaviour {
 	[ClientRpc]
 	public void RpcSetCharacterType(string newCharacterType) {
 		characterType = newCharacterType;
-		if (isLocalPlayer && newCharacterType == "PARASITE") {
+		if (isLocalPlayer && characterType == "PARASITE") {
 			// Generate HUD
 			health = 100;
 			healthObject = Instantiate(HealthPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
