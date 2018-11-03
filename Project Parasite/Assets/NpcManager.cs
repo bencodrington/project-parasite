@@ -39,6 +39,10 @@ public class NpcManager : NetworkBehaviour {
 		int index = NpcList.IndexOf(npc);
 		NpcList.RemoveAt(index);
 		NetworkServer.Destroy(npc.gameObject);
+		if (NpcList.Count == 0) {
+			// Game Over
+			FindObjectOfType<PlayerObject>().CmdStartGame();
+		}
 	}
 
 	void SpawnNPCs() {

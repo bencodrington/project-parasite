@@ -63,7 +63,7 @@ public class PlayerObject : NetworkBehaviour {
 	}
 
 	[Command]
-	void CmdStartGame() {
+	public void CmdStartGame() {
 		foreach (RoundManager rm in FindObjectsOfType<RoundManager>()) {
 			rm.EndRound();
 			Destroy(rm.gameObject);
