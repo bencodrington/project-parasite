@@ -22,6 +22,9 @@ public class PlayerObject : NetworkBehaviour {
 		set {
 			_health = value;
 			healthObject.GetComponentInChildren<Text>().text = value.ToString();
+			if (value <= 0) {
+				CmdStartGame();
+			}
 		}
 	}
 
