@@ -430,6 +430,48 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
+--- !u!1001 &1164335798
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4890277845703574, guid: 7b986d6411917d842a2f060dad0a914a, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: -0.06098938
+      objectReference: {fileID: 0}
+    - target: {fileID: 4890277845703574, guid: 7b986d6411917d842a2f060dad0a914a, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0.5405884
+      objectReference: {fileID: 0}
+    - target: {fileID: 4890277845703574, guid: 7b986d6411917d842a2f060dad0a914a, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4890277845703574, guid: 7b986d6411917d842a2f060dad0a914a, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4890277845703574, guid: 7b986d6411917d842a2f060dad0a914a, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4890277845703574, guid: 7b986d6411917d842a2f060dad0a914a, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4890277845703574, guid: 7b986d6411917d842a2f060dad0a914a, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4890277845703574, guid: 7b986d6411917d842a2f060dad0a914a, type: 2}
+      propertyPath: m_RootOrder
+      value: 7
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 7b986d6411917d842a2f060dad0a914a, type: 2}
+  m_IsPrefabParent: 0
 --- !u!1 &1331754791
 GameObject:
   m_ObjectHideFlags: 0
@@ -457,7 +499,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4524295e7dad8e644b6c5e0d4336c26e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clientType: 
+  clientType: 0
 --- !u!4 &1331754793
 Transform:
   m_ObjectHideFlags: 0
