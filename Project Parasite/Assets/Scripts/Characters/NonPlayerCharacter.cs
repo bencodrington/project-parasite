@@ -15,6 +15,7 @@ public class NonPlayerCharacter : PlayerCharacter {
 	private bool hasTarget = false;
 	private float maxTargetDistance = 5f;
 	private float minTargetDistance = 2f;
+	private const float PARASITE_LAUNCH_VELOCITY = 0.75f;
 
 	// TODO: update to use fixedupdate for physics
 	public override void Update() {
@@ -109,8 +110,7 @@ public class NonPlayerCharacter : PlayerCharacter {
 	[Command]
 	void CmdDespawnSelf() {
 		// Spawn new Parasite Object
-		// TODO: replace with var
-		playerObject.CmdSpawnPlayerCharacter("PARASITE", transform.position, new Vector2(0, .75f));
+		playerObject.CmdSpawnPlayerCharacter("PARASITE", transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY));
 		// Despawn this NPC object
 		FindObjectOfType<NpcManager>().DespawnNpc(netId);
 	}
