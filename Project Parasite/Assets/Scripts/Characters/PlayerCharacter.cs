@@ -13,7 +13,7 @@ public abstract class PlayerCharacter : NetworkBehaviour {
 	protected string type = "undefined type";
 
 	protected Vector3 serverPosition;
-	protected Vector3 serverPositionSmoothVelocity;
+	// protected Vector3 serverPositionSmoothVelocity;
 
 	// Only initialized for PlayerCharacter objects on the server
 	public PlayerObject playerObject;
@@ -25,7 +25,7 @@ public abstract class PlayerCharacter : NetworkBehaviour {
 			HandleInput();
 		} else {
 			// Verify current position is up to date with server position
-			transform.position = Vector3.SmoothDamp(transform.position, serverPosition, ref serverPositionSmoothVelocity, 0.1f);
+			transform.position = Vector3.Lerp(transform.position, serverPosition, 0.4f);
 		}
 	}
 

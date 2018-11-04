@@ -18,7 +18,7 @@ public class NonPlayerCharacter : PlayerCharacter {
 		} else {
 			// This is a cloned representation of the authoritative NPC
 			// 	So just verify current position is up to date with server position
-			transform.position = Vector3.SmoothDamp(transform.position, serverPosition, ref serverPositionSmoothVelocity, 0.1f);
+			transform.position = Vector3.Lerp(transform.position, serverPosition, 0.8f);
 		}
 	}
 
