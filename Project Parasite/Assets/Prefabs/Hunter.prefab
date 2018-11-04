@@ -116,6 +116,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerObject: {fileID: 114743023985419180, guid: c3d12b587d0975b4787bf47335c8913f,
     type: 2}
+  stats: {fileID: 11400000, guid: 17a6e983b5d887a43b32bc85976f87f7, type: 2}
 --- !u!212 &212268207162185018
 SpriteRenderer:
   m_ObjectHideFlags: 1

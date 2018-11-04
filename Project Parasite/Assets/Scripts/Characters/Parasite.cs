@@ -13,9 +13,9 @@ public class Parasite : Character {
 		bool right = Input.GetKey(KeyCode.D);
 		bool left = Input.GetKey(KeyCode.A);
 		if (right && !left) {
-			physicsEntity.velocityX = movementSpeed;
+			physicsEntity.velocityX = stats.movementSpeed;
 		} else if (left && !right) {
-			physicsEntity.velocityX = -movementSpeed;
+			physicsEntity.velocityX = -stats.movementSpeed;
 		} else {
 			physicsEntity.velocityX = 0;
 		}
@@ -33,13 +33,6 @@ public class Parasite : Character {
 				CmdDestroyParasite();
 			}
 		}
-	}
-
-	public override void ImportStats() {
-		// TODO: get stats like this from imported files
-		height = .25f;
-		width = .5f;
-		movementSpeed = .2f;
 	}
 
 	// COMMANDS

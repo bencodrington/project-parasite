@@ -110,6 +110,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerObject: {fileID: 114743023985419180, guid: c3d12b587d0975b4787bf47335c8913f,
     type: 2}
+  stats: {fileID: 11400000, guid: a5083b2a4301a244982cb95884829ad1, type: 2}
   isInfected: 0
 --- !u!114 &114816632723410600
 MonoBehaviour:

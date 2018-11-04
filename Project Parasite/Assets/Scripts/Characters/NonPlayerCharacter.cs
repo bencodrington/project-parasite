@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 
 public class NonPlayerCharacter : Character {
 
-	public bool isInfected;
+	public bool isInfected = false;
 
 	private const float PARASITE_LAUNCH_VELOCITY = 0.75f;
 
@@ -42,14 +42,6 @@ public class NonPlayerCharacter : Character {
 		}
 	}
 
-    public override void ImportStats()
-    {
-		height = .5f;
-		width = .5f;
-		movementSpeed = .06f;
-		isInfected = false;
-    }
-
     protected override void HandleInput()
     {
 		// This function is only called when this NPC is infected,
@@ -74,9 +66,9 @@ public class NonPlayerCharacter : Character {
 		} else {
 			// Still moving
 			if (target.x >= transform.position.x) {
-				physicsEntity.velocityX = movementSpeed;
+				physicsEntity.velocityX = stats.movementSpeed;
 			} else {
-				physicsEntity.velocityX = -movementSpeed;
+				physicsEntity.velocityX = -stats.movementSpeed;
 			}
 		}
 	}

@@ -26,12 +26,6 @@ public class Hunter : Character {
 			}
 		}
 	}
-	
-	public override void ImportStats() {
-		height = .5f;
-		width = .5f;
-		movementSpeed = .07f;
-	}
 
 	IEnumerator StartScan(NetworkInstanceId npcNetId) {
 		yield return new WaitForSeconds(SCAN_TIME);

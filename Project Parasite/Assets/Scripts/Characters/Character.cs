@@ -6,10 +6,7 @@ using UnityEngine.Networking;
 public abstract class Character : NetworkBehaviour {
 
 	protected SpriteRenderer spriteRenderer;
-	protected float height;
-	protected float width;
 	protected PhysicsEntity physicsEntity;
-	protected float movementSpeed;
 
 	protected Vector3 serverPosition;
 	
@@ -22,7 +19,8 @@ public abstract class Character : NetworkBehaviour {
 	// Only initialized for Character objects on the server
 	public PlayerObject playerObject;
 
-	public abstract void ImportStats();
+	public CharacterStats stats;
+
 	protected abstract void HandleInput();
 
 	void Start() {
@@ -59,9 +57,9 @@ public abstract class Character : NetworkBehaviour {
 		bool right = Input.GetKey(KeyCode.D);
 		bool left = Input.GetKey(KeyCode.A);
 		if (right && !left) {
-			physicsEntity.velocityX = movementSpeed;
+			physicsEntity.velocityX = stats.movementSpeed;
 		} else if (left && !right) {
-			physicsEntity.velocityX = -movementSpeed;
+			physicsEntity.velocityX = -stats.movementSpeed;
 		} else {
 			physicsEntity.velocityX = 0;
 		}
@@ -94,9 +92,8 @@ public abstract class Character : NetworkBehaviour {
 	[ClientRpc]
 	public void RpcGeneratePhysicsEntity(Vector2 velocity) {
 		if (hasAuthority) {
-			ImportStats();
 			// Add physics entity
-			physicsEntity = new PhysicsEntity(transform, height, width);
+			physicsEntity = new PhysicsEntity(transform, stats.height, stats.width);
 			// With starting velocity
 			physicsEntity.AddVelocity(velocity.x, velocity.y);
 		}
