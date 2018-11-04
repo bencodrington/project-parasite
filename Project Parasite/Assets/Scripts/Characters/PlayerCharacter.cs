@@ -51,6 +51,11 @@ public abstract class PlayerCharacter : NetworkBehaviour {
 		// TODO: only change serverPosition if newPosition is different, to reduce unnecessary SyncVar updates
 	}
 
+	[Command]
+	public void CmdDeletePhysicsEntity() {
+		physicsEntity = null;
+	}
+
 	// CLIENTRPC
 
 	[ClientRpc]

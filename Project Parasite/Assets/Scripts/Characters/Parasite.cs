@@ -65,9 +65,10 @@ public class Parasite : PlayerCharacter {
 		npc.playerObject = playerObject;
 		// Give Parasite player authority over the NPC
 		networkIdentity.AssignClientAuthority(playerObject.connectionToClient);
+		// Delete physics entity off the server for performance
+		npc.CmdDeletePhysicsEntity();
 		// TODO: transfer velocity from current physics entity?
 		npc.RpcGeneratePhysicsEntity(Vector2.zero);
-		// TODO: delete physics entity off the server for performance?
 		// Set isInfected to true/update sprite on new authority's client
 		npc.RpcInfect();
 		npc.RpcSetCameraFollow();
