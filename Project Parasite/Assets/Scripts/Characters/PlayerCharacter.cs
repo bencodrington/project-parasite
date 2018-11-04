@@ -23,12 +23,6 @@ public abstract class PlayerCharacter : NetworkBehaviour {
 		// Called once per frame for each PlayerCharacter
 		if (hasAuthority) {
 			HandleInput();
-			// if (physicsEntity != null) {
-			// 	physicsEntity.Update();
-			// }
-			// Update the server's position
-			// TODO: clump these updates to improve network usage?
-			CmdUpdatePosition(transform.position);
 		} else {
 			// Verify current position is up to date with server position
 			transform.position = Vector3.SmoothDamp(transform.position, serverPosition, ref serverPositionSmoothVelocity, 0.1f);
@@ -37,7 +31,10 @@ public abstract class PlayerCharacter : NetworkBehaviour {
 
 	public virtual void FixedUpdate() {
 		if (hasAuthority && physicsEntity != null) {
-				physicsEntity.Update();
+			physicsEntity.Update();
+			// Update the server's position
+			// TODO: clump these updates to improve network usage?
+			CmdUpdatePosition(transform.position);
 		}
 	}
 

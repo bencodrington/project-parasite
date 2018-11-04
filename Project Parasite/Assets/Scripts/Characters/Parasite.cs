@@ -9,7 +9,16 @@ public class Parasite : PlayerCharacter {
 
 	protected override void HandleInput()  {
 		// Movement
-		float movementX = Input.GetAxis("Horizontal") * movementSpeed * Time.deltaTime;
+		// TODO: add possibility for being moved outside of input
+		bool right = Input.GetKey(KeyCode.D);
+		bool left = Input.GetKey(KeyCode.A);
+		if (right && !left) {
+			physicsEntity.velocityX = movementSpeed;
+		} else if (left && !right) {
+			physicsEntity.velocityX = -movementSpeed;
+		} else {
+			physicsEntity.velocityX = 0;
+		}
 
 		// Jump
 		if (Input.GetKeyDown(KeyCode.W) && physicsEntity.IsOnGround()) {
@@ -25,16 +34,13 @@ public class Parasite : PlayerCharacter {
 				CmdDestroyParasite();
 			}
 		}
-
-		// Has authority, so translate immediately
-		transform.Translate(movementX, 0, 0);
 	}
 
 	public override void ImportStats() {
 		// TODO: get stats like this from imported files
 		height = .25f;
 		width = .5f;
-		movementSpeed = 15f;
+		movementSpeed = .2f;
 		type = "PARASITE";
 	}
 

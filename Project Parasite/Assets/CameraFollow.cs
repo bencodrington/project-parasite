@@ -9,7 +9,7 @@ public class CameraFollow : MonoBehaviour {
 	// Raise this for camera to be snappier, lower it to be smoother
 	private const float SMOOTH_TIME = 10;
 
-	void LateUpdate() {
+	void FixedUpdate() {
 		if (target == null) { return; }
 		Vector3 targetPosition = target.position + offset;
 		transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * SMOOTH_TIME);

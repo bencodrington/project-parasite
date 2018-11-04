@@ -10,9 +10,16 @@ public class Hunter : PlayerCharacter {
 
 	protected override void HandleInput()  {
 		// Movement
-		float movementX = Input.GetAxis("Horizontal") * movementSpeed * Time.deltaTime;
-		// Has authority, so translate immediately
-		transform.Translate(movementX, 0, 0);
+		// TODO: add possibility for being moved outside of input and reduce duplication
+		bool right = Input.GetKey(KeyCode.D);
+		bool left = Input.GetKey(KeyCode.A);
+		if (right && !left) {
+			physicsEntity.velocityX = movementSpeed;
+		} else if (left && !right) {
+			physicsEntity.velocityX = -movementSpeed;
+		} else {
+			physicsEntity.velocityX = 0;
+		}
 
 		// TODO: optimize so this doesn't run every input cycle
 		int layerMask = 1 << LayerMask.NameToLayer("Characters");
@@ -38,7 +45,7 @@ public class Hunter : PlayerCharacter {
 	public override void ImportStats() {
 		height = .5f;
 		width = .5f;
-		movementSpeed = 10f;
+		movementSpeed = .07f;
 		type = "HUNTER";
 	}
 

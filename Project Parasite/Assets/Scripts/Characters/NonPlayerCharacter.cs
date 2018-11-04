@@ -13,12 +13,8 @@ public class NonPlayerCharacter : PlayerCharacter {
 		if (isInfected && hasAuthority) {
 			// NPC is infected and this client is the Parasite player's client
 			HandleInput();
-			physicsEntity.Update();
-			CmdUpdatePosition(transform.position);
 		} else if (!isInfected && isServer && physicsEntity != null) {
 			// Not infected, so the server should handle physics and be the authority on the NPC's position
-			physicsEntity.Update();
-			CmdUpdatePosition(transform.position);
 		} else {
 			// This is a cloned representation of the authoritative NPC
 			// 	So just verify current position is up to date with server position
@@ -26,11 +22,18 @@ public class NonPlayerCharacter : PlayerCharacter {
 		}
 	}
 
+	public override void FixedUpdate() {
+		if (isInfected && hasAuthority || (!isInfected && isServer && physicsEntity != null)) {
+			physicsEntity.Update();
+			CmdUpdatePosition(transform.position);
+		}
+	}
+
     public override void ImportStats()
     {
 		height = .5f;
 		width = .5f;
-		movementSpeed = 8f;
+		movementSpeed = .06f;
 		type = "NPC";
 		isInfected = false;
     }
@@ -41,9 +44,16 @@ public class NonPlayerCharacter : PlayerCharacter {
 		// 	and is only called on the Parasite player's client
 
 		// Movement
-		float movementX = Input.GetAxis("Horizontal") * movementSpeed * Time.deltaTime;
-		// Has authority, so translate immediately
-		transform.Translate(movementX, 0, 0);
+		// TODO: add possibility for being moved outside of input and reduce duplication
+		bool right = Input.GetKey(KeyCode.D);
+		bool left = Input.GetKey(KeyCode.A);
+		if (right && !left) {
+			physicsEntity.velocityX = movementSpeed;
+		} else if (left && !right) {
+			physicsEntity.velocityX = -movementSpeed;
+		} else {
+			physicsEntity.velocityX = 0;
+		}
 
 		// Self Destruct
 		if (Input.GetMouseButtonDown(0)) {
