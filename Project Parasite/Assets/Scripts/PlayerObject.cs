@@ -10,9 +10,11 @@ public class PlayerObject : NetworkBehaviour {
 	public GameObject HunterPrefab;
 	public GameObject RoundManagerPrefab;
 	public GameObject HealthPrefab;
+	public GameObject NpcCountPrefab;
 
 	private GameObject playerCharacterGameObject;
 	private GameObject healthObject;
+	private GameObject npcCountObject;
 
 	private string characterType;
 	private int _health;
@@ -27,6 +29,17 @@ public class PlayerObject : NetworkBehaviour {
 			}
 		}
 	}
+
+	private int _remainingNpcCount;
+	
+	private int RemainingNpcCount {
+		get { return _remainingNpcCount; }
+		set {
+			_remainingNpcCount = value;
+			if (npcCountObject != null) {npcCountObject.GetComponentInChildren<Text>().text = value.ToString();};
+		}
+	}
+
 
 	void Start () {
 		if (isLocalPlayer == false) {
@@ -108,12 +121,25 @@ public class PlayerObject : NetworkBehaviour {
 			healthObject.GetComponentInChildren<RectTransform>().anchoredPosition = Vector2.zero;
 			Health = 100;
 		}
+		npcCountObject = Instantiate(NpcCountPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
+		// TODO: replace Vector2.zero with a padding constant
+		npcCountObject.GetComponentInChildren<RectTransform>().anchoredPosition = Vector2.zero;
 	}
 
 	[ClientRpc]
 	void RpcRemoveHud() {
-		if (isLocalPlayer && healthObject != null) {
+		if (!isLocalPlayer) { return; }
+		if (healthObject != null) {
 			Destroy(healthObject);
 		}
+		if (npcCountObject != null) {
+			Destroy(npcCountObject);
+		}
+	}
+
+	[ClientRpc]
+	public void RpcUpdateRemainingNpcCount(int updatedCount) {
+		if (!isLocalPlayer) { return; }
+		RemainingNpcCount = updatedCount;
 	}
 }

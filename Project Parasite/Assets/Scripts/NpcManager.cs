@@ -39,6 +39,10 @@ public class NpcManager : NetworkBehaviour {
 		int index = NpcList.IndexOf(npc);
 		NpcList.RemoveAt(index);
 		NetworkServer.Destroy(npc.gameObject);
+		// TODO: there has to be a more efficient way of updating this
+		foreach (PlayerObject playerObject in FindObjectsOfType<PlayerObject>()) {
+			playerObject.RpcUpdateRemainingNpcCount(NpcList.Count);
+		}
 		if (NpcList.Count == 0) {
 			// Game Over
 			FindObjectOfType<PlayerObject>().CmdStartGame();
@@ -47,6 +51,10 @@ public class NpcManager : NetworkBehaviour {
 
 	void SpawnNPCs() {
 		int npcCount = Random.Range(MIN_NPC_COUNT, MAX_NPC_COUNT + 1);
+		// TODO: there has to be a more efficient way of updating this
+		foreach (PlayerObject playerObject in FindObjectsOfType<PlayerObject>()) {
+			playerObject.RpcUpdateRemainingNpcCount(npcCount);
+		}
 		Vector3 spawnPos;
 		NonPlayerCharacter npc;
 		for (int i = 0; i < npcCount; i++) {

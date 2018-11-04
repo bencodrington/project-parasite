@@ -92,3 +92,5 @@ MonoBehaviour:
     type: 2}
   HealthPrefab: {fileID: 1893212046803936, guid: 97a745d3950348a4781f8b1d182954d5,
     type: 2}
+  NpcCountPrefab: {fileID: 1257916060788230, guid: ca84bca96eea3ae479cd93d97fc24088,
+    type: 2}
