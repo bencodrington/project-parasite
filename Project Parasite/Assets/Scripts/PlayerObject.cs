@@ -75,6 +75,7 @@ public class PlayerObject : NetworkBehaviour {
 		playerCharacter.playerObject = this;
 		//  Set playerCharacter as new target of camera
 		playerCharacter.RpcSetCameraFollow();
+		playerCharacter.RpcSetRenderLayer();
 	}
 
 	[Command]

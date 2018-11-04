@@ -76,4 +76,12 @@ public abstract class PlayerCharacter : NetworkBehaviour {
 		}
 	}
 
+	[ClientRpc]
+	public void RpcSetRenderLayer() {
+		Debug.Log("RPCSETRENDERLAYER, hasAuthority: " + hasAuthority);
+		if (hasAuthority) {
+			GetComponentInChildren<SpriteRenderer>().sortingLayerName = "ClientCharacter";
+		}
+	}
+
 }

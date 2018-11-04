@@ -71,6 +71,6 @@ public class Parasite : PlayerCharacter {
 		// Set isInfected to true/update sprite on new authority's client
 		npc.RpcInfect();
 		npc.RpcSetCameraFollow();
-		// TODO: will likely need to remove the npc from the npcManager's list to have a proper count of uninfected NPCs
+		npc.RpcSetRenderLayer();
 	}
 }
