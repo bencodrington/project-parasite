@@ -8,13 +8,20 @@ public class NonPlayerCharacter : PlayerCharacter {
 
 	public bool isInfected;
 
+	private float validDistanceFromTarget = .5f;
+	private Vector3 target;
+	private float minTimeUntilNewPath = 2f;
+	private float maxTimeUntilNewPath = 5f;
+	private bool hasTarget = false;
+	private float newTargetRange = 5f;
+
 	// TODO: update to use fixedupdate for physics
 	public override void Update() {
 		if (isInfected && hasAuthority) {
 			// NPC is infected and this client is the Parasite player's client
 			HandleInput();
 		} else if (!isInfected && isServer && physicsEntity != null) {
-			// Not infected, so the server should handle physics and be the authority on the NPC's position
+			TraversePath();
 		} else {
 			// This is a cloned representation of the authoritative NPC
 			// 	So just verify current position is up to date with server position
@@ -61,6 +68,39 @@ public class NonPlayerCharacter : PlayerCharacter {
 			CmdDespawnSelf();
 		}
     }
+
+	void TraversePath() {
+		if (!hasTarget) { return; }
+		if (Vector3.Distance(this.transform.position, target) < validDistanceFromTarget) {
+			// Reached target
+			StartCoroutine(Idle());
+			physicsEntity.velocityX = 0;
+			hasTarget = false;
+		} else {
+			// Still moving
+			if (target.x >= transform.position.x) {
+				physicsEntity.velocityX = movementSpeed;
+			} else {
+				physicsEntity.velocityX = -movementSpeed;
+			}
+		}
+	}
+
+	void FindNewPath() {
+		// TODO: While path target is not reachable
+		// Choose a path
+		float offset = Random.Range(-newTargetRange, newTargetRange);
+		target = new Vector3(transform.position.x + offset, transform.position.y, 0);
+		hasTarget = true;
+	}
+
+	public IEnumerator Idle() {
+		Debug.Log("Idle");
+		yield return new WaitForSeconds(Random.Range(minTimeUntilNewPath, maxTimeUntilNewPath));
+		// Check that we are still uninfected
+		if (!isInfected) { FindNewPath(); }
+		
+	}
 
 	// COMMANDS
 
