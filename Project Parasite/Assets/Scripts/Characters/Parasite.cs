@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 
 public class Parasite : PlayerCharacter {
 
-	private float jumpVelocity = .25f;
+	private float jumpVelocity = .5f;
 
 	protected override void HandleInput()  {
 		// Movement
@@ -59,7 +59,8 @@ public class Parasite : PlayerCharacter {
 		npc.playerObject = playerObject;
 		// Give Parasite player authority over the NPC
 		networkIdentity.AssignClientAuthority(playerObject.connectionToClient);
-		npc.RpcGeneratePhysicsEntity();
+		// TODO: transfer velocity from current physics entity?
+		npc.RpcGeneratePhysicsEntity(Vector2.zero);
 		// TODO: delete physics entity off the server for performance?
 		// Set isInfected to true/update sprite on new authority's client
 		npc.RpcInfect();

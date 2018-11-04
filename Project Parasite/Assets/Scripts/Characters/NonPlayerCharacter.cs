@@ -8,6 +8,7 @@ public class NonPlayerCharacter : PlayerCharacter {
 
 	public bool isInfected;
 
+	// TODO: update to use fixedupdate for physics
 	public override void Update() {
 		if (isInfected && hasAuthority) {
 			// NPC is infected and this client is the Parasite player's client
@@ -56,7 +57,8 @@ public class NonPlayerCharacter : PlayerCharacter {
 	[Command]
 	void CmdDespawnSelf() {
 		// Spawn new Parasite Object
-		playerObject.CmdSpawnPlayerCharacter("PARASITE", transform.position);
+		// TODO: replace with var
+		playerObject.CmdSpawnPlayerCharacter("PARASITE", transform.position, new Vector2(0, .75f));
 		// Despawn this NPC object
 		FindObjectOfType<NpcManager>().DespawnNpc(netId);
 	}

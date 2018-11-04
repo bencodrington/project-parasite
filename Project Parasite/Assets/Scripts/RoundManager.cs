@@ -25,7 +25,7 @@ public class RoundManager : MonoBehaviour {
 				characterType = "HUNTER";
 			}
 			connectedPlayers[i].RpcSetCharacterType(characterType);
-			connectedPlayers[i].CmdSpawnPlayerCharacter(characterType, new Vector3());
+			connectedPlayers[i].CmdSpawnPlayerCharacter(characterType, Vector3.zero, Vector2.zero);
 		}
 	}
 

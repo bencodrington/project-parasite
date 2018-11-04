@@ -23,15 +23,21 @@ public abstract class PlayerCharacter : NetworkBehaviour {
 		// Called once per frame for each PlayerCharacter
 		if (hasAuthority) {
 			HandleInput();
-			if (physicsEntity != null) {
-				physicsEntity.Update();
-			}
+			// if (physicsEntity != null) {
+			// 	physicsEntity.Update();
+			// }
 			// Update the server's position
 			// TODO: clump these updates to improve network usage?
 			CmdUpdatePosition(transform.position);
 		} else {
 			// Verify current position is up to date with server position
 			transform.position = Vector3.SmoothDamp(transform.position, serverPosition, ref serverPositionSmoothVelocity, 0.1f);
+		}
+	}
+
+	public virtual void FixedUpdate() {
+		if (hasAuthority && physicsEntity != null) {
+				physicsEntity.Update();
 		}
 	}
 
@@ -56,12 +62,13 @@ public abstract class PlayerCharacter : NetworkBehaviour {
 	}
 
 	[ClientRpc]
-	public void RpcGeneratePhysicsEntity() {
+	public void RpcGeneratePhysicsEntity(Vector2 velocity) {
 		if (hasAuthority) {
 			// TODO: Consider importing stats for all characters on each client, if access to type is required
 			ImportStats();
 			// Add physics entity
 			physicsEntity = new PhysicsEntity(transform, height, width);
+			physicsEntity.AddVelocity(velocity.x, velocity.y);
 		}
 	}
 

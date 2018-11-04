@@ -49,7 +49,7 @@ public class PlayerObject : NetworkBehaviour {
 	// Commands
 
 	[Command]
-	public void CmdSpawnPlayerCharacter(string characterType, Vector3 atPosition) {
+	public void CmdSpawnPlayerCharacter(string characterType, Vector3 atPosition, Vector2 velocity) {
 		GameObject playerCharacterPrefab = characterType == "PARASITE" ? ParasitePrefab : HunterPrefab;
 		// Create PlayerCharacter game object on the server
 		playerCharacterGameObject = Instantiate(playerCharacterPrefab, atPosition, Quaternion.identity);
@@ -58,7 +58,7 @@ public class PlayerObject : NetworkBehaviour {
 		// Get PlayerCharacter script
 		PlayerCharacter playerCharacter = playerCharacterGameObject.GetComponentInChildren<PlayerCharacter>();
 		// Initialize each player's character on their own client
-		playerCharacter.RpcGeneratePhysicsEntity();
+		playerCharacter.RpcGeneratePhysicsEntity(velocity);
 		playerCharacter.playerObject = this;
 		//  Set playerCharacter as new target of camera
 		playerCharacter.RpcSetCameraFollow();

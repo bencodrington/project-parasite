@@ -11,10 +11,12 @@ public class PhysicsEntity {
 	float velocityX = 0f;
 	float velocityY = 0f;
 
+	private const float GRAVITY = -2f;
+
 	private bool _isOnGround = false;
 	public bool IsOnGround() { return _isOnGround; }
 
-	public PhysicsEntity(Transform transform, float height = 0.5f, float width = 0.5f, float gravity = -1f, float maxSpeed = 5f) {
+	public PhysicsEntity(Transform transform, float height = 0.5f, float width = 0.5f, float gravity = GRAVITY, float maxSpeed = 5f) {
 		this.transform = transform;
 		this.height = height;
 		this.width = width;

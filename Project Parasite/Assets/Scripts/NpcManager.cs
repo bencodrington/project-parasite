@@ -61,7 +61,7 @@ public class NpcManager : NetworkBehaviour {
 			// Propogate to all clients
 			NetworkServer.Spawn(npc.gameObject);
 
-			npc.RpcGeneratePhysicsEntity();
+			npc.RpcGeneratePhysicsEntity(Vector2.zero);
 		}
 	}
 
