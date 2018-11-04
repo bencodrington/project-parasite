@@ -13,7 +13,8 @@ public class NonPlayerCharacter : PlayerCharacter {
 	private float minTimeUntilNewPath = 2f;
 	private float maxTimeUntilNewPath = 5f;
 	private bool hasTarget = false;
-	private float newTargetRange = 5f;
+	private float maxTargetDistance = 5f;
+	private float minTargetDistance = 2f;
 
 	// TODO: update to use fixedupdate for physics
 	public override void Update() {
@@ -89,13 +90,14 @@ public class NonPlayerCharacter : PlayerCharacter {
 	void FindNewPath() {
 		// TODO: While path target is not reachable
 		// Choose a path
-		float offset = Random.Range(-newTargetRange, newTargetRange);
+		float rangeDifference = maxTargetDistance - minTargetDistance;
+		float offset = Random.Range(-rangeDifference, rangeDifference);
+		offset += (offset >= 0) ? minTargetDistance : -minTargetDistance;
 		target = new Vector3(transform.position.x + offset, transform.position.y, 0);
 		hasTarget = true;
 	}
 
 	public IEnumerator Idle() {
-		Debug.Log("Idle");
 		yield return new WaitForSeconds(Random.Range(minTimeUntilNewPath, maxTimeUntilNewPath));
 		// Check that we are still uninfected
 		if (!isInfected) { FindNewPath(); }

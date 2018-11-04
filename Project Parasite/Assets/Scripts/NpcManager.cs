@@ -70,6 +70,7 @@ public class NpcManager : NetworkBehaviour {
 			NetworkServer.Spawn(npc.gameObject);
 
 			npc.RpcGeneratePhysicsEntity(Vector2.zero);
+			StartCoroutine(npc.Idle());
 		}
 	}
 
