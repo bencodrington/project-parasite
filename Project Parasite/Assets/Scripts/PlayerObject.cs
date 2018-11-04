@@ -12,13 +12,11 @@ public class PlayerObject : NetworkBehaviour {
 	public GameObject HealthPrefab;
 	public GameObject NpcCountPrefab;
 
-	private GameObject playerCharacterGameObject;
+	private GameObject characterGameObject;
 	private GameObject healthObject;
 	private GameObject npcCountObject;
 
-	private string characterType;
 	private int _health;
-	
 	private int Health {
 		get { return _health; }
 		set {
@@ -29,9 +27,7 @@ public class PlayerObject : NetworkBehaviour {
 			}
 		}
 	}
-
 	private int _remainingNpcCount;
-	
 	private int RemainingNpcCount {
 		get { return _remainingNpcCount; }
 		set {
@@ -40,20 +36,12 @@ public class PlayerObject : NetworkBehaviour {
 		}
 	}
 
-
-	void Start () {
-		if (isLocalPlayer == false) {
-			// Object belongs to another player
-			return;
-		}
-	}
+	private const int STARTING_PARASITE_HEALTH = 100;
+	private const int UI_PADDING_DISTANCE = 9;
 
 	void Update () {
 		// Runs on everyone's computer, regardless of whether they own this player object
-		if (isLocalPlayer == false) {
-			return;
-		}
-
+		if (isLocalPlayer == false) { return; }
 		if (Input.GetKeyDown(KeyCode.E)) {
 			CmdStartGame();
 		}
@@ -63,19 +51,19 @@ public class PlayerObject : NetworkBehaviour {
 
 	[Command]
 	public void CmdSpawnPlayerCharacter(string characterType, Vector3 atPosition, Vector2 velocity) {
-		GameObject playerCharacterPrefab = characterType == "PARASITE" ? ParasitePrefab : HunterPrefab;
+		GameObject characterPrefab = characterType == "PARASITE" ? ParasitePrefab : HunterPrefab;
 		// Create PlayerCharacter game object on the server
-		playerCharacterGameObject = Instantiate(playerCharacterPrefab, atPosition, Quaternion.identity);
+		characterGameObject = Instantiate(characterPrefab, atPosition, Quaternion.identity);
 		// Propogate to all clients
-		NetworkServer.SpawnWithClientAuthority(playerCharacterGameObject, connectionToClient);
+		NetworkServer.SpawnWithClientAuthority(characterGameObject, connectionToClient);
 		// Get PlayerCharacter script
-		PlayerCharacter playerCharacter = playerCharacterGameObject.GetComponentInChildren<PlayerCharacter>();
+		Character character = characterGameObject.GetComponentInChildren<Character>();
 		// Initialize each player's character on their own client
-		playerCharacter.RpcGeneratePhysicsEntity(velocity);
-		playerCharacter.playerObject = this;
-		//  Set playerCharacter as new target of camera
-		playerCharacter.RpcSetCameraFollow();
-		playerCharacter.RpcSetRenderLayer();
+		character.RpcGeneratePhysicsEntity(velocity);
+		character.playerObject = this;
+		//  Set character as new target of camera
+		character.RpcSetCameraFollow();
+		character.RpcSetRenderLayer();
 	}
 
 	[Command]
@@ -90,8 +78,8 @@ public class PlayerObject : NetworkBehaviour {
 
 	[Command]
 	public void CmdDestroyCharacter() {
-		if (hasAuthority && playerCharacterGameObject != null) {
-			NetworkServer.Destroy(playerCharacterGameObject);
+		if (characterGameObject != null) {
+			NetworkServer.Destroy(characterGameObject);
 		}
 	}
 
@@ -112,19 +100,18 @@ public class PlayerObject : NetworkBehaviour {
 
 	[ClientRpc]
 	public void RpcSetCharacterType(string newCharacterType) {
-		characterType = newCharacterType;
 		if (!isLocalPlayer) { return; }
 		FindObjectOfType<ClientInformation>().clientType = newCharacterType;
-		if (characterType == "PARASITE") {
-			// Generate HUD
+		// Generate HUD
+		if (newCharacterType == "PARASITE") {
+			// Display health
 			healthObject = Instantiate(HealthPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
-			// TODO: replace Vector2.zero with a padding constant
-			healthObject.GetComponentInChildren<RectTransform>().anchoredPosition = Vector2.zero;
-			Health = 100;
+			healthObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(-UI_PADDING_DISTANCE, -UI_PADDING_DISTANCE);
+			Health = STARTING_PARASITE_HEALTH;
 		}
+		// Display NPC count
 		npcCountObject = Instantiate(NpcCountPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
-		// TODO: replace Vector2.zero with a padding constant
-		npcCountObject.GetComponentInChildren<RectTransform>().anchoredPosition = Vector2.zero;
+		npcCountObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(UI_PADDING_DISTANCE, -UI_PADDING_DISTANCE);
 	}
 
 	[ClientRpc]

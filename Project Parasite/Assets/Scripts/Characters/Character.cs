@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public abstract class PlayerCharacter : NetworkBehaviour {
+public abstract class Character : NetworkBehaviour {
 
 	protected SpriteRenderer spriteRenderer;
 	protected float height;
@@ -13,19 +13,36 @@ public abstract class PlayerCharacter : NetworkBehaviour {
 	protected string type = "undefined type";
 
 	protected Vector3 serverPosition;
-	// protected Vector3 serverPositionSmoothVelocity;
+	
+	protected int characterLayerMask;
+	protected int parasiteLayerMask;
+	protected int npcLayerMask;
 
-	// Only initialized for PlayerCharacter objects on the server
+	const float lagLerpFactor = 0.4f;
+
+	// Only initialized for Character objects on the server
 	public PlayerObject playerObject;
+
+	public abstract void ImportStats();
+	protected abstract void HandleInput();
+
+	void Start() {
+		// Initialize layer mask
+		parasiteLayerMask = 1 << LayerMask.NameToLayer("Parasites");
+		npcLayerMask = 1 << LayerMask.NameToLayer("NPCs");
+		// Character combines both of the above layer masks
+		characterLayerMask = parasiteLayerMask + npcLayerMask;
+	}
 
 	
 	public virtual void Update () {
-		// Called once per frame for each PlayerCharacter
+		// Called once per frame for each Character
 		if (hasAuthority) {
+			// This character belongs to this client
 			HandleInput();
 		} else {
 			// Verify current position is up to date with server position
-			transform.position = Vector3.Lerp(transform.position, serverPosition, 0.4f);
+			transform.position = Vector3.Lerp(transform.position, serverPosition, lagLerpFactor);
 		}
 	}
 
@@ -38,17 +55,29 @@ public abstract class PlayerCharacter : NetworkBehaviour {
 		}
 	}
 
-	public abstract void ImportStats();
-	protected abstract void HandleInput();
+	protected void HandleHorizontalMovement() {
+		// TODO: add possibility for being moved outside of input
+		bool right = Input.GetKey(KeyCode.D);
+		bool left = Input.GetKey(KeyCode.A);
+		if (right && !left) {
+			physicsEntity.velocityX = movementSpeed;
+		} else if (left && !right) {
+			physicsEntity.velocityX = -movementSpeed;
+		} else {
+			physicsEntity.velocityX = 0;
+		}
+	}
 
 	// COMMANDS
 
 	[Command]
 	protected void CmdUpdatePosition(Vector3 newPosition) {
 		// TODO: verify new position is legal
-		serverPosition = newPosition;
-		RpcUpdateServerPosition(serverPosition);
-		// TODO: only change serverPosition if newPosition is different, to reduce unnecessary SyncVar updates
+		// Only change serverPosition if newPosition is different, to reduce unnecessary Rpc calls
+		if (serverPosition != newPosition) {
+			serverPosition = newPosition;
+			RpcUpdateServerPosition(serverPosition);
+		}
 	}
 
 	[Command]
@@ -66,10 +95,10 @@ public abstract class PlayerCharacter : NetworkBehaviour {
 	[ClientRpc]
 	public void RpcGeneratePhysicsEntity(Vector2 velocity) {
 		if (hasAuthority) {
-			// TODO: Consider importing stats for all characters on each client, if access to type is required
 			ImportStats();
 			// Add physics entity
 			physicsEntity = new PhysicsEntity(transform, height, width);
+			// With starting velocity
 			physicsEntity.AddVelocity(velocity.x, velocity.y);
 		}
 	}

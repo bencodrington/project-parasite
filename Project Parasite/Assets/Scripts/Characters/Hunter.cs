@@ -3,41 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class Hunter : PlayerCharacter {
+public class Hunter : Character {
 
 	// The time it takes to fully scan an NPC
 	const float SCAN_TIME = 0.75f;
 
 	protected override void HandleInput()  {
 		// Movement
-		// TODO: add possibility for being moved outside of input and reduce duplication
-		bool right = Input.GetKey(KeyCode.D);
-		bool left = Input.GetKey(KeyCode.A);
-		if (right && !left) {
-			physicsEntity.velocityX = movementSpeed;
-		} else if (left && !right) {
-			physicsEntity.velocityX = -movementSpeed;
-		} else {
-			physicsEntity.velocityX = 0;
-		}
-
-		// TODO: optimize so this doesn't run every input cycle
-		int layerMask = 1 << LayerMask.NameToLayer("Characters");
-
+		HandleHorizontalMovement();
 		// Attack
 		if (Input.GetMouseButtonDown(0)) {
-			Collider2D target = Physics2D.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition), layerMask);
+			Collider2D target = Physics2D.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition), characterLayerMask);
 			if (target != null) {
 				CmdAttackTarget(target.transform.parent.GetComponent<NetworkIdentity>().netId);
 			}
 		}
-
-		// Scan
+		// Scan NPC
 		if (Input.GetMouseButtonDown(1)) {
-			// TODO: restrict layermask to NPCs only?
-			Collider2D target = Physics2D.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition), layerMask);
-			if (target != null) {
-				StartCoroutine(StartScan(target.transform.parent.GetComponent<NetworkIdentity>().netId));
+			Collider2D npc = Physics2D.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition), npcLayerMask);
+			if (npc != null) {
+				StartCoroutine(StartScan(npc.transform.parent.GetComponent<NetworkIdentity>().netId));
 			}
 		}
 	}
@@ -49,25 +34,24 @@ public class Hunter : PlayerCharacter {
 		type = "HUNTER";
 	}
 
-	IEnumerator StartScan(NetworkInstanceId targetNetId) {
-		float scanTime = SCAN_TIME;
-		while (scanTime > 0) {
-			scanTime -= Time.deltaTime;
-			yield return null;
-		}
-		CmdScanTarget(targetNetId);
+	IEnumerator StartScan(NetworkInstanceId npcNetId) {
+		yield return new WaitForSeconds(SCAN_TIME);
+		CmdScanTarget(npcNetId);
 	}
 
 	// Commands
 
 	[Command]
 	void CmdAttackTarget(NetworkInstanceId targetNetId) {
+		// Find target's game object on this client
 		GameObject targetGameObject = NetworkServer.FindLocalObject(targetNetId);
-		PlayerCharacter npc = targetGameObject.GetComponentInChildren<PlayerCharacter>();
-		bool isNpc = npc is NonPlayerCharacter;
-		if (!isNpc || (isNpc && ((NonPlayerCharacter)npc).isInfected)) {
+		// Get PlayerCharacter script
+		Character targetPlayerCharacter = targetGameObject.GetComponentInChildren<Character>();
+		bool isNpc = targetPlayerCharacter is NonPlayerCharacter;
+		// Inflict damage
+		if (!isNpc || (isNpc && ((NonPlayerCharacter)targetPlayerCharacter).isInfected)) {
 			// Damage parasite
-			npc.playerObject.RpcTakeDamage(25);
+			targetPlayerCharacter.playerObject.RpcTakeDamage(25);
 		} else if (isNpc) {
 			// Instant kill npcs
 			FindObjectOfType<NpcManager>().DespawnNpc(targetNetId);
@@ -75,14 +59,11 @@ public class Hunter : PlayerCharacter {
 	}
 
 	[Command]
-	void CmdScanTarget(NetworkInstanceId targetNetId) {
-		GameObject targetGameObject = NetworkServer.FindLocalObject(targetNetId);
-		PlayerCharacter npc = targetGameObject.GetComponentInChildren<PlayerCharacter>();
-		bool isNpc = npc is NonPlayerCharacter;
-		if (!isNpc) {
-			return;
-		} else if (isNpc) {
-			((NonPlayerCharacter)npc).RpcVerify();
-		}
+	void CmdScanTarget(NetworkInstanceId npcNetId) {
+		// Find npc's game object on this client
+		GameObject npcGameObject = NetworkServer.FindLocalObject(npcNetId);
+		// Get NonPlayerCharacter script
+		NonPlayerCharacter npc = npcGameObject.GetComponentInChildren<NonPlayerCharacter>();
+		npc.RpcVerify();
 	}
 }

@@ -3,38 +3,42 @@
 public class PhysicsEntity {
 	Transform transform;
 
+	// Hitbox dimensions: 2*height by 2*width
 	float height = 0.5f;
 	float width = 0.5f;
 
+	// Gravity increases by a rate of 1 unit/second per second
 	float gravityAcceleration = -1f;
+	// TODO: Limit overall speed, not just velocityY
 	float maxSpeed = 5f;
 	public float velocityX = 0f;
 	public float velocityY = 0f;
 
-	private const float GRAVITY = -2f;
+	private const float DEFAULT_GRAVITY = -2f;
 
 	private bool _isOnGround = false;
 	public bool IsOnGround() { return _isOnGround; }
+
+	int obstacleLayerMask = 1 << LayerMask.NameToLayer("Obstacles");
 
 	public PhysicsEntity(Transform transform, float height = 0.5f, float width = 0.5f) {
 		this.transform = transform;
 		this.height = height;
 		this.width = width;
-		this.gravityAcceleration = GRAVITY;
+		this.gravityAcceleration = DEFAULT_GRAVITY;
 	}
 
 	public void Update () {
 		float obstacleHeight, obstacleWidth;
 		// Apply Gravity
 		velocityY = Mathf.Clamp(velocityY + gravityAcceleration * Time.deltaTime, -maxSpeed, maxSpeed);
-		// Check for collisions at new location
+		// Store attempted new position
 		Vector2 newPosition = new Vector2(transform.position.x + velocityX, transform.position.y + velocityY);
-		// Set up points to check for collisions
-		Vector2 pixelBelow 		= newPosition + new Vector2(0, -height);
-		// Create layer mask by bitshifting 1 by the int that represents the obstacles layer
-		int layerMask = 1 << LayerMask.NameToLayer("Obstacles");
-		// Cast rays
-		Collider2D obstacleBelow 		= Physics2D.OverlapPoint(pixelBelow, layerMask);
+		// BELOW
+		// Set up point to check for collisions
+		Vector2 pixelBelow 			= newPosition + new Vector2(0, -height);
+		// Cast ray
+		Collider2D obstacleBelow 	= Physics2D.OverlapPoint(pixelBelow, obstacleLayerMask);
 		// Handle Collisions
 		if (obstacleBelow != null) {
 			// Entity is touching the ground
@@ -47,10 +51,14 @@ public class PhysicsEntity {
 			// Nothing is below entity
 			_isOnGround = false;
 		}
-		Vector2 pixelToTheLeft 	= newPosition + new Vector2(-width, 0);
-		Vector2 pixelToTheRight = newPosition + new Vector2(width, 0);
-		Collider2D obstacleToTheLeft 	= Physics2D.OverlapPoint(pixelToTheLeft, layerMask);
-		Collider2D obstacleToTheRight 	= Physics2D.OverlapPoint(pixelToTheRight, layerMask);
+		// BESIDE
+		// Set up points to check for collisions
+		Vector2 pixelToTheLeft 			= newPosition + new Vector2(-width, 0);
+		Vector2 pixelToTheRight 		= newPosition + new Vector2(width, 0);
+		// Cast rays
+		Collider2D obstacleToTheLeft 	= Physics2D.OverlapPoint(pixelToTheLeft, obstacleLayerMask);
+		Collider2D obstacleToTheRight 	= Physics2D.OverlapPoint(pixelToTheRight, obstacleLayerMask);
+		// Handle Collisions
 		if (obstacleToTheLeft != null && obstacleToTheRight != null) {
 			Debug.LogError("Error: PhysicsEntity is being crushed.");
 			return;
@@ -65,8 +73,7 @@ public class PhysicsEntity {
 			obstacleWidth = obstacleToTheRight.transform.localScale.x / 2;
 			newPosition.x = obstacleToTheRight.transform.position.x - obstacleWidth - width;
 		}
-		// TODO: if velocity is above a certain threshold (probably just under half of width, assuming it's smaller than height)
-		// 	check for collisions in a line between position & new position
+		// Finally set new position
 		transform.position = newPosition;
 	}
 

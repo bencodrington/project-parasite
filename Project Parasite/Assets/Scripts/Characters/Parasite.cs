@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class Parasite : PlayerCharacter {
+public class Parasite : Character {
 
 	private float jumpVelocity = .5f;
 
@@ -27,8 +27,7 @@ public class Parasite : PlayerCharacter {
 
 		// Infect
 		if (Input.GetMouseButtonDown(0)) {
-			// TODO: restrict to layer mask
-			Collider2D npc = Physics2D.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+			Collider2D npc = Physics2D.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition), npcLayerMask);
 			if (npc != null) {
 				CmdInfectNpc(npc.transform.parent.GetComponent<NetworkIdentity>().netId);
 				CmdDestroyParasite();
@@ -65,12 +64,13 @@ public class Parasite : PlayerCharacter {
 		npc.playerObject = playerObject;
 		// Give Parasite player authority over the NPC
 		networkIdentity.AssignClientAuthority(playerObject.connectionToClient);
-		// Delete physics entity off the server for performance
+		// Delete current physics entity off the server for performance
 		npc.CmdDeletePhysicsEntity();
 		// TODO: transfer velocity from current physics entity?
 		npc.RpcGeneratePhysicsEntity(Vector2.zero);
 		// Set isInfected to true/update sprite on new authority's client
 		npc.RpcInfect();
+		// Update client's camera and render settings to reflect new character
 		npc.RpcSetCameraFollow();
 		npc.RpcSetRenderLayer();
 	}

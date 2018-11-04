@@ -8,17 +8,17 @@ public class RoundManager : MonoBehaviour {
 
 	void Start () {
 		// Cache Player Objects
-		// TODO: uncache on leave
 		connectedPlayers = FindObjectsOfType<PlayerObject>();
+		// TODO: uncache on leave
 		SelectParasite();
 	}
 
 	void SelectParasite() {
 		int n = connectedPlayers.Length;
+		// Randomly select one of the players to be parasite, the rest are hunters
 		int indexOfParasite = Random.Range(0, n);
 		string characterType;
 		for (int i = 0; i < n; i++) {
-			// TODO: Replace strings with constants
 			if (i == indexOfParasite) {
 				characterType = "PARASITE";
 			} else { // Player is a hunter
