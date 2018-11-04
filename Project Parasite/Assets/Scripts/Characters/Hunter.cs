@@ -8,23 +8,43 @@ public class Hunter : Character {
 	// The time it takes to fully scan an NPC
 	const float SCAN_TIME = 0.75f;
 	const float DETONATION_RADIUS = 1.5f;
+	const float TIME_UNTIL_CHARGE_READY = 1.5f;
 
 	public GameObject detonationPrefab;
 
+	bool isCharging = false;
+	float timeSpentCharging = 0f;
+
+	Color restingColour = Color.green;
+	Color chargedColour = Color.yellow;
+
 	protected override void HandleInput()  {
-		Vector2 mousePosition;
 		// Movement
 		HandleHorizontalMovement();
 		// Attack
-		if (Input.GetMouseButtonDown(0)) {
-			mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-			Collider2D target = Physics2D.OverlapPoint(mousePosition, characterLayerMask);
-			if (target != null) {
-				CmdAttackTarget(target.transform.parent.GetComponent<NetworkIdentity>().netId);
+		if (Input.GetMouseButton(0)) {
+			if (!isCharging) {
+				// Start charging
+				isCharging = true;
 			} else {
-				CmdAttackPoint(mousePosition);
+				// Continue charging
+				timeSpentCharging += Time.deltaTime;
+				UpdateChargeRate(timeSpentCharging / TIME_UNTIL_CHARGE_READY);
+				CmdUpdateChargeRate(timeSpentCharging / TIME_UNTIL_CHARGE_READY);
 			}
+		} else if (isCharging) {
+			// Mouse1 just released
+			Debug.Log("TSC: " + timeSpentCharging + ", TUCR: " + TIME_UNTIL_CHARGE_READY);
+			if (timeSpentCharging > TIME_UNTIL_CHARGE_READY) {
+				// Sufficiently charged
+				FireCharge();
+			} // TODO: else { Sputter }
+			isCharging = false;
+			timeSpentCharging = 0f;
+			UpdateChargeRate(0f);
+			CmdUpdateChargeRate(0f);
 		}
+
 		// Scan NPC
 		if (Input.GetMouseButtonDown(1)) {
 			Collider2D npc = Physics2D.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition), npcLayerMask);
@@ -34,9 +54,26 @@ public class Hunter : Character {
 		}
 	}
 
+	void FireCharge() {
+		Vector2 mousePosition;
+		mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		// TODO: If there is an obstacle in the way, detonate there instead
+		Collider2D target = Physics2D.OverlapPoint(mousePosition, characterLayerMask);
+		if (target != null) {
+			CmdAttackTarget(target.transform.parent.GetComponent<NetworkIdentity>().netId);
+		} else {
+			CmdAttackPoint(mousePosition);
+		}
+	}
+
 	IEnumerator StartScan(NetworkInstanceId npcNetId) {
 		yield return new WaitForSeconds(SCAN_TIME);
 		CmdScanTarget(npcNetId);
+	}
+
+	void UpdateChargeRate(float chargeRate) {
+		Color newColour = Color.Lerp(restingColour, chargedColour, chargeRate);
+		GetComponentInChildren<SpriteRenderer>().color = newColour;
 	}
 
 	// Commands
@@ -83,10 +120,23 @@ public class Hunter : Character {
 		npc.RpcVerify();
 	}
 
+	[Command]
+	void CmdUpdateChargeRate(float chargeRate) {
+		RpcUpdateChargeRate(chargeRate);
+	}
+
 	// ClientRpc
 
 	[ClientRpc]
 	void RpcSpawnDetonation(Vector3 detonationPosition) {
 		Instantiate(detonationPrefab, detonationPosition, Quaternion.identity);
+	}
+
+	[ClientRpc]
+	void RpcUpdateChargeRate(float chargeRate) {
+		// TODO: send less often and smooth transition on client side? except after firing, will need a smooth flag
+		if (!hasAuthority) {
+			UpdateChargeRate(chargeRate);
+		}
 	}
 }
