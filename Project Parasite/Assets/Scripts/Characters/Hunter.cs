@@ -34,7 +34,6 @@ public class Hunter : Character {
 			}
 		} else if (isCharging) {
 			// Mouse1 just released
-			Debug.Log("TSC: " + timeSpentCharging + ", TUCR: " + TIME_UNTIL_CHARGE_READY);
 			if (timeSpentCharging > TIME_UNTIL_CHARGE_READY) {
 				// Sufficiently charged
 				FireCharge();
