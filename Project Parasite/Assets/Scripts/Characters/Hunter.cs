@@ -31,7 +31,6 @@ public class Hunter : Character {
 		height = .5f;
 		width = .5f;
 		movementSpeed = .07f;
-		type = "HUNTER";
 	}
 
 	IEnumerator StartScan(NetworkInstanceId npcNetId) {

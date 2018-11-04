@@ -40,7 +40,6 @@ public class Parasite : Character {
 		height = .25f;
 		width = .5f;
 		movementSpeed = .2f;
-		type = "PARASITE";
 	}
 
 	// COMMANDS

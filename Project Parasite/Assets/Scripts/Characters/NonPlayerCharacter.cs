@@ -47,7 +47,6 @@ public class NonPlayerCharacter : Character {
 		height = .5f;
 		width = .5f;
 		movementSpeed = .06f;
-		type = "NPC";
 		isInfected = false;
     }
 
@@ -106,7 +105,7 @@ public class NonPlayerCharacter : Character {
 	[Command]
 	void CmdDespawnSelf() {
 		// Spawn new Parasite Object
-		playerObject.CmdSpawnPlayerCharacter("PARASITE", transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY));
+		playerObject.CmdSpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY));
 		// Despawn this NPC object
 		FindObjectOfType<NpcManager>().DespawnNpc(netId);
 	}
@@ -132,7 +131,7 @@ public class NonPlayerCharacter : Character {
 
 	[ClientRpc]
 	public void RpcVerify() {
-		bool isParasitePlayer = FindObjectOfType<ClientInformation>().clientType == "PARASITE";
+		bool isParasitePlayer = FindObjectOfType<ClientInformation>().clientType == CharacterType.Parasite;
 		if (isParasitePlayer) { return;}
 		if (isInfected) {
 			// Turn Magenta

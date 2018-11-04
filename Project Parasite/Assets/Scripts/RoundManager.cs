@@ -17,12 +17,12 @@ public class RoundManager : MonoBehaviour {
 		int n = connectedPlayers.Length;
 		// Randomly select one of the players to be parasite, the rest are hunters
 		int indexOfParasite = Random.Range(0, n);
-		string characterType;
+		CharacterType characterType;
 		for (int i = 0; i < n; i++) {
 			if (i == indexOfParasite) {
-				characterType = "PARASITE";
+				characterType = CharacterType.Parasite;
 			} else { // Player is a hunter
-				characterType = "HUNTER";
+				characterType = CharacterType.Hunter;
 			}
 			connectedPlayers[i].RpcSetCharacterType(characterType);
 			connectedPlayers[i].CmdSpawnPlayerCharacter(characterType, Vector3.zero, Vector2.zero);

@@ -10,7 +10,6 @@ public abstract class Character : NetworkBehaviour {
 	protected float width;
 	protected PhysicsEntity physicsEntity;
 	protected float movementSpeed;
-	protected string type = "undefined type";
 
 	protected Vector3 serverPosition;
 	

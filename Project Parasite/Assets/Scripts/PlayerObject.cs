@@ -50,8 +50,8 @@ public class PlayerObject : NetworkBehaviour {
 	// Commands
 
 	[Command]
-	public void CmdSpawnPlayerCharacter(string characterType, Vector3 atPosition, Vector2 velocity) {
-		GameObject characterPrefab = characterType == "PARASITE" ? ParasitePrefab : HunterPrefab;
+	public void CmdSpawnPlayerCharacter(CharacterType characterType, Vector3 atPosition, Vector2 velocity) {
+		GameObject characterPrefab = characterType == CharacterType.Parasite ? ParasitePrefab : HunterPrefab;
 		// Create PlayerCharacter game object on the server
 		characterGameObject = Instantiate(characterPrefab, atPosition, Quaternion.identity);
 		// Propogate to all clients
@@ -99,11 +99,11 @@ public class PlayerObject : NetworkBehaviour {
 	// Client RPCs
 
 	[ClientRpc]
-	public void RpcSetCharacterType(string newCharacterType) {
+	public void RpcSetCharacterType(CharacterType newCharacterType) {
 		if (!isLocalPlayer) { return; }
 		FindObjectOfType<ClientInformation>().clientType = newCharacterType;
 		// Generate HUD
-		if (newCharacterType == "PARASITE") {
+		if (newCharacterType == CharacterType.Parasite) {
 			// Display health
 			healthObject = Instantiate(HealthPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
 			healthObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(-UI_PADDING_DISTANCE, -UI_PADDING_DISTANCE);
