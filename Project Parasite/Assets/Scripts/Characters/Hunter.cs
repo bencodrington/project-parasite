@@ -5,12 +5,15 @@ using UnityEngine.Networking;
 
 public class Hunter : Character {
 
-	// The time it takes to fully scan an NPC
-	const float SCAN_TIME = 0.75f;
 	const float DETONATION_RADIUS = 1.5f;
 	const float TIME_UNTIL_CHARGE_READY = 1.5f;
+	// Maximum distance from the surface of the ground to consider
+	// 	that space valid for placing a scanner
+	const float SCANNER_OFFSET_X = 0.1f;
+	const float SCANNER_OFFSET_Y = 1f;
 
 	public GameObject detonationPrefab;
+	public GameObject scannerPrefab;
 
 	bool isCharging = false;
 	float timeSpentCharging = 0f;
@@ -44,18 +47,27 @@ public class Hunter : Character {
 			CmdUpdateChargeRate(0f);
 		}
 
-		// Scan NPC
+		// Place Scanner
 		if (Input.GetMouseButtonDown(1)) {
-			Collider2D npc = Physics2D.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition), npcLayerMask);
-			if (npc != null) {
-				StartCoroutine(StartScan(npc.transform.parent.GetComponent<NetworkIdentity>().netId));
+			float topOfGround;
+			// Check for ground in a line above and below mouse location
+			Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			Vector2 offset = new Vector2(SCANNER_OFFSET_X, SCANNER_OFFSET_Y);
+			// TODO: obstacle layer mask
+			Collider2D ground = Physics2D.OverlapArea(mousePosition - offset, mousePosition + offset);
+			if (ground == null) { return; }
+			// If ground found, get y coordinate of top of ground
+			topOfGround = ground.transform.position.y + ground.transform.localScale.y / 2;
+			// If y coordinate is within range of mouse location
+			if (Mathf.Abs(topOfGround - mousePosition.y) < SCANNER_OFFSET_Y) {
+				// Command server to spawn Scanner here
+				CmdSpawnScanner(new Vector2(mousePosition.x, topOfGround));
 			}
 		}
 	}
 
 	void FireCharge() {
-		Vector2 mousePosition;
-		mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 		// TODO: If there is an obstacle in the way, detonate there instead
 		Collider2D target = Physics2D.OverlapPoint(mousePosition, characterLayerMask);
 		if (target != null) {
@@ -63,11 +75,6 @@ public class Hunter : Character {
 		} else {
 			CmdAttackPoint(mousePosition);
 		}
-	}
-
-	IEnumerator StartScan(NetworkInstanceId npcNetId) {
-		yield return new WaitForSeconds(SCAN_TIME);
-		CmdScanTarget(npcNetId);
 	}
 
 	void UpdateChargeRate(float chargeRate) {
@@ -110,6 +117,7 @@ public class Hunter : Character {
 
 	}
 
+	// TODO: remove
 	[Command]
 	void CmdScanTarget(NetworkInstanceId npcNetId) {
 		// Find npc's game object on this client
@@ -122,6 +130,14 @@ public class Hunter : Character {
 	[Command]
 	void CmdUpdateChargeRate(float chargeRate) {
 		RpcUpdateChargeRate(chargeRate);
+	}
+
+	[Command]
+	void CmdSpawnScanner(Vector2 position) {
+		// Create Scanner game object on the server
+		GameObject scanner = Instantiate(scannerPrefab, position, Quaternion.identity);
+		// Propogate to all clients
+		NetworkServer.Spawn(scanner);
 	}
 
 	// ClientRpc

@@ -430,48 +430,6 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
---- !u!1001 &1164335798
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4890277845703574, guid: 7b986d6411917d842a2f060dad0a914a, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: -0.06098938
-      objectReference: {fileID: 0}
-    - target: {fileID: 4890277845703574, guid: 7b986d6411917d842a2f060dad0a914a, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0.5405884
-      objectReference: {fileID: 0}
-    - target: {fileID: 4890277845703574, guid: 7b986d6411917d842a2f060dad0a914a, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4890277845703574, guid: 7b986d6411917d842a2f060dad0a914a, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4890277845703574, guid: 7b986d6411917d842a2f060dad0a914a, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4890277845703574, guid: 7b986d6411917d842a2f060dad0a914a, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4890277845703574, guid: 7b986d6411917d842a2f060dad0a914a, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4890277845703574, guid: 7b986d6411917d842a2f060dad0a914a, type: 2}
-      propertyPath: m_RootOrder
-      value: 7
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 100100000, guid: 7b986d6411917d842a2f060dad0a914a, type: 2}
-  m_IsPrefabParent: 0
 --- !u!1 &1331754791
 GameObject:
   m_ObjectHideFlags: 0
@@ -738,6 +696,7 @@ MonoBehaviour:
   - {fileID: 1042352181666248, guid: 976a2aeaf893c1c449c3e03ae03c1eb9, type: 2}
   - {fileID: 1744548462298568, guid: 8c3e18920cf16344f9ab25cbd87907fc, type: 2}
   - {fileID: 1404862278284056, guid: ffa472e8f9da3c84f800cbd41f67e177, type: 2}
+  - {fileID: 1000417727135242, guid: 4200222229faf4946bec29ce561682b2, type: 2}
   m_CustomConfig: 0
   m_MaxConnections: 4
   m_ConnectionConfig:

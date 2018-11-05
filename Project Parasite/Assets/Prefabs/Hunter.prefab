@@ -119,6 +119,8 @@ MonoBehaviour:
   stats: {fileID: 11400000, guid: 17a6e983b5d887a43b32bc85976f87f7, type: 2}
   detonationPrefab: {fileID: 1367730497659088, guid: 7b986d6411917d842a2f060dad0a914a,
     type: 2}
+  scannerPrefab: {fileID: 1000417727135242, guid: 4200222229faf4946bec29ce561682b2,
+    type: 2}
 --- !u!212 &212268207162185018
 SpriteRenderer:
   m_ObjectHideFlags: 1

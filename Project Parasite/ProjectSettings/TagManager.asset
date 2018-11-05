@@ -50,3 +50,6 @@ TagManager:
   - name: ClientCharacter
     uniqueID: 1974396419
     locked: 0
+  - name: Scanners
+    uniqueID: 10905597
+    locked: 0
