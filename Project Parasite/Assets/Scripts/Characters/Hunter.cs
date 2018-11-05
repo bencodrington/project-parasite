@@ -52,9 +52,10 @@ public class Hunter : Character {
 			float topOfGround;
 			// Check for ground in a line above and below mouse location
 			Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			// Maximum distance from mousePosition to check for ground
 			Vector2 offset = new Vector2(SCANNER_OFFSET_X, SCANNER_OFFSET_Y);
-			// TODO: obstacle layer mask
-			Collider2D ground = Physics2D.OverlapArea(mousePosition - offset, mousePosition + offset);
+			// Get all obstacles in the specified area
+			Collider2D ground = Physics2D.OverlapArea(mousePosition - offset, mousePosition + offset, obstacleLayerMask);
 			if (ground == null) { return; }
 			// If ground found, get y coordinate of top of ground
 			topOfGround = ground.transform.position.y + ground.transform.localScale.y / 2;

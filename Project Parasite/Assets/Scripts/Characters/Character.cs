@@ -13,6 +13,7 @@ public abstract class Character : NetworkBehaviour {
 	protected int characterLayerMask;
 	protected int parasiteLayerMask;
 	protected int npcLayerMask;
+	protected int obstacleLayerMask;
 
 	const float lagLerpFactor = 0.4f;
 
@@ -25,6 +26,7 @@ public abstract class Character : NetworkBehaviour {
 
 	void Start() {
 		// Initialize layer mask
+		obstacleLayerMask = 1 << LayerMask.NameToLayer("Obstacles");
 		parasiteLayerMask = 1 << LayerMask.NameToLayer("Parasites");
 		npcLayerMask = 1 << LayerMask.NameToLayer("NPCs");
 		// Character combines both of the above layer masks
