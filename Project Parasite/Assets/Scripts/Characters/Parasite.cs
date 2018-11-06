@@ -6,6 +6,8 @@ using UnityEngine.Networking;
 public class Parasite : Character {
 
 	private float jumpVelocity = .5f;
+	// Whether the "UP" key was being pressed last frame
+	private bool oldUp = false;
 
 	protected override void HandleInput()  {
 		// Movement
@@ -28,10 +30,22 @@ public class Parasite : Character {
 			physicsEntity.velocityY = 0;
 		}
 
-		// Jump
-		if (Input.GetKeyDown(KeyCode.W) && physicsEntity.IsOnGround()) {
+		bool up = Input.GetKey(KeyCode.W);
+		bool down = Input.GetKey(KeyCode.S);
+		if (up && !oldUp && physicsEntity.IsOnGround()) {
+			// Jump
 			physicsEntity.AddVelocity(0, jumpVelocity);
+		} else if (up && isOnWall()) {
+			// Climb Up
+			physicsEntity.velocityY = stats.movementSpeed;
 		}
+		if (down && isOnWall()) {
+			// Climb Down
+			physicsEntity.velocityY = -stats.movementSpeed;
+		}
+		oldUp = up;
+		
+
 
 		// Infect
 		if (Input.GetMouseButtonDown(0)) {
@@ -41,6 +55,10 @@ public class Parasite : Character {
 				CmdDestroyParasite();
 			}
 		}
+	}
+
+	bool isOnWall() {
+		return physicsEntity.IsOnLeftWall() || physicsEntity.IsOnRightWall();
 	}
 
 	// COMMANDS
