@@ -17,13 +17,13 @@ public class ElevatorCallField : NetworkBehaviour {
 		int hunterMask = 1 << LayerMask.NameToLayer("Hunters");
 		int npcMask = 1 << LayerMask.NameToLayer("NPCs");
 		int parasiteMask = 1 << LayerMask.NameToLayer("Parasites");
-		callerLayerMask = hunterMask + npcMask + parasiteMask;
-							
+		callerLayerMask = hunterMask + npcMask + parasiteMask;				
 	} 
 
 	void FixedUpdate() {
 		if (!isServer) { return; }
 		// TODO: this probably doesn't need to run every single physics update
+		// Check for entity within borders
 		caller = Physics2D.OverlapArea(transform.position,
 										transform.position + new Vector3(size.x, size.y, 0),
 										callerLayerMask);
