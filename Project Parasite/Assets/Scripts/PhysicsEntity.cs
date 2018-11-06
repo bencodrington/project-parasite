@@ -22,6 +22,12 @@ public class PhysicsEntity {
 
 	private bool _isOnGround = false;
 	public bool IsOnGround() { return _isOnGround; }
+	private bool _isOnLeftWall = false;
+	public bool IsOnLeftWall() { return _isOnLeftWall; }
+	private bool _isOnRightWall = false;
+	public bool IsOnRightWall() { return _isOnRightWall; }
+
+	public bool applyGravity = true;
 
 	int obstacleLayerMask = 1 << LayerMask.NameToLayer("Obstacles");
 
@@ -34,20 +40,20 @@ public class PhysicsEntity {
 	}
 
 	public void Update () {
-		// Apply Gravity
-		velocityY += gravityAcceleration * Time.deltaTime;
-		if (Input.GetKey(KeyCode.Q)) {
-			Debug.Log("velocityY: " + velocityY);
+		if (applyGravity) {
+			// Apply Gravity
+			velocityY += gravityAcceleration * Time.deltaTime;
 		}
 		// Store attempted new position
 		Vector2 newPosition = new Vector2(transform.position.x + velocityX, transform.position.y + velocityY);
-		// Check for, and resolve, collisions
-		newPosition = new Vector2(CheckBeside(newPosition), CheckBelow(newPosition));
+		// TODO: It may become necessary to loop the below line until it doesn't change
+		// Check for, and resolve, collisions below, and then beside
+		newPosition = CheckBeside(CheckBelow(newPosition));
 		// Set new position
 		transform.position = newPosition;
 	}
 
-	float CheckBelow(Vector2 newPosition) {
+	Vector2 CheckBelow(Vector2 newPosition) {
 		float obstacleHeight;
 		Collider2D obstacleBelow;
 		Vector2 pixelBelow = newPosition + new Vector2(0, -height);
@@ -73,40 +79,47 @@ public class PhysicsEntity {
 			// Nothing is below entity
 			_isOnGround = false;
 		}
-		return newPosition.y;
+		return newPosition;
 	}
 
-	float CheckBeside(Vector2 newPosition) {
+	Vector2 CheckBeside(Vector2 newPosition) {
 		float obstacleWidth;
-		Collider2D obstacleToTheLeft, obstacleToTheRight;
+		Collider2D obstacleToTheLeft = null;
+		Collider2D obstacleToTheRight = null;
+		_isOnLeftWall = false;
+		_isOnRightWall = false;
 		Vector2 pixelToTheLeft 	= newPosition + new Vector2(-width, 0);
 		Vector2 pixelToTheRight = newPosition + new Vector2(width, 0);
+		// TODO: remove
+		Debug.DrawLine(oldPixelToTheLeft, pixelToTheLeft);
+		Debug.DrawLine(oldPixelToTheRight, pixelToTheRight);
 		// If moving left
 		if (velocityX < 0) {
 			obstacleToTheLeft	= Physics2D.OverlapArea(oldPixelToTheLeft, pixelToTheLeft, obstacleLayerMask);
-			obstacleToTheRight 	= null;
-		} else { // Moving right
+		} else if (velocityX > 0) { // Moving right
 			obstacleToTheRight 	= Physics2D.OverlapArea(oldPixelToTheRight, pixelToTheRight, obstacleLayerMask);
-			obstacleToTheLeft	= null;
 		}
-		oldPixelToTheLeft = pixelToTheLeft;
-		oldPixelToTheRight = pixelToTheRight;
 
 		// Handle Collisions
 		if (obstacleToTheLeft != null) {
+			Debug.DrawLine(oldPixelToTheLeft, pixelToTheLeft, Color.red, 10f);
 			// Stop moving
 			velocityX = 0;
 			// Align left edge of entity with right edge of obstacle
 			obstacleWidth = obstacleToTheLeft.transform.localScale.x / 2;
 			newPosition.x = obstacleToTheLeft.transform.position.x + obstacleWidth + width;
+			_isOnLeftWall = true;
 		}
 		if (obstacleToTheRight != null) {
 			velocityX = 0;
 			obstacleWidth = obstacleToTheRight.transform.localScale.x / 2;
 			newPosition.x = obstacleToTheRight.transform.position.x - obstacleWidth - width;
+			_isOnRightWall = true;
 		}
 
-		return newPosition.x;
+		oldPixelToTheLeft = pixelToTheLeft;
+		oldPixelToTheRight = pixelToTheRight;
+		return newPosition;
 	}
 
 	public void AddVelocity(float x, float y) {

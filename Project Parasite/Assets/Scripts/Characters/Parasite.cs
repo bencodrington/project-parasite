@@ -13,11 +13,19 @@ public class Parasite : Character {
 		bool right = Input.GetKey(KeyCode.D);
 		bool left = Input.GetKey(KeyCode.A);
 		if (right && !left) {
+			physicsEntity.applyGravity = !physicsEntity.IsOnRightWall();
 			physicsEntity.velocityX = stats.movementSpeed;
 		} else if (left && !right) {
+			physicsEntity.applyGravity = !physicsEntity.IsOnLeftWall();
 			physicsEntity.velocityX = -stats.movementSpeed;
 		} else {
+			physicsEntity.applyGravity = true;
 			physicsEntity.velocityX = 0;
+		}
+
+		if (physicsEntity.IsOnLeftWall() || physicsEntity.IsOnRightWall()) {
+			// Don't maintain momentum from previous movement
+			physicsEntity.velocityY = 0;
 		}
 
 		// Jump

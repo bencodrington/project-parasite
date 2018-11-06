@@ -832,7 +832,7 @@ GameObject:
   - component: {fileID: 1483340696}
   - component: {fileID: 1483340695}
   m_Layer: 8
-  m_Name: Floor (1)
+  m_Name: Floor double layer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
