@@ -9,12 +9,12 @@ public class PhysicsEntity {
 
 	// Gravity increases by a rate of 1 unit/second per second
 	float gravityAcceleration = -1f;
-	// TODO: Limit overall speed, not just velocityY
-	float maxSpeed = 5f;
 	public float velocityX = 0f;
 	public float velocityY = 0f;
 
 	private Vector2 oldPixelBelow;
+	private Vector2 oldPixelToTheLeft;
+	private Vector2 oldPixelToTheRight;
 
 	private const float DEFAULT_GRAVITY = -2f;
 
@@ -32,22 +32,28 @@ public class PhysicsEntity {
 	}
 
 	public void Update () {
-		float obstacleHeight, obstacleWidth;
 		// Apply Gravity
-		velocityY = Mathf.Clamp(velocityY + gravityAcceleration * Time.deltaTime, -maxSpeed, maxSpeed);
+		velocityY += gravityAcceleration * Time.deltaTime;
 		if (Input.GetKey(KeyCode.Q)) {
 			Debug.Log("velocityY: " + velocityY);
 		}
 		// Store attempted new position
 		Vector2 newPosition = new Vector2(transform.position.x + velocityX, transform.position.y + velocityY);
-		// BELOW
-		// Set up point to check for collisions
-		Vector2 pixelBelow 			= newPosition + new Vector2(0, -height);
-		Debug.DrawLine(oldPixelBelow, pixelBelow);
-		// Cast ray
+		// Check for, and resolve, collisions
+		newPosition = new Vector2(CheckBeside(newPosition), CheckBelow(newPosition));
+		// Set new position
+		transform.position = newPosition;
+	}
+
+	float CheckBelow(Vector2 newPosition) {
+		float obstacleHeight;
 		Collider2D obstacleBelow;
-		// If moving down, check for obstacles encountered between current position and new position
+		Vector2 pixelBelow = newPosition + new Vector2(0, -height);
+		// TODO: remove
+		Debug.DrawLine(oldPixelBelow, pixelBelow);
+		// If moving down
 		if (velocityY < 0) {
+			// Check for obstacles encountered between current position and new position
 			obstacleBelow = Physics2D.OverlapArea(oldPixelBelow, pixelBelow, obstacleLayerMask);
 		} else {
 			obstacleBelow = null;
@@ -57,7 +63,7 @@ public class PhysicsEntity {
 		if (obstacleBelow != null) {
 			// Entity is touching the ground
 			_isOnGround = true;
-			// Then new velocityY is 0 and position is directly above the obstacle
+			// Then new velocityY is 0 and position self directly above the obstacle
 			velocityY = 0;
 			obstacleHeight = obstacleBelow.transform.localScale.y / 2;
 			newPosition.y = obstacleBelow.transform.position.y + obstacleHeight + height;
@@ -65,20 +71,30 @@ public class PhysicsEntity {
 			// Nothing is below entity
 			_isOnGround = false;
 		}
-		// BESIDE
-		// Set up points to check for collisions
-		Vector2 pixelToTheLeft 			= newPosition + new Vector2(-width, 0);
-		Vector2 pixelToTheRight 		= newPosition + new Vector2(width, 0);
-		// Cast rays
-		Collider2D obstacleToTheLeft 	= Physics2D.OverlapPoint(pixelToTheLeft, obstacleLayerMask);
-		Collider2D obstacleToTheRight 	= Physics2D.OverlapPoint(pixelToTheRight, obstacleLayerMask);
-		// Handle Collisions
-		if (obstacleToTheLeft != null && obstacleToTheRight != null) {
-			Debug.LogError("Error: PhysicsEntity is being crushed.");
-			return;
+		return newPosition.y;
+	}
+
+	float CheckBeside(Vector2 newPosition) {
+		float obstacleWidth;
+		Collider2D obstacleToTheLeft, obstacleToTheRight;
+		Vector2 pixelToTheLeft 	= newPosition + new Vector2(-width, 0);
+		Vector2 pixelToTheRight = newPosition + new Vector2(width, 0);
+		// If moving left
+		if (velocityX < 0) {
+			obstacleToTheLeft	= Physics2D.OverlapArea(oldPixelToTheLeft, pixelToTheLeft, obstacleLayerMask);
+			obstacleToTheRight 	= null;
+		} else { // Moving right
+			obstacleToTheRight 	= Physics2D.OverlapArea(oldPixelToTheRight, pixelToTheRight, obstacleLayerMask);
+			obstacleToTheLeft	= null;
 		}
+		oldPixelToTheLeft = pixelToTheLeft;
+		oldPixelToTheRight = pixelToTheRight;
+
+		// Handle Collisions
 		if (obstacleToTheLeft != null) {
+			// Stop moving
 			velocityX = 0;
+			// Align left edge of entity with right edge of obstacle
 			obstacleWidth = obstacleToTheLeft.transform.localScale.x / 2;
 			newPosition.x = obstacleToTheLeft.transform.position.x + obstacleWidth + width;
 		}
@@ -87,8 +103,8 @@ public class PhysicsEntity {
 			obstacleWidth = obstacleToTheRight.transform.localScale.x / 2;
 			newPosition.x = obstacleToTheRight.transform.position.x - obstacleWidth - width;
 		}
-		// Finally set new position
-		transform.position = newPosition;
+
+		return newPosition.x;
 	}
 
 	public void AddVelocity(float x, float y) {
