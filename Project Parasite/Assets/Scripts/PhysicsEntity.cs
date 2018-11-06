@@ -102,7 +102,6 @@ public class PhysicsEntity {
 
 		// Handle Collisions
 		if (obstacleToTheLeft != null) {
-			Debug.DrawLine(oldPixelToTheLeft, pixelToTheLeft, Color.red, 10f);
 			// Stop moving
 			velocityX = 0;
 			// Align left edge of entity with right edge of obstacle
