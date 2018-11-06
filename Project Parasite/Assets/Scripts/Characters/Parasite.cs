@@ -35,6 +35,9 @@ public class Parasite : Character {
 		if (up && !oldUp && physicsEntity.IsOnGround()) {
 			// Jump
 			physicsEntity.AddVelocity(0, jumpVelocity);
+		} else if (up && physicsEntity.IsOnCeiling()) {
+			// Stick to ceiling
+			physicsEntity.applyGravity = false;
 		} else if (up && isOnWall()) {
 			// Climb Up
 			physicsEntity.velocityY = stats.movementSpeed;

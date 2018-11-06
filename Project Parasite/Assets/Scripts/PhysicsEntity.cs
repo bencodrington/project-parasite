@@ -17,11 +17,14 @@ public class PhysicsEntity {
 	public float velocityY = 0f;
 
 	private Vector2 oldPixelBelow;
+	private Vector2 oldPixelAbove;
 	private Vector2 oldPixelToTheLeft;
 	private Vector2 oldPixelToTheRight;
 
 	private bool _isOnGround = false;
 	public bool IsOnGround() { return _isOnGround; }
+	private bool _isOnCeiling = false;
+	public bool IsOnCeiling() { return _isOnCeiling; }
 	private bool _isOnLeftWall = false;
 	public bool IsOnLeftWall() { return _isOnLeftWall; }
 	private bool _isOnRightWall = false;
@@ -48,15 +51,19 @@ public class PhysicsEntity {
 		Vector2 newPosition = new Vector2(transform.position.x + velocityX, transform.position.y + velocityY);
 		// TODO: It may become necessary to loop the below line until it doesn't change
 		// Check for, and resolve, collisions below, and then beside
-		newPosition = CheckBeside(CheckBelow(newPosition));
+		newPosition = CheckBeside(CheckAboveAndBelow(newPosition));
 		// Set new position
 		transform.position = newPosition;
 	}
 
-	Vector2 CheckBelow(Vector2 newPosition) {
+	Vector2 CheckAboveAndBelow(Vector2 newPosition) {
 		float obstacleHeight;
-		Collider2D obstacleBelow;
+		Collider2D obstacleBelow = null;
+		Collider2D obstacleAbove = null;
 		Vector2 pixelBelow = newPosition + new Vector2(0, -height);
+		Vector2 pixelAbove = newPosition + new Vector2(0, height);
+		_isOnGround = false;
+		_isOnCeiling = false;
 		// TODO: remove
 		Debug.DrawLine(oldPixelBelow, pixelBelow);
 		// If moving down
@@ -64,9 +71,8 @@ public class PhysicsEntity {
 			// Check for obstacles encountered between current position and new position
 			obstacleBelow = Physics2D.OverlapArea(oldPixelBelow, pixelBelow, obstacleLayerMask);
 		} else {
-			obstacleBelow = null;
+			obstacleAbove = Physics2D.OverlapArea(oldPixelAbove, pixelAbove, obstacleLayerMask);
 		}
-		oldPixelBelow = pixelBelow;
 		// Handle Collisions
 		if (obstacleBelow != null) {
 			// Entity is touching the ground
@@ -75,10 +81,15 @@ public class PhysicsEntity {
 			velocityY = 0;
 			obstacleHeight = obstacleBelow.transform.localScale.y / 2;
 			newPosition.y = obstacleBelow.transform.position.y + obstacleHeight + height;
-		} else {
-			// Nothing is below entity
-			_isOnGround = false;
 		}
+		if (obstacleAbove != null) {
+			_isOnCeiling = true;
+			velocityY = 0;
+			obstacleHeight = obstacleAbove.transform.localScale.y / 2;
+			newPosition.y = obstacleAbove.transform.position.y - obstacleHeight - height;
+		}
+		oldPixelBelow = pixelBelow;
+		oldPixelAbove = pixelAbove;
 		return newPosition;
 	}
 
@@ -115,7 +126,6 @@ public class PhysicsEntity {
 			newPosition.x = obstacleToTheRight.transform.position.x - obstacleWidth - width;
 			_isOnRightWall = true;
 		}
-
 		oldPixelToTheLeft = pixelToTheLeft;
 		oldPixelToTheRight = pixelToTheRight;
 		return newPosition;
