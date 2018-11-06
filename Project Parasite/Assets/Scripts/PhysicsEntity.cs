@@ -14,6 +14,8 @@ public class PhysicsEntity {
 	public float velocityX = 0f;
 	public float velocityY = 0f;
 
+	private Vector2 oldPixelBelow;
+
 	private const float DEFAULT_GRAVITY = -2f;
 
 	private bool _isOnGround = false;
@@ -26,19 +28,31 @@ public class PhysicsEntity {
 		this.height = height;
 		this.width = width;
 		this.gravityAcceleration = DEFAULT_GRAVITY;
+		oldPixelBelow = transform.position;
 	}
 
 	public void Update () {
 		float obstacleHeight, obstacleWidth;
 		// Apply Gravity
 		velocityY = Mathf.Clamp(velocityY + gravityAcceleration * Time.deltaTime, -maxSpeed, maxSpeed);
+		if (Input.GetKey(KeyCode.Q)) {
+			Debug.Log("velocityY: " + velocityY);
+		}
 		// Store attempted new position
 		Vector2 newPosition = new Vector2(transform.position.x + velocityX, transform.position.y + velocityY);
 		// BELOW
 		// Set up point to check for collisions
 		Vector2 pixelBelow 			= newPosition + new Vector2(0, -height);
+		Debug.DrawLine(oldPixelBelow, pixelBelow);
 		// Cast ray
-		Collider2D obstacleBelow 	= Physics2D.OverlapPoint(pixelBelow, obstacleLayerMask);
+		Collider2D obstacleBelow;
+		// If moving down, check for obstacles encountered between current position and new position
+		if (velocityY < 0) {
+			obstacleBelow = Physics2D.OverlapArea(oldPixelBelow, pixelBelow, obstacleLayerMask);
+		} else {
+			obstacleBelow = null;
+		}
+		oldPixelBelow = pixelBelow;
 		// Handle Collisions
 		if (obstacleBelow != null) {
 			// Entity is touching the ground
