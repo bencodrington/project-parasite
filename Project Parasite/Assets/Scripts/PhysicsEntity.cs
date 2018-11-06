@@ -1,22 +1,24 @@
 ﻿using UnityEngine;
 
 public class PhysicsEntity {
+
+	private const float DEFAULT_GRAVITY = -2f;
+
 	Transform transform;
 
 	// Hitbox dimensions: 2*height by 2*width
-	float height = 0.5f;
-	float width = 0.5f;
+	float height;
+	float width;
 
 	// Gravity increases by a rate of 1 unit/second per second
-	float gravityAcceleration = -1f;
+	float gravityAcceleration;
+
 	public float velocityX = 0f;
 	public float velocityY = 0f;
 
 	private Vector2 oldPixelBelow;
 	private Vector2 oldPixelToTheLeft;
 	private Vector2 oldPixelToTheRight;
-
-	private const float DEFAULT_GRAVITY = -2f;
 
 	private bool _isOnGround = false;
 	public bool IsOnGround() { return _isOnGround; }
