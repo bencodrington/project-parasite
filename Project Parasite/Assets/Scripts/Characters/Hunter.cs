@@ -7,6 +7,8 @@ public class Hunter : Character {
 
 	const float DETONATION_RADIUS = 1.5f;
 	const float TIME_UNTIL_CHARGE_READY = 1.5f;
+	const float TIME_UNTIL_AUTO_DETONATE = 3.5f;
+	const float TIME_BETWEEN_READY_AND_DETONATE = TIME_UNTIL_AUTO_DETONATE - TIME_UNTIL_CHARGE_READY;
 	// Maximum distance from the surface of the ground to consider
 	// 	that space valid for placing a scanner
 	const float SCANNER_OFFSET_X = 0.1f;
@@ -29,11 +31,15 @@ public class Hunter : Character {
 			if (!isCharging) {
 				// Start charging
 				isCharging = true;
+			} else if (timeSpentCharging > TIME_UNTIL_AUTO_DETONATE) {
+				// Detonate on self
+				CmdAttackPoint(transform.position);
+				ResetCharge();
 			} else {
 				// Continue charging
 				timeSpentCharging += Time.deltaTime;
-				UpdateChargeRate(timeSpentCharging / TIME_UNTIL_CHARGE_READY);
-				CmdUpdateChargeRate(timeSpentCharging / TIME_UNTIL_CHARGE_READY);
+				UpdateChargeRate(timeSpentCharging);
+				CmdUpdateChargeRate(timeSpentCharging);
 			}
 		} else if (isCharging) {
 			// Mouse1 just released
@@ -41,10 +47,7 @@ public class Hunter : Character {
 				// Sufficiently charged
 				FireCharge();
 			} // TODO: else { Sputter }
-			isCharging = false;
-			timeSpentCharging = 0f;
-			UpdateChargeRate(0f);
-			CmdUpdateChargeRate(0f);
+			ResetCharge();
 		}
 
 		// Place Scanner
@@ -78,9 +81,31 @@ public class Hunter : Character {
 		}
 	}
 
-	void UpdateChargeRate(float chargeRate) {
-		Color newColour = Color.Lerp(restingColour, chargedColour, chargeRate);
+	void UpdateChargeRate(float timeSpentCharging) {
+		float flashRate, timeRemaining, chargeRate;
+		Color newColour = Color.green;
+
+		// Get more yellow the closer to being charged we are
+		chargeRate = timeSpentCharging / TIME_UNTIL_CHARGE_READY;
+		newColour = Color.Lerp(restingColour, chargedColour, chargeRate);
+		// If we're fully charged
+		if (timeSpentCharging > TIME_UNTIL_CHARGE_READY) {
+			timeRemaining = TIME_UNTIL_AUTO_DETONATE - timeSpentCharging;
+			// Flash faster the closer to self-combustion
+			flashRate = timeRemaining > (TIME_BETWEEN_READY_AND_DETONATE / 3) ? 0.4f : 0.1f;
+			// Flash red every [flashRate] seconds for 0.02 seconds
+			if ((timeRemaining % flashRate) < 0.02f) {
+				newColour = Color.red;
+			}
+		}
 		GetComponentInChildren<SpriteRenderer>().color = newColour;
+	}
+
+	void ResetCharge() {
+		isCharging = false;
+		timeSpentCharging = 0f;
+		UpdateChargeRate(0f);
+		CmdUpdateChargeRate(0f);
 	}
 
 	// Commands
