@@ -39,6 +39,12 @@ public class PlayerObject : NetworkBehaviour {
 	private const int STARTING_PARASITE_HEALTH = 100;
 	private const int UI_PADDING_DISTANCE = 9;
 
+	void Start() {
+		if (isLocalPlayer) {
+			FindObjectOfType<ClientInformation>().localPlayer = this;
+		}
+	}
+
 	void Update () {
 		// Runs on everyone's computer, regardless of whether they own this player object
 		if (isLocalPlayer == false) { return; }
@@ -91,14 +97,19 @@ public class PlayerObject : NetworkBehaviour {
 		RpcRemoveHud();
 	}
 
+	[Command]
+	public void CmdCallElevatorToStop(NetworkInstanceId elevatorId, int stopIndex) {
+		NetworkServer.FindLocalObject(elevatorId).GetComponentInChildren<Elevator>().CmdCallToStop(stopIndex);
+	}
+
+	// Client RPCs
+
 	[ClientRpc]
 	public void RpcTakeDamage(int damage) {
 		if (isLocalPlayer) {
 			Health -= damage;
 		}
 	}
-
-	// Client RPCs
 
 	[ClientRpc]
 	public void RpcSetCharacterType(CharacterType newCharacterType) {

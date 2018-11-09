@@ -7,11 +7,35 @@ public class Elevator : NetworkBehaviour {
 	
 	const float LAG_LERP_FACTOR = 0.4f;
 	const float MOVEMENT_SPEED = 4f;
+	const float BUTTON_OFFSET = 0.5f;
 
 	public Vector2[] stops;
+	public Vector2 size;
+
+	public GameObject buttonPrefab;
+
 	int targetStop;
 	Vector3 serverPosition;
 	bool isMoving = false;
+	
+	private Collider2D[] passengers;
+	private int passengerLayerMask;
+
+	void Start() {
+		int hunterMask = 1 << LayerMask.NameToLayer("Hunters");
+		int npcMask = 1 << LayerMask.NameToLayer("NPCs");
+		int parasiteMask = 1 << LayerMask.NameToLayer("Parasites");
+		passengerLayerMask = hunterMask + npcMask + parasiteMask;	
+
+		Vector2 spawnPos = new Vector2(transform.position.x, transform.position.y + (size.y / 2));
+		// Spawn button prefabs based on # of stops
+		for (int i = 0; i < stops.Length; i++) {
+			spawnPos.y += BUTTON_OFFSET;
+			ElevatorButton button = Instantiate(buttonPrefab, spawnPos, Quaternion.identity, transform).GetComponentInChildren<ElevatorButton>();
+			button.stopIndex = i;
+			button.elevatorId = this.netId;
+		}
+	}
 
 	void Update() {
 		if (isServer) { return; }
@@ -24,9 +48,20 @@ public class Elevator : NetworkBehaviour {
 		if (isServer) {
 			if (isMoving) {
 				MoveToTargetStop();
+			} else {
+				// TODO: this probably doesn't need to run every single physics update
+				// Check for entity within borders
+				passengers = Physics2D.OverlapAreaAll(transform.position,
+												transform.position + new Vector3(size.x, size.y, 0),
+												passengerLayerMask);
+				Debug.DrawLine(transform.position, transform.position + new Vector3(size.x, size.y, 0));
+				if (passengers.Length > 0) {
+					// TODO: Show Buttons
+				}
 			}
 			RpcUpdateServerPosition(transform.position);
 		}
+		
 	}
 
 	void MoveToTargetStop() {

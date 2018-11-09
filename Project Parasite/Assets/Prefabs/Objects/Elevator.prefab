@@ -197,6 +197,9 @@ MonoBehaviour:
   stops:
   - {x: -15, y: -0.5}
   - {x: -15, y: 11.5}
+  size: {x: 0, y: 0}
+  buttonPrefab: {fileID: 1033965413891920, guid: f3dfc9ff2808eee409e1cd94896183e0,
+    type: 2}
 --- !u!114 &114291094327166142
 MonoBehaviour:
   m_ObjectHideFlags: 1

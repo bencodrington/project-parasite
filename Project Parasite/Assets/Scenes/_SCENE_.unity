@@ -335,6 +335,16 @@ Prefab:
       propertyPath: stops.Array.data[2].y
       value: 23.5
       objectReference: {fileID: 0}
+    - target: {fileID: 114118296409918906, guid: ecc1121d7c76816448f88a024b0d363a,
+        type: 2}
+      propertyPath: size.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114118296409918906, guid: ecc1121d7c76816448f88a024b0d363a,
+        type: 2}
+      propertyPath: size.y
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ecc1121d7c76816448f88a024b0d363a, type: 2}
   m_IsPrefabParent: 0
@@ -2493,6 +2503,16 @@ Prefab:
         type: 2}
       propertyPath: stops.Array.data[1].x
       value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 114118296409918906, guid: ecc1121d7c76816448f88a024b0d363a,
+        type: 2}
+      propertyPath: size.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114118296409918906, guid: ecc1121d7c76816448f88a024b0d363a,
+        type: 2}
+      propertyPath: size.y
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ecc1121d7c76816448f88a024b0d363a, type: 2}
