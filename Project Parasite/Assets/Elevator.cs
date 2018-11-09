@@ -20,8 +20,11 @@ public class Elevator : NetworkBehaviour {
 	
 	private Collider2D[] passengers;
 	private int passengerLayerMask;
+	private ElevatorButton[] buttons;
 
 	void Start() {
+		ElevatorButton button;
+		buttons = new ElevatorButton[stops.Length];
 		int hunterMask = 1 << LayerMask.NameToLayer("Hunters");
 		int npcMask = 1 << LayerMask.NameToLayer("NPCs");
 		int parasiteMask = 1 << LayerMask.NameToLayer("Parasites");
@@ -31,10 +34,12 @@ public class Elevator : NetworkBehaviour {
 		// Spawn button prefabs based on # of stops
 		for (int i = 0; i < stops.Length; i++) {
 			spawnPos.y += BUTTON_OFFSET;
-			ElevatorButton button = Instantiate(buttonPrefab, spawnPos, Quaternion.identity, transform).GetComponentInChildren<ElevatorButton>();
+			button = Instantiate(buttonPrefab, spawnPos, Quaternion.identity, transform).GetComponentInChildren<ElevatorButton>();
 			button.stopIndex = i;
 			button.elevatorId = this.netId;
+			buttons[i] = button;
 		}
+
 	}
 
 	void Update() {
@@ -51,12 +56,16 @@ public class Elevator : NetworkBehaviour {
 			} else {
 				// TODO: this probably doesn't need to run every single physics update
 				// Check for entity within borders
-				passengers = Physics2D.OverlapAreaAll(transform.position,
-												transform.position + new Vector3(size.x, size.y, 0),
+				Vector2 halfSize = size / 2;
+				passengers = Physics2D.OverlapAreaAll((Vector2)transform.position - halfSize,
+												(Vector2)transform.position + halfSize,
 												passengerLayerMask);
-				Debug.DrawLine(transform.position, transform.position + new Vector3(size.x, size.y, 0));
+				Debug.DrawLine((Vector2)transform.position - halfSize, (Vector2)transform.position + halfSize);
 				if (passengers.Length > 0) {
-					// TODO: Show Buttons
+					// Show buttons on server
+					SetButtonEnabled(true);
+					// Show buttons on client
+					RpcSetButtonEnabled(true);
 				}
 			}
 			RpcUpdateServerPosition(transform.position);
@@ -78,12 +87,20 @@ public class Elevator : NetworkBehaviour {
 
 	}
 
+	void SetButtonEnabled(bool isEnabled) {
+		for (int i = 0; i < buttons.Length; i++) {
+			buttons[i].IsEnabled = isEnabled;
+		}
+	}
+
 	// Commands
 
 	[Command]
 	public void CmdCallToStop(int indexOfStop) {
 		targetStop = indexOfStop;
 		isMoving = true;
+		SetButtonEnabled(false);
+		RpcSetButtonEnabled(false);
 	}
 
 	// ClientRpc
@@ -93,6 +110,13 @@ public class Elevator : NetworkBehaviour {
 		if (isServer) { return; }
 		// Else, on a client machine, so update our record of the elevator's true position
 		serverPosition = newPosition;
+	}
+
+	[ClientRpc]
+	void RpcSetButtonEnabled(bool isEnabled) {
+		if (!isServer) {
+			SetButtonEnabled(isEnabled);
+		}
 	}
 
 

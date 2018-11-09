@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class ElevatorButton : NetworkBehaviour {
+public class ElevatorButton : MonoBehaviour {
 
 	// The width and height of this button's "clickbox"
 	public Vector2 size;
@@ -11,8 +11,28 @@ public class ElevatorButton : NetworkBehaviour {
 	public int stopIndex;
 	// The elevator this button belongs to
 	public NetworkInstanceId elevatorId;
+
+	private SpriteRenderer spriteRenderer;
+	private bool _isEnabled;
+	public bool IsEnabled {
+		get {
+			return _isEnabled;
+		} set {
+			spriteRenderer.color = new Color(spriteRenderer.color.r,
+											spriteRenderer.color.g,
+											spriteRenderer.color.b,
+											value ? 1 : 0);
+			_isEnabled = value;
+		}
+	}
+
+	void Start() {
+		spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+		IsEnabled = false;
+	}
 	
 	void Update () {
+		if (!_isEnabled) { return; }
 		Vector2 mousePosition, bottomLeft, topRight;
 		Vector2 halfSize = size / 2;
 		// Upon mouse click
