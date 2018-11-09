@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 public class Elevator : NetworkBehaviour {
 	
 	const float LAG_LERP_FACTOR = 0.4f;
-	const float MOVEMENT_SPEED = 1f;
+	const float MOVEMENT_SPEED = 4f;
 
 	public Vector2[] stops;
 	int targetStop;
