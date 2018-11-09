@@ -61,6 +61,8 @@ public class PlayerObject : NetworkBehaviour {
 		// Initialize each player's character on their own client
 		character.RpcGeneratePhysicsEntity(velocity);
 		character.playerObject = this;
+		// Ensure character snaps to its starting position on all clients
+		character.CmdUpdatePosition(atPosition, true);
 		//  Set character as new target of camera
 		character.RpcSetCameraFollow();
 		character.RpcSetRenderLayer();

@@ -38,7 +38,7 @@ public class NonPlayerCharacter : Character {
 		if (isInfected && hasAuthority || (!isInfected && isServer && physicsEntity != null)) {
 			// Run physics update and notify server
 			physicsEntity.Update();
-			CmdUpdatePosition(transform.position);
+			CmdUpdatePosition(transform.position, false);
 		}
 	}
 

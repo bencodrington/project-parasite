@@ -9,6 +9,7 @@ public abstract class Character : NetworkBehaviour {
 	protected PhysicsEntity physicsEntity;
 
 	protected Vector3 serverPosition;
+	protected bool shouldSnapToServerPosition = false;
 	
 	protected int characterLayerMask;
 	protected int parasiteLayerMask;
@@ -41,7 +42,12 @@ public abstract class Character : NetworkBehaviour {
 			HandleInput();
 		} else {
 			// Verify current position is up to date with server position
-			transform.position = Vector3.Lerp(transform.position, serverPosition, lagLerpFactor);
+			if (shouldSnapToServerPosition) {
+				transform.position = serverPosition;
+				shouldSnapToServerPosition = false;
+			} else {
+				transform.position = Vector3.Lerp(transform.position, serverPosition, lagLerpFactor);
+			}
 		}
 	}
 
@@ -50,7 +56,7 @@ public abstract class Character : NetworkBehaviour {
 			physicsEntity.Update();
 			// Update the server's position
 			// TODO: clump these updates to improve network usage?
-			CmdUpdatePosition(transform.position);
+			CmdUpdatePosition(transform.position, false);
 		}
 	}
 
@@ -70,12 +76,12 @@ public abstract class Character : NetworkBehaviour {
 	// COMMANDS
 
 	[Command]
-	protected void CmdUpdatePosition(Vector3 newPosition) {
+	public void CmdUpdatePosition(Vector3 newPosition, bool snapToNewPos) {
 		// TODO: verify new position is legal
 		// Only change serverPosition if newPosition is different, to reduce unnecessary Rpc calls
 		if (serverPosition != newPosition) {
 			serverPosition = newPosition;
-			RpcUpdateServerPosition(serverPosition);
+			RpcUpdateServerPosition(serverPosition, snapToNewPos);
 		}
 	}
 
@@ -87,8 +93,9 @@ public abstract class Character : NetworkBehaviour {
 	// CLIENTRPC
 
 	[ClientRpc]
-	void RpcUpdateServerPosition(Vector3 newPosition) {
+	void RpcUpdateServerPosition(Vector3 newPosition, bool snapToNewPos) {
 		serverPosition = newPosition;
+		shouldSnapToServerPosition = snapToNewPos;
 	}
 
 	[ClientRpc]

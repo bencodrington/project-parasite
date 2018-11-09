@@ -70,6 +70,8 @@ public class NpcManager : NetworkBehaviour {
 			NetworkServer.Spawn(npc.gameObject);
 
 			npc.RpcGeneratePhysicsEntity(Vector2.zero);
+			// Ensure npc snaps to it's starting position on all clients
+			npc.CmdUpdatePosition(spawnPos, true);
 			StartCoroutine(npc.Idle());
 		}
 	}
