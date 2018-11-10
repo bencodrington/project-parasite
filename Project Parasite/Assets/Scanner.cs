@@ -69,7 +69,6 @@ public class Scanner : NetworkBehaviour {
 
     [ClientRpc]
     void RpcSetBeamSpriteScale(float distanceToCeiling) {
-        Debug.Log(distanceToCeiling);
         spriteRenderer.transform.localScale = new Vector2(spriteRenderer.transform.localScale.x, distanceToCeiling);
         spriteRenderer.transform.position = new Vector2(spriteRenderer.transform.position.x, transform.position.y + distanceToCeiling / 2);
     }
