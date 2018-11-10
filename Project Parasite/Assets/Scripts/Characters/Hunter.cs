@@ -20,8 +20,8 @@ public class Hunter : Character {
 	bool isCharging = false;
 	float timeSpentCharging = 0f;
 
-	Color restingColour = Color.green;
-	Color chargedColour = Color.yellow;
+	Color restingColour = Color.white;
+	Color chargedColour = Color.green;
 
 	protected override void HandleInput()  {
 		// Movement

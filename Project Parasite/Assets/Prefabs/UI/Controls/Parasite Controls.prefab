@@ -60,9 +60,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: '[W] Jump
-
-    [A and D] Move left and right
+  m_Text: '[W,A,S,D] Crawl along walls, ceilings, and floors
 
     [Click] Infect and gain control of target
 

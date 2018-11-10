@@ -32,6 +32,7 @@ public abstract class Character : NetworkBehaviour {
 		npcLayerMask = 1 << LayerMask.NameToLayer("NPCs");
 		// Character combines both of the above layer masks
 		characterLayerMask = parasiteLayerMask + npcLayerMask;
+		spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 	}
 
 	
@@ -66,11 +67,19 @@ public abstract class Character : NetworkBehaviour {
 		bool left = Input.GetKey(KeyCode.A);
 		if (right && !left) {
 			physicsEntity.velocityX = stats.movementSpeed;
+			SetSpriteFlip(false);
+			CmdSetSpriteFlip(false);
 		} else if (left && !right) {
 			physicsEntity.velocityX = -stats.movementSpeed;
+			SetSpriteFlip(true);
+			CmdSetSpriteFlip(true);
 		} else {
 			physicsEntity.velocityX = 0;
 		}
+	}
+
+	void SetSpriteFlip(bool isFacingLeft) {
+		spriteRenderer.flipX = isFacingLeft;
 	}
 
 	// COMMANDS
@@ -88,6 +97,11 @@ public abstract class Character : NetworkBehaviour {
 	[Command]
 	public void CmdDeletePhysicsEntity() {
 		physicsEntity = null;
+	}
+
+	[Command]
+	void CmdSetSpriteFlip(bool isFacingLeft) {
+		RpcSetSpriteFlip(isFacingLeft);
 	}
 
 	// CLIENTRPC
@@ -119,6 +133,13 @@ public abstract class Character : NetworkBehaviour {
 	public void RpcSetRenderLayer() {
 		if (hasAuthority) {
 			GetComponentInChildren<SpriteRenderer>().sortingLayerName = "ClientCharacter";
+		}
+	}
+
+	[ClientRpc]
+	void RpcSetSpriteFlip(bool isFacingLeft) {
+		if (!hasAuthority) {
+			SetSpriteFlip(isFacingLeft);
 		}
 	}
 
