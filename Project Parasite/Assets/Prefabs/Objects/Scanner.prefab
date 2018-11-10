@@ -20,6 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4882844211948004}
   - component: {fileID: 114898326910886408}
+  - component: {fileID: 114742879788214388}
   m_Layer: 0
   m_Name: Scanner
   m_TagString: Untagged
@@ -45,7 +46,7 @@ GameObject:
   m_IsActive: 1
 --- !u!1 &1321280963240176
 GameObject:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 5
@@ -81,13 +82,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1321280963240176}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.44, z: 0}
-  m_LocalScale: {x: 2, y: 0.08, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.08, z: 0}
+  m_LocalScale: {x: 0.5, y: 0.1, z: 1}
   m_Children:
   - {fileID: 4741734318153770}
-  m_Father: {fileID: 4331277643095718}
-  m_RootOrder: 0
+  m_Father: {fileID: 4882844211948004}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4331277643095718
 Transform:
@@ -98,8 +99,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.75, z: 0}
   m_LocalScale: {x: 0.25, y: 1.5, z: 1}
-  m_Children:
-  - {fileID: 4033606524688550}
+  m_Children: []
   m_Father: {fileID: 4882844211948004}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -123,13 +123,28 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000417727135242}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -2, z: 0}
+  m_LocalPosition: {x: 3, y: -2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4331277643095718}
+  - {fileID: 4033606524688550}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114742879788214388
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000417727135242}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 490dc6d9565e550458e5f01a8db1cfa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spriteRenderer: {fileID: 212087607382511360}
+  detectingParasiteColour: {r: 1, g: 0, b: 0, a: 0.734}
+  restingColour: {r: 0, g: 0.9568628, b: 1, a: 0.178}
 --- !u!114 &114898326910886408
 MonoBehaviour:
   m_ObjectHideFlags: 1

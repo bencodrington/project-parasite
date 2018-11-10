@@ -120,17 +120,4 @@ public class NonPlayerCharacter : Character {
 			GetComponentInChildren<SpriteRenderer>().color = Color.white;
 		}
 	}
-
-	[ClientRpc]
-	public void RpcVerify() {
-		bool isParasitePlayer = FindObjectOfType<ClientInformation>().clientType == CharacterType.Parasite;
-		if (isParasitePlayer) { return;}
-		if (isInfected) {
-			// Turn Magenta
-			GetComponentInChildren<SpriteRenderer>().color = Color.magenta;
-		} else {
-			// Turn Green
-			GetComponentInChildren<SpriteRenderer>().color = Color.cyan;
-		}
-	}
 }

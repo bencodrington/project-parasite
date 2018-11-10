@@ -143,16 +143,6 @@ public class Hunter : Character {
 
 	}
 
-	// TODO: remove
-	[Command]
-	void CmdScanTarget(NetworkInstanceId npcNetId) {
-		// Find npc's game object on this client
-		GameObject npcGameObject = NetworkServer.FindLocalObject(npcNetId);
-		// Get NonPlayerCharacter script
-		NonPlayerCharacter npc = npcGameObject.GetComponentInChildren<NonPlayerCharacter>();
-		npc.RpcVerify();
-	}
-
 	[Command]
 	void CmdUpdateChargeRate(float chargeRate) {
 		RpcUpdateChargeRate(chargeRate);
