@@ -7,7 +7,9 @@ using UnityEngine.UI;
 public class PlayerObject : NetworkBehaviour {
 
 	public GameObject ParasitePrefab;
+	public GameObject ParasiteControlsPrefab;
 	public GameObject HunterPrefab;
+	public GameObject HunterControlsPrefab;
 	public GameObject RoundManagerPrefab;
 	public GameObject HealthPrefab;
 	public GameObject NpcCountPrefab;
@@ -15,6 +17,7 @@ public class PlayerObject : NetworkBehaviour {
 	private GameObject characterGameObject;
 	private GameObject healthObject;
 	private GameObject npcCountObject;
+	private GameObject controlsObject;
 
 	private int _health;
 	private int Health {
@@ -121,7 +124,12 @@ public class PlayerObject : NetworkBehaviour {
 			healthObject = Instantiate(HealthPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
 			healthObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(-UI_PADDING_DISTANCE, -UI_PADDING_DISTANCE);
 			Health = STARTING_PARASITE_HEALTH;
+			controlsObject = Instantiate(ParasiteControlsPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
+		} else {
+			// Display controls
+			controlsObject = Instantiate(HunterControlsPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
 		}
+		controlsObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(UI_PADDING_DISTANCE, UI_PADDING_DISTANCE);
 		// Display NPC count
 		npcCountObject = Instantiate(NpcCountPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
 		npcCountObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(UI_PADDING_DISTANCE, -UI_PADDING_DISTANCE);
@@ -135,6 +143,9 @@ public class PlayerObject : NetworkBehaviour {
 		}
 		if (npcCountObject != null) {
 			Destroy(npcCountObject);
+		}
+		if (controlsObject != null) {
+			Destroy(controlsObject);
 		}
 	}
 

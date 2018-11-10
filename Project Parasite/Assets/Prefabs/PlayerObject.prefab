@@ -86,7 +86,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ParasitePrefab: {fileID: 1744548462298568, guid: 8c3e18920cf16344f9ab25cbd87907fc,
     type: 2}
+  ParasiteControlsPrefab: {fileID: 1781725809795122, guid: 1ee8585f1dcdfa549be3fe95eb5b09bd,
+    type: 2}
   HunterPrefab: {fileID: 1404862278284056, guid: ffa472e8f9da3c84f800cbd41f67e177,
+    type: 2}
+  HunterControlsPrefab: {fileID: 1837243442876654, guid: 40bb69824403fa544863cf21950d59b1,
     type: 2}
   RoundManagerPrefab: {fileID: 1463329413419142, guid: 64e476012ce7af140b598b86d5a34da9,
     type: 2}
