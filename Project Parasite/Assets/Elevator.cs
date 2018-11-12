@@ -46,7 +46,6 @@ public class Elevator : NetworkBehaviour {
 		if (isServer) { return; }
 		// We're on a client machine, so
 		// 	Make sure we're in line with where the server says we should be
-		transform.position = Vector3.Lerp(transform.position, serverPosition, LAG_LERP_FACTOR);
 	}
 	
 	void FixedUpdate() {
@@ -69,8 +68,9 @@ public class Elevator : NetworkBehaviour {
 				}
 			}
 			RpcUpdateServerPosition(transform.position);
+		} else {
+			transform.position = Vector3.Lerp(transform.position, serverPosition, LAG_LERP_FACTOR);
 		}
-		
 	}
 
 	void MoveToTargetStop() {

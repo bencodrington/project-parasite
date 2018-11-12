@@ -16,10 +16,15 @@ public class PhysicsEntity {
 	public float velocityX = 0f;
 	public float velocityY = 0f;
 
+	// public float pixelOffset = 0.05f;
+
 	private Vector2 oldPixelBelow;
 	private Vector2 oldPixelAbove;
 	private Vector2 oldPixelToTheLeft;
 	private Vector2 oldPixelToTheRight;
+
+	private Collider2D obstacleBelow;
+	private Vector2 obstacleBelowOldPosition;
 
 	private bool _isOnGround = false;
 	public bool IsOnGround() { return _isOnGround; }
@@ -43,6 +48,20 @@ public class PhysicsEntity {
 	}
 
 	public void Update () {
+		Vector2 floorVelocity;
+
+		// Check if obstacle below has moved
+		if (obstacleBelow != null && (Vector2)obstacleBelow.transform.position != obstacleBelowOldPosition) {
+			// Debug.Log(obstacleBelow.transform.position);
+			// Debug.Log(obstacleBelowOldPosition);
+			floorVelocity = (Vector2)obstacleBelow.transform.position - obstacleBelowOldPosition;
+			// Debug.Log("Velocity BEFORE = " + velocityY);
+			velocityY += floorVelocity.y;
+			oldPixelBelow += new Vector2(0, velocityY);
+			// Debug.Log("Floor velocity = " + floorVelocity);
+			// Debug.Log("Velocity = " + velocityY);
+		}
+
 		if (applyGravity) {
 			// Apply Gravity
 			velocityY += gravityAcceleration * Time.deltaTime;
@@ -58,21 +77,16 @@ public class PhysicsEntity {
 
 	Vector2 CheckAboveAndBelow(Vector2 newPosition) {
 		float obstacleHeight;
-		Collider2D obstacleBelow = null;
+		obstacleBelow = null;
 		Collider2D obstacleAbove = null;
-		Vector2 pixelBelow = newPosition + new Vector2(0, -height);
+		Vector2 pixelBelow = GetPixelBelow(newPosition);
 		Vector2 pixelAbove = newPosition + new Vector2(0, height);
 		_isOnGround = false;
 		_isOnCeiling = false;
 		// TODO: remove
-		Debug.DrawLine(oldPixelBelow, pixelBelow);
-		// If moving down
-		if (velocityY < 0) {
-			// Check for obstacles encountered between current position and new position
-			obstacleBelow = Physics2D.OverlapArea(oldPixelBelow, pixelBelow, obstacleLayerMask);
-		} else {
-			obstacleAbove = Physics2D.OverlapArea(oldPixelAbove, pixelAbove, obstacleLayerMask);
-		}
+		// Check for obstacles encountered between current position and new position
+		obstacleBelow = Physics2D.OverlapArea(oldPixelBelow, pixelBelow, obstacleLayerMask);
+		obstacleAbove = Physics2D.OverlapArea(oldPixelAbove, pixelAbove, obstacleLayerMask);
 		// Handle Collisions
 		if (obstacleBelow != null) {
 			// Entity is touching the ground
@@ -81,13 +95,15 @@ public class PhysicsEntity {
 			velocityY = 0;
 			obstacleHeight = obstacleBelow.transform.localScale.y / 2;
 			newPosition.y = obstacleBelow.transform.position.y + obstacleHeight + height;
-		}
-		if (obstacleAbove != null) {
+			obstacleBelowOldPosition = obstacleBelow.transform.position;
+			pixelBelow = GetPixelBelow(newPosition);
+		} else if (obstacleAbove != null) {
 			_isOnCeiling = true;
 			velocityY = 0;
 			obstacleHeight = obstacleAbove.transform.localScale.y / 2;
 			newPosition.y = obstacleAbove.transform.position.y - obstacleHeight - height;
 		}
+		Debug.DrawLine(oldPixelBelow, pixelBelow);
 		oldPixelBelow = pixelBelow;
 		oldPixelAbove = pixelAbove;
 		return newPosition;
@@ -134,5 +150,9 @@ public class PhysicsEntity {
 	public void AddVelocity(float x, float y) {
 		velocityX += x;
 		velocityY += y;
+	}
+
+	Vector2 GetPixelBelow(Vector2 position) {
+		return position + new Vector2(0, -height + 0.03f);
 	}
 }
