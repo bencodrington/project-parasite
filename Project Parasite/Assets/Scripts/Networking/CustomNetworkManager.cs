@@ -15,6 +15,7 @@ public class CustomNetworkManager : NetworkManager {
 		}
 		Debug.Log("CustomNetworkManager: Client: Connected to " + conn.connectionId + ", host ID: " + conn.hostId);
 		networkDiscoveryClient.StopBroadcast();
+		Destroy(networkDiscoveryClient.gameObject);
 	}
 
 	public override void OnServerConnect(NetworkConnection conn) {

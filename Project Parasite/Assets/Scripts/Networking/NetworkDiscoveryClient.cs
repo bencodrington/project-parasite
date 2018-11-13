@@ -5,6 +5,8 @@ using UnityEngine.Networking;
 
 public class NetworkDiscoveryClient : NetworkDiscovery {
 
+    public MenuItemSet searchingForGameMenuItemSet;
+
     // Necessary to fix Unity bug where onReceivedBroadcast will be called multiple times
     bool hasRecievedBroadcastAtLeastOnce = true;
 
@@ -20,6 +22,13 @@ public class NetworkDiscoveryClient : NetworkDiscovery {
             return;
         }
          */
+
+        Menu menu = FindObjectOfType<Menu>();
+        if (menu == null) {
+            Debug.LogError("NetworkDiscoveryClient: onEnable: Menu not found");
+            return;
+        }
+        menu.TransitionToNewMenuItemSet(searchingForGameMenuItemSet);
 
         Initialize();
         hasRecievedBroadcastAtLeastOnce = false;

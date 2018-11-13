@@ -27,7 +27,7 @@ public class Menu : MonoBehaviour {
 		menuItems.Clear();
 	}
 
-	void TransitionToNewMenuItemSet(MenuItemSet newMenuItemSet) {
+	public void TransitionToNewMenuItemSet(MenuItemSet newMenuItemSet) {
 		DeleteMenuItems();
 		menuItemSet = newMenuItemSet;
 		InitializeMenuItems();

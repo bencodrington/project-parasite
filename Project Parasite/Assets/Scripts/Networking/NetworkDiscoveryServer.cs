@@ -5,7 +5,16 @@ using UnityEngine.Networking;
 
 public class NetworkDiscoveryServer : NetworkDiscovery {
 
+    public MenuItemSet searchingForPlayersMenuItemSet;
+
 	void Start () {
+        Menu menu = FindObjectOfType<Menu>();
+        if (menu == null) {
+            Debug.LogError("NetworkDiscoveryClient: onEnable: Menu not found");
+            return;
+        }
+        menu.TransitionToNewMenuItemSet(searchingForPlayersMenuItemSet);
+
 		// NetworkManager.singleton.StartServer();
 		NetworkManager.singleton.StartHost();
 		Initialize();

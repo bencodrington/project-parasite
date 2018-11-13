@@ -51,7 +51,7 @@ public class PlayerObject : NetworkBehaviour {
 	void Update () {
 		// Runs on everyone's computer, regardless of whether they own this player object
 		if (isLocalPlayer == false) { return; }
-		if (Input.GetKeyDown(KeyCode.E)) {
+		if (Input.GetKeyDown(KeyCode.N)) {
 			CmdStartGame();
 		}
 	}
