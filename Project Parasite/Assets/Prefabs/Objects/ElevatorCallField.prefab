@@ -115,8 +115,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   elevator: {fileID: 0}
-  stopIndex: 0
-  size: {x: 2, y: 3}
+  stopIndex: 1
+  size: {x: 2, y: 4}
 --- !u!212 &212596940018536920
 SpriteRenderer:
   m_ObjectHideFlags: 1

@@ -79,6 +79,7 @@ public class PlayerObject : NetworkBehaviour {
 
 	[Command]
 	public void CmdStartGame() {
+		RpcDestroyTitleScreen();
 		foreach (RoundManager rm in FindObjectsOfType<RoundManager>()) {
 			rm.EndRound();
 			Destroy(rm.gameObject);
@@ -112,6 +113,18 @@ public class PlayerObject : NetworkBehaviour {
 		if (isLocalPlayer) {
 			Health -= damage;
 		}
+	}
+
+	[ClientRpc]
+	public void RpcDestroyTitleScreen() {
+		Destroy(GameObject.FindWithTag("TitleScreen"));
+		// Hide Menu
+        Menu menu = FindObjectOfType<Menu>();
+        if (menu == null) {
+            Debug.LogError("NetworkDiscoveryClient: onReceivedBroadcast: Menu not found");
+            return;
+        }
+        menu.DeleteMenuItems();
 	}
 
 	[ClientRpc]
