@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using System;
 
 public class Hunter : Character {
 
@@ -13,6 +14,18 @@ public class Hunter : Character {
 	// 	that space valid for placing a scanner
 	const float SCANNER_OFFSET_X = 0.1f;
 	const float SCANNER_OFFSET_Y = 1f;
+
+	private int _armourHealth = 100;
+
+	public int ArmourHealth {
+		get {return _armourHealth;}
+		set {
+			_armourHealth = value;
+			OnArmourHealthChange(value);
+		}
+	}
+
+	Action<int> OnArmourHealthChange;
 
 	public GameObject detonationPrefab;
 	public GameObject scannerPrefab;
@@ -73,12 +86,12 @@ public class Hunter : Character {
 	void FireCharge() {
 		Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 		// TODO: If there is an obstacle in the way, detonate there instead
-		Collider2D target = Physics2D.OverlapPoint(mousePosition, characterLayerMask);
-		if (target != null) {
-			CmdAttackTarget(target.transform.parent.GetComponent<NetworkIdentity>().netId);
-		} else {
+		// Collider2D target = Physics2D.OverlapPoint(mousePosition, characterLayerMask);
+		// if (target != null) {
+		// 	CmdAttackTarget(target.transform.parent.GetComponent<NetworkIdentity>().netId);
+		// } else {
 			CmdAttackPoint(mousePosition);
-		}
+		// }
 	}
 
 	void UpdateChargeRate(float timeSpentCharging) {
@@ -108,6 +121,12 @@ public class Hunter : Character {
 		CmdUpdateChargeRate(0f);
 	}
 
+	// Actions
+
+	public void RegisterOnArmourChangeCallback(Action<int> callback) {
+		OnArmourHealthChange += callback;
+	}
+
 	// Commands
 
 	[Command]
@@ -121,7 +140,7 @@ public class Hunter : Character {
 	[Command]
 	void CmdAttackPoint(Vector3 targetPoint) {
 		Character character;
-		bool isNpc;
+		bool isNpc, isHunter;
 		// Spawn detonation object
 		RpcSpawnDetonation(targetPoint);
 		// Find all characters in radius DETONATION_RADIUS
@@ -131,6 +150,7 @@ public class Hunter : Character {
 			// Get Character script
 			character = characterCollider.transform.parent.GetComponentInChildren<Character>();
 			isNpc = character is NonPlayerCharacter;
+			isHunter = character is NonPlayerCharacter;
 			// Inflict damage
 			if (!isNpc || (isNpc && ((NonPlayerCharacter)character).isInfected)) {
 				// Damage parasite
@@ -138,6 +158,9 @@ public class Hunter : Character {
 			} else if (isNpc) {
 				// Instant kill npcs
 				FindObjectOfType<NpcManager>().DespawnNpc(character.netId);
+			} else if (isHunter) {
+				// Damage armour
+				((Hunter)character).RpcTakeArmourDamage(25);
 			}
 		}
 
@@ -168,6 +191,13 @@ public class Hunter : Character {
 		// TODO: send less often and smooth transition on client side? except after firing, will need a smooth flag
 		if (!hasAuthority) {
 			UpdateChargeRate(chargeRate);
+		}
+	}
+
+	[ClientRpc]
+	void RpcTakeArmourDamage(int damage) {
+		if (hasAuthority) {
+			ArmourHealth -= damage;
 		}
 	}
 }

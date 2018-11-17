@@ -45,6 +45,8 @@ public class PlayerObject : NetworkBehaviour {
 	void Start() {
 		if (isLocalPlayer) {
 			FindObjectOfType<ClientInformation>().localPlayer = this;
+			PlayerGrid.Instance.AddPlayer(netId);
+			PlayerGrid.Instance.SetLocalPlayer(netId);
 		}
 	}
 
@@ -54,6 +56,10 @@ public class PlayerObject : NetworkBehaviour {
 		if (Input.GetKeyDown(KeyCode.N)) {
 			CmdStartGame();
 		}
+	}
+
+	void UpdateHealthObject(int newValue) {
+		Debug.Log("Update Health Object: new value: " + newValue);
 	}
 
 	// Commands
@@ -75,6 +81,7 @@ public class PlayerObject : NetworkBehaviour {
 		//  Set character as new target of camera
 		character.RpcSetCameraFollow();
 		character.RpcSetRenderLayer();
+		PlayerGrid.Instance.SetCharacterType(netId, characterType);
 	}
 
 	[Command]
@@ -132,10 +139,10 @@ public class PlayerObject : NetworkBehaviour {
 		if (!isLocalPlayer) { return; }
 		FindObjectOfType<ClientInformation>().clientType = newCharacterType;
 		// Generate HUD
+		healthObject = Instantiate(HealthPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
+		healthObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(-UI_PADDING_DISTANCE, -UI_PADDING_DISTANCE);
 		if (newCharacterType == CharacterType.Parasite) {
 			// Display health
-			healthObject = Instantiate(HealthPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
-			healthObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(-UI_PADDING_DISTANCE, -UI_PADDING_DISTANCE);
 			Health = STARTING_PARASITE_HEALTH;
 			controlsObject = Instantiate(ParasiteControlsPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
 		} else {
@@ -146,6 +153,19 @@ public class PlayerObject : NetworkBehaviour {
 		// Display NPC count
 		npcCountObject = Instantiate(NpcCountPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
 		npcCountObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(UI_PADDING_DISTANCE, -UI_PADDING_DISTANCE);
+	}
+
+	[ClientRpc]
+	public void RpcConnectToCharacter() {
+		// if (!isLocalPlayer) { return; }
+		// Character character = PlayerGrid.Instance.GetLocalCharacter();
+		// CharacterType characterType = PlayerGrid.Instance.GetLocalCharacterType();
+		// // If character is a hunter, register armour damage callback
+		// if (character is Hunter) {
+		// 	Hunter hunter = ((Hunter) character);
+		// 	hunter.RegisterOnArmourChangeCallback(UpdateHealthObject);
+		// 	hunter.ArmourHealth = 150;
+		// }
 	}
 
 	[ClientRpc]

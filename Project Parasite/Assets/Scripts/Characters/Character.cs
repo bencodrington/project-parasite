@@ -13,6 +13,7 @@ public abstract class Character : NetworkBehaviour {
 	
 	protected int characterLayerMask;
 	protected int parasiteLayerMask;
+	protected int hunterLayerMask;
 	protected int npcLayerMask;
 	protected int obstacleLayerMask;
 
@@ -26,12 +27,14 @@ public abstract class Character : NetworkBehaviour {
 	protected abstract void HandleInput();
 
 	void Start() {
-		// Initialize layer mask
+		// Initialize layer masks
 		obstacleLayerMask = 1 << LayerMask.NameToLayer("Obstacles");
+		
 		parasiteLayerMask = 1 << LayerMask.NameToLayer("Parasites");
 		npcLayerMask = 1 << LayerMask.NameToLayer("NPCs");
-		// Character combines both of the above layer masks
-		characterLayerMask = parasiteLayerMask + npcLayerMask;
+		hunterLayerMask = 1 << LayerMask.NameToLayer("Hunters");
+		// Character combines all three of the above layer masks
+		characterLayerMask = parasiteLayerMask + npcLayerMask + hunterLayerMask;
 		spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 	}
 

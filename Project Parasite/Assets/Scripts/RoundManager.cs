@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -24,6 +24,7 @@ public class RoundManager : MonoBehaviour {
 			} else { // Player is a hunter
 				characterType = CharacterType.Hunter;
 			}
+			PlayerGrid.Instance.AddPlayer(connectedPlayers[i].netId);
 			connectedPlayers[i].RpcSetCharacterType(characterType);
 			connectedPlayers[i].CmdSpawnPlayerCharacter(characterType, Vector3.zero, Vector2.zero);
 		}
