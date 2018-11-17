@@ -38,7 +38,7 @@ public class PlayerGrid : NetworkBehaviour {
 
     List<PlayerData> playerList;
 
-    void OnEnable() {
+    void Awake() {
 		if(Instance != null) {
             // There should never be two player grid instances
             Debug.LogError("Attempting to enable a second PlayerGrid.");
@@ -50,8 +50,11 @@ public class PlayerGrid : NetworkBehaviour {
     }
 
     PlayerData FindEntryWithId(NetworkInstanceId playerNetId) {
-        PlayerData playerData = playerList.Find((entry) => entry.playerNetId == playerNetId);
-        return playerData;
+        return playerList.Find((entry) => entry.playerNetId == playerNetId);
+    }
+
+    PlayerData FindLocalEntry() {
+        return playerList.Find((entry => entry.isLocalPlayer));
     }
 
     // public GameObject GetLocalPlayerObject() {
@@ -62,15 +65,29 @@ public class PlayerGrid : NetworkBehaviour {
     //     return LocalPlayerObject;
     // }
 
-    // public Character GetLocalCharacter() {
-    //     return null;
-    // }
+    public Character GetLocalCharacter() {
+        PlayerData player = FindLocalEntry();
+        if (player == null) {
+            Debug.LogError("PlayerGrid: GetLocalCharacter: No entries are marked as the local player");
+            return null;
+        }
+        return player.character;
+    }
 
     public CharacterType GetLocalCharacterType() {
         return CharacterType.Hunter;
     }
 
-    public void SetCharacterType(NetworkInstanceId playerNetId, CharacterType characterType) {
+    void SetCharacter(NetworkInstanceId playerNetId, Character character) {
+        PlayerData player = FindEntryWithId(playerNetId);
+        if (player == null) {
+            Debug.LogError("PlayerGrid: SetCharacter: Failed to find player with net id " + playerNetId);
+            return;
+        }
+        player.character = character;
+    }
+
+    void SetCharacterType(NetworkInstanceId playerNetId, CharacterType characterType) {
         PlayerData player = FindEntryWithId(playerNetId);
         if (player == null) {
             Debug.LogError("PlayerGrid: SetCharacterType: Failed to find player with net id " + playerNetId);
@@ -104,15 +121,73 @@ public class PlayerGrid : NetworkBehaviour {
     }
 
     public void AddPlayer(NetworkInstanceId playerNetId) {
+        // AddPlayer is only called by the PlayerObject.Start() method, which should run for
+        //  every player object on each client. Therefore we don't need to propagate these
+        //  changes via RPC call.
+        // Make sure grid doesn't already contain this player
+        if (FindEntryWithId(playerNetId) != null) {
+            Debug.Log("PlayerGrid: AddPlayer: Grid already contains an entry with net id " + playerNetId);
+            return;
+        }
+        PlayerObject playerObject;
+        if (isServer) {
+            playerObject = NetworkServer.FindLocalObject(playerNetId).GetComponent<PlayerObject>();
+        } else {
+            playerObject = ClientScene.FindLocalObject(playerNetId).GetComponent<PlayerObject>();
+        }
         PlayerData newPlayer = new PlayerData("Undefined Name",
                     playerNetId,
-                    NetworkServer.FindLocalObject(playerNetId).GetComponent<PlayerObject>(),
+                    playerObject,
                     CharacterType.NPC,
                     null,
                     false);
         playerList.Add(newPlayer);
         Debug.Log("ADD PLAYER: " + newPlayer.name + ", Net Id: " + newPlayer.playerNetId);
-        // TODO: RPC update clients
-        // TODO: make sure they don't already have this player in their list, as local player objects may have updated their local player grid before notifying the server
+    }
+
+    // Commands
+
+    [Command]
+    public void CmdSetCharacterType(NetworkInstanceId playerNetId, CharacterType characterType) {
+        PlayerData player = FindEntryWithId(playerNetId);
+        if (player == null) {
+            Debug.LogError("PlayerGrid: CmdSetCharacterType: Failed to find player with net id " + playerNetId);
+            return;
+        }
+        if (player.characterType == characterType) {
+            return;
+        }
+        RpcSetCharacterType(playerNetId, characterType);
+    }
+
+    [Command]
+    public void CmdSetCharacter(NetworkInstanceId playerNetId, NetworkInstanceId characterNetId) {
+        GameObject localObject = NetworkServer.FindLocalObject(characterNetId);
+        if (localObject == null) {
+            Debug.LogError("PlayerGrid: CmdSetCharacter: Failed to find character object with net id " + characterNetId);
+            return;
+        }
+        RpcSetCharacter(playerNetId, characterNetId);
+    }
+
+    // ClientRpc
+
+    [ClientRpc]
+    void RpcSetCharacterType(NetworkInstanceId playerNetId, CharacterType characterType) {
+        if (isServer) { return; }
+        SetCharacterType(playerNetId, characterType);
+    }
+
+    [ClientRpc]
+    void RpcSetCharacter(NetworkInstanceId playerNetId, NetworkInstanceId characterNetId) {
+        GameObject localObject =    isServer ?
+                                    NetworkServer.FindLocalObject(characterNetId) :
+                                    ClientScene.FindLocalObject(characterNetId);
+        if (localObject == null) {
+            Debug.LogError("PlayerGrid: CmdSetCharacter: Failed to find character object with net id " + characterNetId);
+            return;
+        }
+        SetCharacter(playerNetId, localObject.GetComponent<Character>());
+
     }
 }

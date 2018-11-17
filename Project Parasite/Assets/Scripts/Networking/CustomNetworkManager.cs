@@ -25,6 +25,5 @@ public class CustomNetworkManager : NetworkManager {
         int hid = conn.hostId;
  
         Debug.Log("CustomNetworkManager: Server: Client with CID " + cid + " connected, host " + hid);
-		// TODO: PlayerGrid.AddPlayer();
 	}
 }

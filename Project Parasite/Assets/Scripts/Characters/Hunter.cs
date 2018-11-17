@@ -21,7 +21,9 @@ public class Hunter : Character {
 		get {return _armourHealth;}
 		set {
 			_armourHealth = value;
-			OnArmourHealthChange(value);
+			if (OnArmourHealthChange != null) {
+				OnArmourHealthChange(value);
+			}
 		}
 	}
 
@@ -140,7 +142,7 @@ public class Hunter : Character {
 	[Command]
 	void CmdAttackPoint(Vector3 targetPoint) {
 		Character character;
-		bool isNpc, isHunter;
+		bool isNpc, isHunter, isParasite;
 		// Spawn detonation object
 		RpcSpawnDetonation(targetPoint);
 		// Find all characters in radius DETONATION_RADIUS
@@ -150,9 +152,10 @@ public class Hunter : Character {
 			// Get Character script
 			character = characterCollider.transform.parent.GetComponentInChildren<Character>();
 			isNpc = character is NonPlayerCharacter;
-			isHunter = character is NonPlayerCharacter;
+			isHunter = character is Hunter;
+			isParasite = character is Parasite;
 			// Inflict damage
-			if (!isNpc || (isNpc && ((NonPlayerCharacter)character).isInfected)) {
+			if (isParasite || (isNpc && ((NonPlayerCharacter)character).isInfected)) {
 				// Damage parasite
 				character.playerObject.RpcTakeDamage(25);
 			} else if (isNpc) {
