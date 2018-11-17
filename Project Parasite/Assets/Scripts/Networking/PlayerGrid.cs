@@ -149,7 +149,6 @@ public class PlayerGrid : NetworkBehaviour {
 
     [Command]
     public void CmdSetCharacterType(NetworkInstanceId playerNetId, CharacterType characterType) {
-        Debug.Log("CMD set character type: " + characterType);
         PlayerData player = FindEntryWithId(playerNetId);
         if (player == null) {
             Debug.LogError("PlayerGrid: CmdSetCharacterType: Failed to find player with net id " + playerNetId);
