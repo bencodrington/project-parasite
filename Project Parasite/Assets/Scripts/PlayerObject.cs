@@ -19,17 +19,17 @@ public class PlayerObject : NetworkBehaviour {
 	private GameObject npcCountObject;
 	private GameObject controlsObject;
 
-	private int _health;
-	// private int Health {
-	// 	get { return _health; }
-	// 	set {
-	// 		_health = value;
-	// 		healthObject.GetComponentInChildren<Text>().text = value.ToString();
-	// 		if (value <= 0) {
-	// 			CmdStartGame();
-	// 		}
-	// 	}
-	// }
+	private int _parasiteHealth;
+	private int ParasiteHealth {
+		get { return _parasiteHealth; }
+		set {
+			_parasiteHealth = value;
+			UpdateHealthObject(value);
+			if (value <= 0) {
+				CmdStartGame();
+			}
+		}
+	}
 	private int _remainingNpcCount;
 	private int RemainingNpcCount {
 		get { return _remainingNpcCount; }
@@ -131,10 +131,9 @@ public class PlayerObject : NetworkBehaviour {
 	// Client RPCs
 
 	[ClientRpc]
-	public void RpcTakeDamage(int damage) {
+	public void RpcParasiteTakeDamage(int damage) {
 		if (isLocalPlayer) {
-			// TODO:
-			// Health -= damage;
+			ParasiteHealth -= damage;
 		}
 	}
 
@@ -152,8 +151,6 @@ public class PlayerObject : NetworkBehaviour {
 
 	// 	// TODO: refactor (from RpcSetCharacterType)
 	// 	if (newCharacterType == CharacterType.Parasite) {
-	// 		// Display health
-	// 		Health = STARTING_PARASITE_HEALTH;
 	// 		controlsObject = Instantiate(ParasiteControlsPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
 	// 	} else {
 	// 		// Display controls
@@ -172,10 +169,14 @@ public class PlayerObject : NetworkBehaviour {
 		CharacterType characterType = PlayerGrid.Instance.GetLocalCharacterType();
 		switch (characterType) {
 			case CharacterType.Hunter: 
+				topRightUiText.enabled = true;
 				Hunter hunter = ((Hunter) character);
 				hunter.RegisterOnArmourChangeCallback(UpdateHealthObject);
 				hunter.ArmourHealth = 150;
+				break;
+			case CharacterType.Parasite:
 				topRightUiText.enabled = true;
+				ParasiteHealth = STARTING_PARASITE_HEALTH;
 				break;
 			default:
 				// TODO: deactivate all UI

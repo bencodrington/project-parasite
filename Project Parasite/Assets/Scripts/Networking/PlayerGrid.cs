@@ -75,7 +75,7 @@ public class PlayerGrid : NetworkBehaviour {
     }
 
     public CharacterType GetLocalCharacterType() {
-        return CharacterType.Hunter;
+        return FindLocalEntry().characterType;
     }
 
     void SetCharacter(NetworkInstanceId playerNetId, Character character) {
@@ -149,6 +149,7 @@ public class PlayerGrid : NetworkBehaviour {
 
     [Command]
     public void CmdSetCharacterType(NetworkInstanceId playerNetId, CharacterType characterType) {
+        Debug.Log("CMD set character type: " + characterType);
         PlayerData player = FindEntryWithId(playerNetId);
         if (player == null) {
             Debug.LogError("PlayerGrid: CmdSetCharacterType: Failed to find player with net id " + playerNetId);
@@ -174,7 +175,6 @@ public class PlayerGrid : NetworkBehaviour {
 
     [ClientRpc]
     void RpcSetCharacterType(NetworkInstanceId playerNetId, CharacterType characterType) {
-        if (isServer) { return; }
         SetCharacterType(playerNetId, characterType);
     }
 

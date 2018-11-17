@@ -157,7 +157,7 @@ public class Hunter : Character {
 			// Inflict damage
 			if (isParasite || (isNpc && ((NonPlayerCharacter)character).isInfected)) {
 				// Damage parasite
-				character.playerObject.RpcTakeDamage(25);
+				character.playerObject.RpcParasiteTakeDamage(25);
 			} else if (isNpc) {
 				// Instant kill npcs
 				FindObjectOfType<NpcManager>().DespawnNpc(character.netId);
