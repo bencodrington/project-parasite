@@ -111,13 +111,11 @@ public class NonPlayerCharacter : Character {
 
 	[ClientRpc]
 	public void RpcInfect() {
+		// TODO: update PlayerGrid
 		isInfected = true;
 		if (hasAuthority) {
 			// Only update sprite if on the Parasite player's client
-			GetComponentInChildren<SpriteRenderer>().color = Color.magenta;
-		} else {
-			// On all other clients, un-verify
-			GetComponentInChildren<SpriteRenderer>().color = Color.white;
+			spriteRenderer.color = Color.magenta;
 		}
 	}
 }

@@ -113,7 +113,7 @@ public class Hunter : Character {
 				newColour = Color.red;
 			}
 		}
-		GetComponentInChildren<SpriteRenderer>().color = newColour;
+		spriteRenderer.color = newColour;
 	}
 
 	void ResetCharge() {

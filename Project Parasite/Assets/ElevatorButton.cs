@@ -42,7 +42,7 @@ public class ElevatorButton : MonoBehaviour {
 			mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 			// Check if click is within bounds
 			if (WithinBounds(bottomLeft, mousePosition, topRight)) {
-				FindObjectOfType<ClientInformation>().localPlayer.CmdCallElevatorToStop(elevatorId, stopIndex);
+				PlayerGrid.Instance.GetLocalPlayerObject().CmdCallElevatorToStop(elevatorId, stopIndex);
 			}
 		}
 	}

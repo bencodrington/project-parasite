@@ -14,6 +14,6 @@ public class StartButton : MonoBehaviour {
 		}
 		networkDiscoveryServer.StopBroadcast();
 		Destroy(networkDiscoveryServer.gameObject);
-		FindObjectOfType<ClientInformation>().localPlayer.CmdStartGame();
+		PlayerGrid.Instance.GetLocalPlayerObject().CmdStartGame();
 	}
 }

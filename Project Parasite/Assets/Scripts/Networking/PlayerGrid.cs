@@ -57,13 +57,9 @@ public class PlayerGrid : NetworkBehaviour {
         return playerList.Find((entry => entry.isLocalPlayer));
     }
 
-    // public GameObject GetLocalPlayerObject() {
-    //     GameObject LocalPlayerObject = null;
-    //     // TODO:
-    //     // Find entry in player list where isLocalPlayer is true
-    //     // return entry.playerObject;
-    //     return LocalPlayerObject;
-    // }
+    public PlayerObject GetLocalPlayerObject() {
+        return FindLocalEntry().playerObject;
+    }
 
     public Character GetLocalCharacter() {
         PlayerData player = FindLocalEntry();
