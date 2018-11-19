@@ -149,19 +149,6 @@ public class PlayerObject : NetworkBehaviour {
         menu.DeleteMenuItems();
 	}
 
-	// 	// TODO: refactor (from RpcSetCharacterType)
-	// 	if (newCharacterType == CharacterType.Parasite) {
-	// 		controlsObject = Instantiate(ParasiteControlsPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
-	// 	} else {
-	// 		// Display controls
-	// 		controlsObject = Instantiate(HunterControlsPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
-	// 	}
-	// 	controlsObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(UI_PADDING_DISTANCE, UI_PADDING_DISTANCE);
-	// 	// Display NPC count
-	// 	npcCountObject = Instantiate(NpcCountPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
-	// 	npcCountObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(UI_PADDING_DISTANCE, -UI_PADDING_DISTANCE);
-	// }
-
 	[ClientRpc]
 	void RpcUpdateHud() {
 		if (!isLocalPlayer) { return; }
@@ -173,16 +160,22 @@ public class PlayerObject : NetworkBehaviour {
 				Hunter hunter = ((Hunter) character);
 				hunter.RegisterOnArmourChangeCallback(UpdateHealthObject);
 				hunter.ArmourHealth = 150;
+				controlsObject = Instantiate(HunterControlsPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
 				break;
 			case CharacterType.Parasite:
 				topRightUiText.enabled = true;
 				ParasiteHealth = STARTING_PARASITE_HEALTH;
+				controlsObject = Instantiate(ParasiteControlsPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
 				break;
 			default:
 				// TODO: deactivate all UI
 				topRightUiText.enabled = false;
 				break;
 		}
+		controlsObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(UI_PADDING_DISTANCE, UI_PADDING_DISTANCE);
+		// Display NPC count 
+		npcCountObject = Instantiate(NpcCountPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
+		npcCountObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(UI_PADDING_DISTANCE, -UI_PADDING_DISTANCE);
 	}
 
 	[ClientRpc]
