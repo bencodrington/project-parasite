@@ -189,7 +189,7 @@ public class PlayerObject : NetworkBehaviour {
 	void RpcRemoveHud() {
 		if (!isLocalPlayer) { return; }
 		if (topRightUiText != null) {
-			topRightUiText.gameObject.SetActive(false);
+			topRightUiText.enabled = false;
 		}
 		if (npcCountObject != null) {
 			Destroy(npcCountObject);
