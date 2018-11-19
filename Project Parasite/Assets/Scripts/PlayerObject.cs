@@ -69,9 +69,9 @@ public class PlayerObject : NetworkBehaviour {
 	// Commands
 
 	[Command]
-	public void CmdAssignCharacterType(CharacterType characterType) {
+	public void CmdAssignCharacterTypeAndSpawnPoint(CharacterType characterType, Vector2 spawnPoint) {
 		// Spawn Character across clients
-		CmdSpawnPlayerCharacter(characterType, Vector3.zero, Vector2.zero);
+		CmdSpawnPlayerCharacter(characterType, spawnPoint, Vector2.zero);
 		// Update grid entry to include new character type
 		PlayerGrid.Instance.CmdSetCharacterType(netId, characterType);
 		// Update HUD to show necessary information for this character type
