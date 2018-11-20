@@ -31,6 +31,9 @@ public class Hunter : Character {
 
 	public GameObject detonationPrefab;
 	public GameObject scannerPrefab;
+	public GameObject scannerAlertPrefab;
+
+	List<Scanner> scanners = new List<Scanner>();
 
 	bool isCharging = false;
 	float timeSpentCharging = 0f;
@@ -177,9 +180,12 @@ public class Hunter : Character {
 	[Command]
 	void CmdSpawnScanner(Vector2 position) {
 		// Create Scanner game object on the server
-		GameObject scanner = Instantiate(scannerPrefab, position, Quaternion.identity);
+		GameObject scannerGameObject = Instantiate(scannerPrefab, position, Quaternion.identity);
+		Scanner scanner = scannerGameObject.GetComponent<Scanner>();
+		scanners.Add(scanner);
+		scanner.SetOwner(this);
 		// Propogate to all clients
-		NetworkServer.Spawn(scanner);
+		NetworkServer.Spawn(scannerGameObject);
 	}
 
 	// ClientRpc
@@ -201,6 +207,16 @@ public class Hunter : Character {
 	void RpcTakeArmourDamage(int damage) {
 		if (hasAuthority) {
 			ArmourHealth -= damage;
+		}
+	}
+
+	[ClientRpc]
+	public void RpcOnScannerTriggered(Vector2 scannerPosition) {
+		if (hasAuthority) {
+			// TODO: delete all prefabs in tear down function
+			GameObject scannerAlert = Instantiate(scannerAlertPrefab);
+			scannerAlert.transform.SetParent(FindObjectOfType<Canvas>().transform);
+			scannerAlert.GetComponent<ScannerAlert>().SetScannerPosition(scannerPosition);
 		}
 	}
 }

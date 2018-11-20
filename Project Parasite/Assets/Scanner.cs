@@ -10,6 +10,9 @@ public class Scanner : NetworkBehaviour {
     private float MAX_DISTANCE = 24;
     private int parasiteLayerMask;
     private int npcLayerMask;
+    private bool isBeingTriggered = false;
+
+    private Hunter owner;
 
     public Color detectingParasiteColour;
     public Color restingColour;
@@ -33,8 +36,7 @@ public class Scanner : NetworkBehaviour {
 		// Check area between scanner and ceiling above
         Collider2D parasite = Physics2D.OverlapArea(transform.position, ceilingPoint, parasiteLayerMask);
         if (parasite != null) {
-            IsDetectingParasite(true);
-            RpcIsDetectingParasite(true);
+            IsDetectingParasite();
             return;
         }
         // Check for infected NPCs
@@ -43,28 +45,37 @@ public class Scanner : NetworkBehaviour {
         foreach (Collider2D npcCollider in npcColliders) {
             npc = npcCollider.transform.parent.GetComponentInChildren<NonPlayerCharacter>();
             if (npc.isInfected) {
-                IsDetectingParasite(true);
-                RpcIsDetectingParasite(true);
+                IsDetectingParasite();
                 return;
             }
         }
-        IsDetectingParasite(false);
-        RpcIsDetectingParasite(false);
+        // If we reach this point, we're not currently detecting a parasite, so reset
+        isBeingTriggered = false;
 	}
 
-    void IsDetectingParasite(bool isAlerted) {
-        if (isAlerted) {
-            spriteRenderer.color = detectingParasiteColour;
-        } else {
-            spriteRenderer.color = Color.Lerp(spriteRenderer.color, restingColour, 0.002f);
-        }
+    void Update() {
+        // Fade back to resting colour
+        spriteRenderer.color = Color.Lerp(spriteRenderer.color, restingColour, 0.120f * Time.deltaTime);
+    }
+
+    void IsDetectingParasite() {
+        if (!isServer) { return; }
+        // If this is not a new trigger, exit early
+        if (isBeingTriggered) { return; }
+        // First frame this has occured, notify clients
+        isBeingTriggered = true;
+        owner.RpcOnScannerTriggered(transform.position);
+        RpcIsDetectingParasite();
+    }
+
+    public void SetOwner(Hunter owner) {
+        this.owner = owner;
     }
 
     // ClientRpc
     [ClientRpc]
-    void RpcIsDetectingParasite(bool isAlerted) {
-        if (isServer) { return; }
-        IsDetectingParasite(isAlerted);
+    void RpcIsDetectingParasite() {
+        spriteRenderer.color = detectingParasiteColour;
     }
 
     [ClientRpc]

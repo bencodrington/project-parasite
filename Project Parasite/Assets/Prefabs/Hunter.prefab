@@ -147,6 +147,8 @@ MonoBehaviour:
     type: 2}
   scannerPrefab: {fileID: 1000417727135242, guid: 4200222229faf4946bec29ce561682b2,
     type: 2}
+  scannerAlertPrefab: {fileID: 1834075161872888, guid: 712bf79eb346f5e469e14dc73fcfb261,
+    type: 2}
 --- !u!212 &212268207162185018
 SpriteRenderer:
   m_ObjectHideFlags: 1
