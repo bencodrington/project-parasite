@@ -82,9 +82,9 @@ public class Parasite : Character {
 		networkIdentity.localPlayerAuthority = true;
 		npc.RpcSetLocalPlayerAuthority(true);
 		// Store playerObject for eventual transfer back to parasite
-		npc.playerObject = playerObject;
+		npc.PlayerObject = PlayerObject;
 		// Give Parasite player authority over the NPC
-		networkIdentity.AssignClientAuthority(playerObject.connectionToClient);
+		networkIdentity.AssignClientAuthority(PlayerObject.connectionToClient);
 		// Delete current physics entity off the server for performance
 		npc.CmdDeletePhysicsEntity();
 		// TODO: transfer velocity from current physics entity?

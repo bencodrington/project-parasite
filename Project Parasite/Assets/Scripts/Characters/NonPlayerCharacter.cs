@@ -97,7 +97,7 @@ public class NonPlayerCharacter : Character {
 	[Command]
 	void CmdDespawnSelf() {
 		// Spawn new Parasite Object
-		playerObject.CmdSpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY));
+		PlayerObject.CmdSpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY));
 		// Despawn this NPC object
 		FindObjectOfType<NpcManager>().DespawnNpc(netId);
 	}

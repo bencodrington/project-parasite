@@ -126,6 +126,12 @@ public class Hunter : Character {
 		CmdUpdateChargeRate(0f);
 	}
 
+	protected override void OnCharacterDestroy() {
+		foreach (Scanner scanner in scanners) {
+			NetworkServer.Destroy(scanner.gameObject);
+		}
+	}
+
 	// Actions
 
 	public void RegisterOnArmourChangeCallback(Action<int> callback) {
@@ -160,7 +166,7 @@ public class Hunter : Character {
 			// Inflict damage
 			if (isParasite || (isNpc && ((NonPlayerCharacter)character).isInfected)) {
 				// Damage parasite
-				character.playerObject.RpcParasiteTakeDamage(25);
+				character.PlayerObject.RpcParasiteTakeDamage(25);
 			} else if (isNpc) {
 				// Instant kill npcs
 				FindObjectOfType<NpcManager>().DespawnNpc(character.netId);
@@ -186,6 +192,13 @@ public class Hunter : Character {
 		scanner.SetOwner(this);
 		// Propogate to all clients
 		NetworkServer.Spawn(scannerGameObject);
+	}
+
+	[Command]
+	void CmdDestroyScanners() {
+		foreach (Scanner scanner in scanners) {
+			NetworkServer.Destroy(scanner.gameObject);
+		}
 	}
 
 	// ClientRpc

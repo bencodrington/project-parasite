@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -41,6 +42,14 @@ public class PlayerObject : NetworkBehaviour {
 
 	private const int STARTING_PARASITE_HEALTH = 100;
 	private const int UI_PADDING_DISTANCE = 9;
+
+	private Action OnCharacterDestroy;
+	public void RegisterOnCharacterDestroyCallback(Action cb) {
+		OnCharacterDestroy += cb;
+	}
+	public void UnRegisterOnCharacterDestroyCallback(Action cb) {
+		OnCharacterDestroy -= cb;
+	}
 
 	void Start() {
 		PlayerGrid.Instance.AddPlayer(netId);
@@ -90,7 +99,7 @@ public class PlayerObject : NetworkBehaviour {
 		PlayerGrid.Instance.CmdSetCharacter(netId, character.netId);
 		// Initialize each player's character on their own client
 		character.RpcGeneratePhysicsEntity(velocity);
-		character.playerObject = this;
+		character.PlayerObject = this;
 		// Ensure character snaps to its starting position on all clients
 		character.CmdUpdatePosition(atPosition, true);
 		//  Set character as new target of camera
@@ -112,6 +121,7 @@ public class PlayerObject : NetworkBehaviour {
 	[Command]
 	public void CmdDestroyCharacter() {
 		if (characterGameObject != null) {
+			OnCharacterDestroy();
 			NetworkServer.Destroy(characterGameObject);
 		}
 	}

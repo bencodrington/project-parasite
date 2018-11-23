@@ -20,7 +20,18 @@ public abstract class Character : NetworkBehaviour {
 	const float lagLerpFactor = 0.4f;
 
 	// Only initialized for Character objects on the server
-	public PlayerObject playerObject;
+	private PlayerObject _playerObject;
+	public PlayerObject PlayerObject {
+		get { return _playerObject; }
+		set {
+			_playerObject = value;
+			_playerObject.RegisterOnCharacterDestroyCallback(unregisterAndDestroy);
+		}
+	}
+	private void unregisterAndDestroy() {
+		PlayerObject.UnRegisterOnCharacterDestroyCallback(unregisterAndDestroy);
+		OnCharacterDestroy();
+	}
 
 	public CharacterStats stats;
 
@@ -79,6 +90,10 @@ public abstract class Character : NetworkBehaviour {
 		} else {
 			physicsEntity.velocityX = 0;
 		}
+	}
+
+	protected virtual void OnCharacterDestroy() {
+		Debug.Log("ON CHARACTER DESTROY");
 	}
 
 	void SetSpriteFlip(bool isFacingLeft) {
