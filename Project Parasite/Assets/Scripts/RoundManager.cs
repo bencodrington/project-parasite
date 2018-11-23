@@ -11,6 +11,8 @@ public class RoundManager : MonoBehaviour {
 	Vector2 parasiteSpawnPoint;
 	Vector2 hunterSpawnPoint;
 
+	bool huntersOnlyMode = false;
+
 	void Start () {
 		// Cache Player Objects
 		connectedPlayers = FindObjectsOfType<PlayerObject>();
@@ -24,6 +26,7 @@ public class RoundManager : MonoBehaviour {
 		Vector2 spawnPoint;
 		// Randomly select one of the players to be parasite, the rest are hunters
 		int indexOfParasite = Random.Range(0, n);
+		if (huntersOnlyMode) { indexOfParasite = -1; }
 		CharacterType characterType;
 		for (int i = 0; i < n; i++) {
 			if (i == indexOfParasite) {
