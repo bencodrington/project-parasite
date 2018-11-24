@@ -9,39 +9,52 @@ Prefab:
     m_Modifications: []
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 1938243808907530}
+  m_RootGameObject: {fileID: 1385279692659820}
   m_IsPrefabAsset: 1
---- !u!1 &1938243808907530
+--- !u!1 &1385279692659820
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 224231531508713064}
-  - component: {fileID: 222751073871266182}
-  - component: {fileID: 114453670382630672}
-  - component: {fileID: 114855738362341852}
+  - component: {fileID: 224426519049457790}
+  - component: {fileID: 222228052620843144}
+  - component: {fileID: 114786834461845722}
+  - component: {fileID: 114183453947915510}
   m_Layer: 5
-  m_Name: ClientName
-  m_TagString: Name Field
+  m_Name: PlayerList
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &114453670382630672
+--- !u!114 &114183453947915510
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1938243808907530}
+  m_GameObject: {fileID: 1385279692659820}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8562e7c9aaadb5e4b9569589650dea57, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PlayerListEntryPrefab: {fileID: 1862126661788688, guid: 4d8f5f8e1e80e5c419c1cd02d89f4a72,
+    type: 2}
+--- !u!114 &114786834461845722
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1385279692659820}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.9117647, g: 0.62348616, b: 0.62348616, a: 1}
+  m_Color: {r: 0.39554575, g: 0.30348876, b: 0.41509432, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -55,38 +68,27 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 10
     m_MaxSize: 40
-    m_Alignment: 2
+    m_Alignment: 0
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Name: [UNDEFINED]'
---- !u!114 &114855738362341852
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1938243808907530}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f94de4ce0f66ac4cb496019b1354032, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!222 &222751073871266182
+  m_Text: 'Connected Players:'
+--- !u!222 &222228052620843144
 CanvasRenderer:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1938243808907530}
+  m_GameObject: {fileID: 1385279692659820}
   m_CullTransparentMesh: 0
---- !u!224 &224231531508713064
+--- !u!224 &224426519049457790
 RectTransform:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1938243808907530}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_GameObject: {fileID: 1385279692659820}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []

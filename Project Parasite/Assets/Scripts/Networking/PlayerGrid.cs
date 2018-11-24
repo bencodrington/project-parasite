@@ -38,6 +38,8 @@ public class PlayerGrid : NetworkBehaviour {
 
     List<PlayerData> playerList;
 
+    public string localPlayerName;
+
     void Awake() {
 		if(Instance != null) {
             // There should never be two player grid instances
@@ -74,6 +76,14 @@ public class PlayerGrid : NetworkBehaviour {
         return FindLocalEntry().characterType;
     }
 
+    public List<string> GetPlayerNames() {
+        List<string> names = new List<string>();
+        foreach(PlayerData player in playerList) {
+            names.Add(player.name);
+        }
+        return names;
+    }
+
     void SetCharacter(NetworkInstanceId playerNetId, Character character) {
         PlayerData player = FindEntryWithId(playerNetId);
         if (player == null) {
@@ -99,6 +109,9 @@ public class PlayerGrid : NetworkBehaviour {
             return;
         }
         player.isLocalPlayer = true;
+        if (localPlayerName != null) {
+            player.name = localPlayerName;
+        }
     }
 
     public void PrintGrid() {
