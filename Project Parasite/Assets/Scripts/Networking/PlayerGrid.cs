@@ -110,8 +110,17 @@ public class PlayerGrid : NetworkBehaviour {
         }
         player.isLocalPlayer = true;
         if (localPlayerName != null) {
-            player.name = localPlayerName;
+            CmdSetPlayerName(playerNetId, localPlayerName);
         }
+    }
+
+    void SetPlayerName(NetworkInstanceId playerNetId, string name) {
+        PlayerData player = FindEntryWithId(playerNetId);
+        if (player == null) {
+            Debug.LogError("PlayerGrid: SetPlayerName: Failed to find player with net id " + playerNetId);
+            return;
+        }
+        player.name = name;
     }
 
     public void PrintGrid() {
@@ -179,6 +188,19 @@ public class PlayerGrid : NetworkBehaviour {
         RpcSetCharacter(playerNetId, characterNetId);
     }
 
+    [Command]
+    void CmdSetPlayerName(NetworkInstanceId playerNetId, string name) {
+        PlayerData player = FindEntryWithId(playerNetId);
+        if (player == null) {
+            Debug.LogError("PlayerGrid: CmdSetPlayerName: Failed to find player with net id " + playerNetId);
+            return;
+        }
+        if (player.name == name) {
+            return;
+        }
+        RpcSetPlayerName(playerNetId, name);
+    }
+
     // ClientRpc
 
     [ClientRpc]
@@ -197,5 +219,10 @@ public class PlayerGrid : NetworkBehaviour {
         }
         SetCharacter(playerNetId, localObject.GetComponent<Character>());
 
+    }
+
+    [ClientRpc]
+    void RpcSetPlayerName(NetworkInstanceId playerNetId, string name) {
+        SetPlayerName(playerNetId, name);
     }
 }
