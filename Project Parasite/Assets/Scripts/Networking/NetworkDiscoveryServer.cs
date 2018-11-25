@@ -33,10 +33,6 @@ public class NetworkDiscoveryServer : NetworkDiscovery {
 		broadcastData = clientName;
 		// IMPORTANT NOTE! Make sure broadcastData is not an empty string, otherwise you'll get an ArgumentOutOfRange exception
 		StartAsServer();
-		// // TODO: remove
-		// // IMPORTANT NOTE! PlayerGrid is not activated until NetworkManager.StartHost() is called
-		// // 	attempting to reference it before that will cause errors
-		// PlayerGrid.Instance.localPlayerName = clientName;
 
 		Debug.Log("NetworkDiscoveryServer: Server Started");
 	}
