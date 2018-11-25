@@ -109,9 +109,6 @@ public class PlayerGrid : NetworkBehaviour {
             return;
         }
         player.isLocalPlayer = true;
-        if (localPlayerName != null) {
-            CmdSetPlayerName(playerNetId, localPlayerName);
-        }
     }
 
     void SetPlayerName(NetworkInstanceId playerNetId, string name) {
@@ -189,7 +186,7 @@ public class PlayerGrid : NetworkBehaviour {
     }
 
     [Command]
-    void CmdSetPlayerName(NetworkInstanceId playerNetId, string name) {
+    public void CmdSetPlayerName(NetworkInstanceId playerNetId, string name) {
         PlayerData player = FindEntryWithId(playerNetId);
         if (player == null) {
             Debug.LogError("PlayerGrid: CmdSetPlayerName: Failed to find player with net id " + playerNetId);

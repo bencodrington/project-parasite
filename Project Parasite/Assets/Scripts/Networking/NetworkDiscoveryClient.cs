@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class NetworkDiscoveryClient : NetworkDiscovery {
 
@@ -16,12 +17,21 @@ public class NetworkDiscoveryClient : NetworkDiscovery {
 
     // Use onEnable instead of Start() or Awake() in case we disable/reenable upon disconnection
     protected void onEnable() {
-        /*
-        if ( DURING DEVELOPMENT) {
-            OnReceivedBroadcast("localhost", "");
-            return;
-        }
-         */
+		// Get name from input box
+		GameObject nameField = GameObject.FindGameObjectWithTag("Name Field");
+		string name = "";
+		if (nameField != null) {
+			name = nameField.GetComponent<InputField>().text;
+		}
+		name = (name == "") ? "Anonymous Client" : name;
+
+        Initialize();
+        hasRecievedBroadcastAtLeastOnce = false;
+        StartAsClient();
+		Debug.Log("NetworkDiscoveryClient: Client Started");
+		// IMPORTANT NOTE! PlayerGrid is not activated until StartAsClient() is called
+		// 	attempting to reference it before that will cause errors
+		PlayerGrid.Instance.localPlayerName = name;
 
         Menu menu = FindObjectOfType<Menu>();
         if (menu == null) {
@@ -29,11 +39,6 @@ public class NetworkDiscoveryClient : NetworkDiscovery {
             return;
         }
         menu.TransitionToNewMenuItemSet(searchingForGameMenuItemSet);
-
-        Initialize();
-        hasRecievedBroadcastAtLeastOnce = false;
-        StartAsClient();
-		Debug.Log("NetworkDiscoveryClient: Client Started");
     }
 
     public override void OnReceivedBroadcast(string fromAddress, string data)

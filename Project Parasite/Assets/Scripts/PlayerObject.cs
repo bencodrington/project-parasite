@@ -52,10 +52,12 @@ public class PlayerObject : NetworkBehaviour {
 	}
 
 	void Start() {
+		Debug.Log("PlayerGrid.localPlayerName: " + PlayerGrid.Instance.localPlayerName);
 		PlayerGrid.Instance.AddPlayer(netId);
 		if (isLocalPlayer) {
 			PlayerGrid.Instance.SetLocalPlayer(netId);
 			topRightUiText = GameObject.FindGameObjectWithTag("TopRightUI").GetComponent<Text>();
+			CmdSetPlayerName(netId, PlayerGrid.Instance.localPlayerName);
 		}
 	}
 
@@ -135,6 +137,11 @@ public class PlayerObject : NetworkBehaviour {
 	[Command]
 	public void CmdCallElevatorToStop(NetworkInstanceId elevatorId, int stopIndex) {
 		NetworkServer.FindLocalObject(elevatorId).GetComponentInChildren<Elevator>().CmdCallToStop(stopIndex);
+	}
+
+	[Command]
+	void CmdSetPlayerName(NetworkInstanceId playerNetId, string name) {
+		PlayerGrid.Instance.CmdSetPlayerName(playerNetId, name);
 	}
 
 	// Client RPCs

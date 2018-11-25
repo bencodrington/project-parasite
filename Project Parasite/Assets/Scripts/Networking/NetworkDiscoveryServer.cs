@@ -15,12 +15,11 @@ public class NetworkDiscoveryServer : NetworkDiscovery {
 		if (nameField != null) {
 			name = nameField.GetComponent<InputField>().text;
 		}
-		name = (name == "") ? "Anonymous" : name;
-		PlayerGrid.Instance.localPlayerName = name;
+		name = (name == "") ? "Anonymous Server" : name;
 		// Switch to looking for player menu
         Menu menu = FindObjectOfType<Menu>();
         if (menu == null) {
-            Debug.LogError("NetworkDiscoveryClient: onEnable: Menu not found");
+            Debug.LogError("NetworkDiscoveryServer: Start: Menu not found");
             return;
         }
         menu.TransitionToNewMenuItemSet(searchingForPlayersMenuItemSet);
@@ -32,6 +31,9 @@ public class NetworkDiscoveryServer : NetworkDiscovery {
 		broadcastData = name;
 		// IMPORTANT NOTE! Make sure broadcastData is not an empty string, otherwise you'll get an ArgumentOutOfRange exception
 		StartAsServer();
+		// IMPORTANT NOTE! PlayerGrid is not activated until StartAsServer is called
+		// 	attempting to reference it before that will cause errors
+		PlayerGrid.Instance.localPlayerName = name;
 
 		Debug.Log("NetworkDiscoveryServer: Server Started");
 	}
