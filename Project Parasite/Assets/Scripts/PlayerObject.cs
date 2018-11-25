@@ -76,6 +76,8 @@ public class PlayerObject : NetworkBehaviour {
 		if (isLocalPlayer) {
 			topRightUiText = GameObject.FindGameObjectWithTag("TopRightUI").GetComponent<Text>();
 		}
+		// Runs for all PlayerObjects on all clients
+		PlayerGrid.Instance.SetPlayerObject(netId, this);
 	}
 
 	void Update () {

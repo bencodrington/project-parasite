@@ -129,6 +129,15 @@ public class PlayerGrid : NetworkBehaviour {
         player.name = name;
     }
 
+    public void SetPlayerObject(NetworkInstanceId playerNetId, PlayerObject playerObject) {
+        PlayerData player = FindEntryWithId(playerNetId);
+        if (player == null) {
+            AddPlayer(playerNetId);
+            player = FindEntryWithId(playerNetId);
+        }
+        player.playerObject = playerObject;
+    }
+
     public void PrintGrid() {
         Debug.Log("=========Player Grid=========");
         foreach (PlayerData entry in playerList) {
@@ -206,10 +215,6 @@ public class PlayerGrid : NetworkBehaviour {
             // Find any properties that have been set and distribute them to client copies of the PlayerGrid
             if (pD.name != e.name) {
                 RpcSetPlayerName(pD.playerNetId, pD.name);
-            }
-            // TODO: this might not be necessary?
-            if (pD.playerObject != e.playerObject) {
-                // TODO: RpcSetPlayerObject
             }
             if (pD.characterType != e.characterType){
                 RpcSetCharacterType(pD.playerNetId, pD.characterType);
