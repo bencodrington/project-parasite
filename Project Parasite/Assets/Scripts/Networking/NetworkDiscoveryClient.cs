@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class NetworkDiscoveryClient : NetworkDiscovery {
 
     public MenuItemSet searchingForGameMenuItemSet;
+    public MenuItemSet searchingForPlayersClientMenuItemSet;
     public GameObject ClientInformationPrefab;
 
     // Necessary to fix Unity bug where onReceivedBroadcast will be called multiple times
@@ -58,7 +59,7 @@ public class NetworkDiscoveryClient : NetworkDiscovery {
             Debug.LogError("NetworkDiscoveryClient: onReceivedBroadcast: Menu not found");
             return;
         }
-        menu.DeleteMenuItems();
+        menu.TransitionToNewMenuItemSet(searchingForPlayersClientMenuItemSet);
 		
         // Deactivate Network Discovery Client
         // gameObject.SetActive(false);
