@@ -63,3 +63,5 @@ MonoBehaviour:
   m_OffsetY: 0
   searchingForPlayersMenuItemSet: {fileID: 11400000, guid: 11d287f6b955cc74aa0c1b2321d33972,
     type: 2}
+  ClientInformationPrefab: {fileID: 1688660268600780, guid: a66ab832ed462b244b3b8512c591559b,
+    type: 2}

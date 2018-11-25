@@ -51,13 +51,30 @@ public class PlayerObject : NetworkBehaviour {
 		OnCharacterDestroy -= cb;
 	}
 
-	void Start() {
-		Debug.Log("PlayerGrid.localPlayerName: " + PlayerGrid.Instance.localPlayerName);
+	public override void OnStartLocalPlayer() {
+		base.OnStartLocalPlayer();
+		ClientInformation cI = FindObjectOfType<ClientInformation>();
+		if (cI == null) {
+			Debug.LogError("PlayerObject:OnStartLocalPlayer: ClientInformation not found");
+			return;
+		}
+		// Request the server's PlayerGrid to distribute any info it had before we connected
+		CmdPullPlayerGrid();
+		// Update local copy of PlayerGrid so that we can set local player without waiting
+		// 	for the Rpc call to return to us
+		// TODO: mimic setplayername for setlocalplayer, such that it creates an entry if a matching one isn't found
 		PlayerGrid.Instance.AddPlayer(netId);
+		// Update server copy and propogate to other clients
+		CmdAddToPlayerGrid();
+		// Update local copy with local player boolean
+		PlayerGrid.Instance.SetLocalPlayer(netId);
+		// Update all copies with the client name
+		CmdSetPlayerName(cI.clientName);
+	}
+
+	void Start() {
 		if (isLocalPlayer) {
-			PlayerGrid.Instance.SetLocalPlayer(netId);
 			topRightUiText = GameObject.FindGameObjectWithTag("TopRightUI").GetComponent<Text>();
-			CmdSetPlayerName(netId, PlayerGrid.Instance.localPlayerName);
 		}
 	}
 
@@ -140,8 +157,18 @@ public class PlayerObject : NetworkBehaviour {
 	}
 
 	[Command]
-	void CmdSetPlayerName(NetworkInstanceId playerNetId, string name) {
-		PlayerGrid.Instance.CmdSetPlayerName(playerNetId, name);
+	void CmdPullPlayerGrid() {
+		PlayerGrid.Instance.CmdPull();
+	}
+
+	[Command]
+	void CmdAddToPlayerGrid() {
+		PlayerGrid.Instance.CmdAddPlayer(netId);
+	}
+
+	[Command]
+	void CmdSetPlayerName(string name) {
+		PlayerGrid.Instance.CmdSetPlayerName(netId, name);
 	}
 
 	// Client RPCs

@@ -7,15 +7,17 @@ using UnityEngine.UI;
 public class NetworkDiscoveryServer : NetworkDiscovery {
 
     public MenuItemSet searchingForPlayersMenuItemSet;
+    public GameObject ClientInformationPrefab;
 
 	void Start () {
 		// Get name from input box
 		GameObject nameField = GameObject.FindGameObjectWithTag("Name Field");
-		string name = "";
+		string clientName = "";
 		if (nameField != null) {
-			name = nameField.GetComponent<InputField>().text;
+			clientName = nameField.GetComponent<InputField>().text;
 		}
-		name = (name == "") ? "Anonymous Server" : name;
+		clientName = (clientName == "") ? "Anonymous Server" : clientName;
+        Instantiate(ClientInformationPrefab).GetComponent<ClientInformation>().clientName = clientName;
 		// Switch to looking for player menu
         Menu menu = FindObjectOfType<Menu>();
         if (menu == null) {
@@ -28,12 +30,13 @@ public class NetworkDiscoveryServer : NetworkDiscovery {
 		Initialize();
 		// Broadcast string in input box
 		// 	for future possibility of selecting from several servers
-		broadcastData = name;
+		broadcastData = clientName;
 		// IMPORTANT NOTE! Make sure broadcastData is not an empty string, otherwise you'll get an ArgumentOutOfRange exception
 		StartAsServer();
-		// IMPORTANT NOTE! PlayerGrid is not activated until StartAsServer is called
-		// 	attempting to reference it before that will cause errors
-		PlayerGrid.Instance.localPlayerName = name;
+		// // TODO: remove
+		// // IMPORTANT NOTE! PlayerGrid is not activated until NetworkManager.StartHost() is called
+		// // 	attempting to reference it before that will cause errors
+		// PlayerGrid.Instance.localPlayerName = clientName;
 
 		Debug.Log("NetworkDiscoveryServer: Server Started");
 	}

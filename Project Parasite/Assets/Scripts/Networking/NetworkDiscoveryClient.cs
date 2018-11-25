@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class NetworkDiscoveryClient : NetworkDiscovery {
 
     public MenuItemSet searchingForGameMenuItemSet;
+    public GameObject ClientInformationPrefab;
 
     // Necessary to fix Unity bug where onReceivedBroadcast will be called multiple times
     bool hasRecievedBroadcastAtLeastOnce = true;
@@ -19,19 +20,17 @@ public class NetworkDiscoveryClient : NetworkDiscovery {
     protected void onEnable() {
 		// Get name from input box
 		GameObject nameField = GameObject.FindGameObjectWithTag("Name Field");
-		string name = "";
+		string clientName = "";
 		if (nameField != null) {
-			name = nameField.GetComponent<InputField>().text;
+			clientName = nameField.GetComponent<InputField>().text;
 		}
-		name = (name == "") ? "Anonymous Client" : name;
+		clientName = (clientName == "") ? "Anonymous Client" : clientName;
+        Instantiate(ClientInformationPrefab).GetComponent<ClientInformation>().clientName = clientName;
 
         Initialize();
         hasRecievedBroadcastAtLeastOnce = false;
         StartAsClient();
 		Debug.Log("NetworkDiscoveryClient: Client Started");
-		// IMPORTANT NOTE! PlayerGrid is not activated until StartAsClient() is called
-		// 	attempting to reference it before that will cause errors
-		PlayerGrid.Instance.localPlayerName = name;
 
         Menu menu = FindObjectOfType<Menu>();
         if (menu == null) {

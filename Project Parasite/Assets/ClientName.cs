@@ -5,12 +5,13 @@ using UnityEngine.UI;
 
 public class ClientName : MonoBehaviour {
 	void Start () {
-		if (PlayerGrid.Instance == null) {
-			Debug.Log("ClientName:Start: PlayerGrid.Instance is null");
+		ClientInformation cI = FindObjectOfType<ClientInformation>();
+		if (cI == null) {
+			Debug.Log("ClientName:Start: cI is null");
 			return;
 		}
-		if (PlayerGrid.Instance.localPlayerName != null) {
-			GetComponent<Text>().text = "Name: " + PlayerGrid.Instance.localPlayerName;
+		if (cI.clientName != null) {
+			GetComponent<Text>().text = "Name: " + cI.clientName;
 		}
 	}
 }

@@ -34,6 +34,15 @@ public class PlayerGrid : NetworkBehaviour {
             this.character = character;
             this.isLocalPlayer = isLocalPlayer;
         }
+
+        public static PlayerData Empty() {
+            return new PlayerData("Undefined Name",
+                    NetworkInstanceId.Invalid,
+                    null,
+                    CharacterType.NPC,
+                    null,
+                    false);
+        }
     }
 
     List<PlayerData> playerList;
@@ -114,8 +123,8 @@ public class PlayerGrid : NetworkBehaviour {
     void SetPlayerName(NetworkInstanceId playerNetId, string name) {
         PlayerData player = FindEntryWithId(playerNetId);
         if (player == null) {
-            Debug.LogError("PlayerGrid: SetPlayerName: Failed to find player with net id " + playerNetId);
-            return;
+            AddPlayer(playerNetId);
+            player = FindEntryWithId(playerNetId);
         }
         player.name = name;
     }
@@ -136,9 +145,6 @@ public class PlayerGrid : NetworkBehaviour {
     }
 
     public void AddPlayer(NetworkInstanceId playerNetId) {
-        // AddPlayer is only called by the PlayerObject.Start() method, which should run for
-        //  every player object on each client. Therefore we don't need to propagate these
-        //  changes via RPC call.
         // Make sure grid doesn't already contain this player
         if (FindEntryWithId(playerNetId) != null) {
             Debug.Log("PlayerGrid: AddPlayer: Grid already contains an entry with net id " + playerNetId);
@@ -150,17 +156,20 @@ public class PlayerGrid : NetworkBehaviour {
         } else {
             playerObject = ClientScene.FindLocalObject(playerNetId).GetComponent<PlayerObject>();
         }
-        PlayerData newPlayer = new PlayerData("Undefined Name",
-                    playerNetId,
-                    playerObject,
-                    CharacterType.NPC,
-                    null,
-                    false);
+        PlayerData newPlayer = PlayerData.Empty();
+        newPlayer.playerObject = playerObject;
+        newPlayer.playerNetId = playerNetId;
         playerList.Add(newPlayer);
         Debug.Log("ADD PLAYER: " + newPlayer.name + ", Net Id: " + newPlayer.playerNetId);
     }
 
     // Commands
+
+    [Command]
+    public void CmdAddPlayer(NetworkInstanceId playerNetId) {
+        // CmdAddPlayer is only called by the PlayerObject.OnStartLocalPlayer() method
+        RpcAddPlayer(playerNetId);
+    }
 
     [Command]
     public void CmdSetCharacterType(NetworkInstanceId playerNetId, CharacterType characterType) {
@@ -187,18 +196,36 @@ public class PlayerGrid : NetworkBehaviour {
 
     [Command]
     public void CmdSetPlayerName(NetworkInstanceId playerNetId, string name) {
-        PlayerData player = FindEntryWithId(playerNetId);
-        if (player == null) {
-            Debug.LogError("PlayerGrid: CmdSetPlayerName: Failed to find player with net id " + playerNetId);
-            return;
-        }
-        if (player.name == name) {
-            return;
-        }
         RpcSetPlayerName(playerNetId, name);
     }
 
+    [Command]
+    public void CmdPull() {
+        PlayerData e = PlayerData.Empty();
+        foreach (PlayerData pD in playerList) {
+            // Find any properties that have been set and distribute them to client copies of the PlayerGrid
+            if (pD.name != e.name) {
+                RpcSetPlayerName(pD.playerNetId, pD.name);
+            }
+            // TODO: this might not be necessary?
+            if (pD.playerObject != e.playerObject) {
+                // TODO: RpcSetPlayerObject
+            }
+            if (pD.characterType != e.characterType){
+                RpcSetCharacterType(pD.playerNetId, pD.characterType);
+            }
+            if (pD.character != e.character) {
+                RpcSetCharacter(pD.playerNetId, pD.character.netId);
+            }
+        }
+    }
+
     // ClientRpc
+
+    [ClientRpc]
+    void RpcAddPlayer(NetworkInstanceId playerNetId) {
+        AddPlayer(playerNetId);
+    }
 
     [ClientRpc]
     void RpcSetCharacterType(NetworkInstanceId playerNetId, CharacterType characterType) {

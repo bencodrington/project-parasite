@@ -31,7 +31,6 @@ public class PlayerList : MonoBehaviour {
 		}
 		GameObject playerListEntry;
 		for(int i = 0; i < playerNames.Count; i++) {
-			Debug.Log("ADDING ENTRY: " + playerNames[i]);
 			playerListEntry = Instantiate(PlayerListEntryPrefab);
 			playerListEntry.transform.SetParent(transform);
 			playerListEntry.transform.position = (Vector2)transform.position + new Vector2(0, (i+1) * -30);
