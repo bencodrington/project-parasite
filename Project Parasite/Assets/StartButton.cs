@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class StartButton : MonoBehaviour {
 
-	public GameObject RoundManagerPrefab;
-
 	public void StartGame() {
 		NetworkDiscoveryServer networkDiscoveryServer = FindObjectOfType<NetworkDiscoveryServer>();
 		if (networkDiscoveryServer == null) {
@@ -14,6 +12,10 @@ public class StartButton : MonoBehaviour {
 		}
 		networkDiscoveryServer.StopBroadcast();
 		Destroy(networkDiscoveryServer.gameObject);
+		PlayerGrid.Instance.GetLocalPlayerObject().CmdStartGame();
+	}
+
+	public void RestartGame() {
 		PlayerGrid.Instance.GetLocalPlayerObject().CmdStartGame();
 	}
 }

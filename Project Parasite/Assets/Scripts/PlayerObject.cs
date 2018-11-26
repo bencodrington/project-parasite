@@ -14,11 +14,14 @@ public class PlayerObject : NetworkBehaviour {
 	public GameObject RoundManagerPrefab;
 	public GameObject HealthPrefab;
 	public GameObject NpcCountPrefab;
+	public GameObject GameOverScreenPrefab;
+	public GameObject GameOverScreenServerPrefab;
 
 	private GameObject characterGameObject;
 	private Text topRightUiText;
 	private GameObject npcCountObject;
 	private GameObject controlsObject;
+	private GameObject gameOverScreen;
 
 	private int _parasiteHealth;
 	private int ParasiteHealth {
@@ -27,7 +30,7 @@ public class PlayerObject : NetworkBehaviour {
 			_parasiteHealth = value;
 			UpdateHealthObject(value);
 			if (value <= 0) {
-				CmdStartGame();
+				CmdShowGameOverScreen();
 			}
 		}
 	}
@@ -95,6 +98,23 @@ public class PlayerObject : NetworkBehaviour {
 		topRightUiText.text = newValue.ToString();
 	}
 
+	void ShowGameOverScreen() {
+		gameOverScreen = isServer ? Instantiate(GameOverScreenServerPrefab) : Instantiate(GameOverScreenPrefab);
+		gameOverScreen.transform.SetParent(FindObjectOfType<Canvas>().transform);
+		RectTransform rect = gameOverScreen.GetComponent<RectTransform>();
+		// Position gameOverScreen;
+		rect.anchoredPosition = new Vector2(0.5f, 0.5f);
+		rect.offsetMax = Vector2.zero;
+		rect.offsetMin = Vector2.zero;
+	}
+
+	void DestroyGameOverScreen() {
+		// gameOverScreen should be null when starting the game from the main menu
+		// 	as opposed to when restarting after a round has been completed
+		if (gameOverScreen == null) { return; }
+		Destroy(gameOverScreen.gameObject);
+	}
+
 	// Commands
 
 	[Command]
@@ -129,8 +149,19 @@ public class PlayerObject : NetworkBehaviour {
 	}
 
 	[Command]
+	public void CmdShowGameOverScreen() {
+		RpcShowGameOverScreen();
+	}
+
+	[Command]
+	public void CmdDestroyGameOverScreen() {
+		RpcDestroyGameOverScreen();
+	}
+
+	[Command]
 	public void CmdStartGame() {
 		RpcDestroyTitleScreen();
+		RpcDestroyGameOverScreen();
 		foreach (RoundManager rm in FindObjectsOfType<RoundManager>()) {
 			rm.EndRound();
 			Destroy(rm.gameObject);
@@ -241,5 +272,15 @@ public class PlayerObject : NetworkBehaviour {
 	public void RpcUpdateRemainingNpcCount(int updatedCount) {
 		if (!isLocalPlayer) { return; }
 		RemainingNpcCount = updatedCount;
+	}
+
+	[ClientRpc]
+	void RpcShowGameOverScreen() {
+		PlayerGrid.Instance.GetLocalPlayerObject().ShowGameOverScreen();
+	}
+
+	[ClientRpc]
+	void RpcDestroyGameOverScreen() {
+		PlayerGrid.Instance.GetLocalPlayerObject().DestroyGameOverScreen();
 	}
 }

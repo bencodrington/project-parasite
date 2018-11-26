@@ -18,6 +18,7 @@ public class PlayerList : MonoBehaviour {
 	
 	void Update() {
 		// TODO: this almost certainly doesn't need to run every frame
+		if (PlayerGrid.Instance == null) { return; }
 		playerNames = PlayerGrid.Instance.GetPlayerNames();
 		if (ListHasBeenModified()) {
 			UpdateChildren();
