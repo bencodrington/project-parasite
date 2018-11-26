@@ -23,6 +23,13 @@ public class PlayerObject : NetworkBehaviour {
 	private GameObject controlsObject;
 	private GameObject gameOverScreen;
 
+	// The text shown on the game over screen
+	private const string HUNTERS_WIN = "HUNTERS WIN!";
+	private const string PARASITE_WINS = "PARASITE WINS!";
+	// The colour of the text shown on the game over screen
+	private Color WIN_COLOUR = Color.green;
+	private Color LOSS_COLOUR = Color.red;
+
 	private int _parasiteHealth;
 	private int ParasiteHealth {
 		get { return _parasiteHealth; }
@@ -30,7 +37,7 @@ public class PlayerObject : NetworkBehaviour {
 			_parasiteHealth = value;
 			UpdateHealthObject(value);
 			if (value <= 0) {
-				CmdShowGameOverScreen();
+				CmdShowGameOverScreen(CharacterType.Hunter);
 			}
 		}
 	}
@@ -98,7 +105,7 @@ public class PlayerObject : NetworkBehaviour {
 		topRightUiText.text = newValue.ToString();
 	}
 
-	void ShowGameOverScreen() {
+	void ShowGameOverScreen(CharacterType victorType) {
 		gameOverScreen = isServer ? Instantiate(GameOverScreenServerPrefab) : Instantiate(GameOverScreenPrefab);
 		gameOverScreen.transform.SetParent(FindObjectOfType<Canvas>().transform);
 		RectTransform rect = gameOverScreen.GetComponent<RectTransform>();
@@ -106,6 +113,15 @@ public class PlayerObject : NetworkBehaviour {
 		rect.anchoredPosition = new Vector2(0.5f, 0.5f);
 		rect.offsetMax = Vector2.zero;
 		rect.offsetMin = Vector2.zero;
+
+		Transform VictorText = gameOverScreen.transform.Find("Victor");
+		if (VictorText == null) {
+			Debug.LogError("PlayerObject:ShowGameOverScreen: Victor Text not found");
+			return;
+		}
+		Text txt = VictorText.GetComponent<Text>();
+		txt.text = victorType == CharacterType.Hunter ? HUNTERS_WIN : PARASITE_WINS;
+		txt.color = victorType == PlayerGrid.Instance.GetLocalCharacterType() ? WIN_COLOUR : LOSS_COLOUR;
 	}
 
 	void DestroyGameOverScreen() {
@@ -149,8 +165,8 @@ public class PlayerObject : NetworkBehaviour {
 	}
 
 	[Command]
-	public void CmdShowGameOverScreen() {
-		RpcShowGameOverScreen();
+	public void CmdShowGameOverScreen(CharacterType victorType) {
+		RpcShowGameOverScreen(victorType);
 	}
 
 	[Command]
@@ -275,8 +291,8 @@ public class PlayerObject : NetworkBehaviour {
 	}
 
 	[ClientRpc]
-	void RpcShowGameOverScreen() {
-		PlayerGrid.Instance.GetLocalPlayerObject().ShowGameOverScreen();
+	void RpcShowGameOverScreen(CharacterType victorType) {
+		PlayerGrid.Instance.GetLocalPlayerObject().ShowGameOverScreen(victorType);
 	}
 
 	[ClientRpc]

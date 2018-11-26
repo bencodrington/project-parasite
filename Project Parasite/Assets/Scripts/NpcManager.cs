@@ -45,7 +45,7 @@ public class NpcManager : NetworkBehaviour {
 		}
 		if (NpcList.Count == 0) {
 			// Game Over
-			PlayerGrid.Instance.GetLocalPlayerObject().CmdShowGameOverScreen();
+			PlayerGrid.Instance.GetLocalPlayerObject().CmdShowGameOverScreen(CharacterType.Parasite);
 		}
 	}
 
