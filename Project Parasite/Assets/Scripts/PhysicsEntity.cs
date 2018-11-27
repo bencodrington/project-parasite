@@ -83,7 +83,6 @@ public class PhysicsEntity {
 		Vector2 pixelAbove = newPosition + new Vector2(0, height);
 		_isOnGround = false;
 		_isOnCeiling = false;
-		// TODO: remove
 		// Check for obstacles encountered between current position and new position
 		obstacleBelow = Physics2D.OverlapArea(oldPixelBelow, pixelBelow, obstacleLayerMask);
 		obstacleAbove = Physics2D.OverlapArea(oldPixelAbove, pixelAbove, obstacleLayerMask);
