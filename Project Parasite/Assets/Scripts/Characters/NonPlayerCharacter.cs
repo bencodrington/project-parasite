@@ -7,7 +7,7 @@ public class NonPlayerCharacter : Character {
 
 	public bool isInfected = false;
 
-	private const float PARASITE_LAUNCH_VELOCITY = 0.75f;
+	private const float PARASITE_LAUNCH_VELOCITY = 45f;
 
 	// Pathfinding
 	private float validDistanceFromTarget = .5f;
