@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 
 public class Parasite : Character {
 
-	private float jumpVelocity = .5f;
+	private float jumpVelocity = 30f;
 	// Whether the "UP" key was being pressed last frame
 	private bool oldUp = false;
 
@@ -30,6 +30,7 @@ public class Parasite : Character {
 			physicsEntity.velocityY = 0;
 		}
 
+		bool isOvercomingGravity = false;
 		bool up = Input.GetKey(KeyCode.W);
 		bool down = Input.GetKey(KeyCode.S);
 		if (up && !oldUp && physicsEntity.IsOnGround()) {
@@ -37,7 +38,7 @@ public class Parasite : Character {
 			physicsEntity.AddVelocity(0, jumpVelocity);
 		} else if (up && physicsEntity.IsOnCeiling()) {
 			// Stick to ceiling
-			physicsEntity.applyGravity = false;
+			isOvercomingGravity = true;
 		} else if (up && isOnWall()) {
 			// Climb Up
 			physicsEntity.velocityY = stats.movementSpeed;
@@ -47,7 +48,7 @@ public class Parasite : Character {
 			physicsEntity.velocityY = -stats.movementSpeed;
 		}
 		oldUp = up;
-		
+		physicsEntity.SetIsOvercomingGravity(isOvercomingGravity);
 
 
 		// Infect

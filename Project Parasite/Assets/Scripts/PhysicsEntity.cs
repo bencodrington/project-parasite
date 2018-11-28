@@ -12,6 +12,7 @@ public class PhysicsEntity {
 
 	// Gravity increases by a rate of 1 unit/second per second
 	float gravityAcceleration;
+	public float GravityAcceleration() { return gravityAcceleration; }
 
 	public float velocityX = 0f;
 	public float velocityY = 0f;
@@ -37,6 +38,11 @@ public class PhysicsEntity {
 
 	public bool applyGravity = true;
 
+	bool _isOvercomingGravity = false;
+	public void SetIsOvercomingGravity(bool isOvercomingGravity) {
+		_isOvercomingGravity = isOvercomingGravity;
+	}
+
 	int obstacleLayerMask = 1 << LayerMask.NameToLayer("Obstacles");
 
 	public PhysicsEntity(Transform transform, float height = 0.5f, float width = 0.5f) {
@@ -52,22 +58,20 @@ public class PhysicsEntity {
 
 		// Check if obstacle below has moved
 		if (obstacleBelow != null && (Vector2)obstacleBelow.transform.position != obstacleBelowOldPosition) {
-			// Debug.Log(obstacleBelow.transform.position);
-			// Debug.Log(obstacleBelowOldPosition);
 			floorVelocity = (Vector2)obstacleBelow.transform.position - obstacleBelowOldPosition;
-			// Debug.Log("Velocity BEFORE = " + velocityY);
 			velocityY += floorVelocity.y;
 			oldPixelBelow += new Vector2(0, velocityY);
-			// Debug.Log("Floor velocity = " + floorVelocity);
-			// Debug.Log("Velocity = " + velocityY);
 		}
 
 		if (applyGravity) {
 			// Apply Gravity
-			velocityY += gravityAcceleration * Time.deltaTime;
+			velocityY += gravityAcceleration;
+		}
+		if (applyGravity && _isOvercomingGravity) {
+			velocityY -= gravityAcceleration;
 		}
 		// Store attempted new position
-		Vector2 newPosition = new Vector2(transform.position.x + velocityX, transform.position.y + velocityY);
+		Vector2 newPosition = new Vector2(transform.position.x + velocityX * Time.deltaTime, transform.position.y + velocityY * Time.deltaTime);
 		// TODO: It may become necessary to loop the below line until it doesn't change
 		// Check for, and resolve, collisions below, and then beside
 		newPosition = CheckBeside(CheckAboveAndBelow(newPosition));
@@ -80,12 +84,15 @@ public class PhysicsEntity {
 		obstacleBelow = null;
 		Collider2D obstacleAbove = null;
 		Vector2 pixelBelow = GetPixelBelow(newPosition);
-		Vector2 pixelAbove = newPosition + new Vector2(0, height);
+		Vector2 pixelAbove = GetPixelAbove(newPosition);
 		_isOnGround = false;
 		_isOnCeiling = false;
 		// Check for obstacles encountered between current position and new position
 		obstacleBelow = Physics2D.OverlapArea(oldPixelBelow, pixelBelow, obstacleLayerMask);
-		obstacleAbove = Physics2D.OverlapArea(oldPixelAbove, pixelAbove, obstacleLayerMask);
+		if (velocityY >=0 ) {
+			// TODO: this if statement might be causing parasites to glitch through the roofs of moving elevators?
+			obstacleAbove = Physics2D.OverlapArea(oldPixelAbove, pixelAbove, obstacleLayerMask);
+		}
 		// Handle Collisions
 		if (obstacleBelow != null) {
 			// Entity is touching the ground
@@ -95,13 +102,20 @@ public class PhysicsEntity {
 			obstacleHeight = obstacleBelow.transform.localScale.y / 2;
 			newPosition.y = obstacleBelow.transform.position.y + obstacleHeight + height;
 			obstacleBelowOldPosition = obstacleBelow.transform.position;
+			// Re-update triggers
 			pixelBelow = GetPixelBelow(newPosition);
+			pixelAbove = GetPixelAbove(newPosition);
 		} else if (obstacleAbove != null) {
 			_isOnCeiling = true;
 			velocityY = 0;
 			obstacleHeight = obstacleAbove.transform.localScale.y / 2;
 			newPosition.y = obstacleAbove.transform.position.y - obstacleHeight - height;
+			// Re-update triggers
+			pixelBelow = GetPixelBelow(newPosition);
+			pixelAbove = GetPixelAbove(newPosition);
 		}
+		// Technically the below should occur after the CheckBeside() call is made, might fix some bugs,
+		// 	but is only definitely responsible for misplaced 'drawline trail' for pixelbelow
 		Debug.DrawLine(oldPixelBelow, pixelBelow);
 		oldPixelBelow = pixelBelow;
 		oldPixelAbove = pixelAbove;
@@ -114,11 +128,8 @@ public class PhysicsEntity {
 		Collider2D obstacleToTheRight = null;
 		_isOnLeftWall = false;
 		_isOnRightWall = false;
-		Vector2 pixelToTheLeft 	= newPosition + new Vector2(-width, 0);
-		Vector2 pixelToTheRight = newPosition + new Vector2(width, 0);
-		// TODO: remove
-		Debug.DrawLine(oldPixelToTheLeft, pixelToTheLeft);
-		Debug.DrawLine(oldPixelToTheRight, pixelToTheRight);
+		Vector2 pixelToTheLeft 	= GetPixelToTheLeft(newPosition);
+		Vector2 pixelToTheRight = GetPixelToTheRight(newPosition);
 		// If moving left
 		if (velocityX < 0) {
 			obstacleToTheLeft	= Physics2D.OverlapArea(oldPixelToTheLeft, pixelToTheLeft, obstacleLayerMask);
@@ -133,14 +144,22 @@ public class PhysicsEntity {
 			// Align left edge of entity with right edge of obstacle
 			obstacleWidth = obstacleToTheLeft.transform.localScale.x / 2;
 			newPosition.x = obstacleToTheLeft.transform.position.x + obstacleWidth + width;
+			// Re-update triggers
+			pixelToTheLeft 	= GetPixelToTheLeft(newPosition);
+			pixelToTheRight = GetPixelToTheRight(newPosition);
 			_isOnLeftWall = true;
 		}
 		if (obstacleToTheRight != null) {
 			velocityX = 0;
 			obstacleWidth = obstacleToTheRight.transform.localScale.x / 2;
 			newPosition.x = obstacleToTheRight.transform.position.x - obstacleWidth - width;
+			// Re-update triggers
+			pixelToTheLeft 	= GetPixelToTheLeft(newPosition);
+			pixelToTheRight = GetPixelToTheRight(newPosition);
 			_isOnRightWall = true;
 		}
+		Debug.DrawLine(oldPixelToTheLeft, pixelToTheLeft);
+		Debug.DrawLine(oldPixelToTheRight, pixelToTheRight);
 		oldPixelToTheLeft = pixelToTheLeft;
 		oldPixelToTheRight = pixelToTheRight;
 		return newPosition;
@@ -153,5 +172,12 @@ public class PhysicsEntity {
 
 	Vector2 GetPixelBelow(Vector2 position) {
 		return position + new Vector2(0, -height + 0.03f);
+	}Vector2 GetPixelAbove(Vector2 position) {
+		return position + new Vector2(0, height);
+	}
+	Vector2 GetPixelToTheLeft(Vector2 position) {
+		return position + new Vector2(-width, 0);
+	}Vector2 GetPixelToTheRight(Vector2 position) {
+		return position + new Vector2(width, 0);
 	}
 }
