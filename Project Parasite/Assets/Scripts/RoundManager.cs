@@ -14,6 +14,8 @@ public class RoundManager : MonoBehaviour {
 	bool huntersOnlyMode = false;
 
 	void Start () {
+		// FIXME
+		// huntersOnlyMode = true;
 		// Cache Player Objects
 		connectedPlayers = FindObjectsOfType<PlayerObject>();
 		// TODO: uncache on leave
