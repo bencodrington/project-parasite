@@ -55,8 +55,12 @@ public abstract class Character : NetworkBehaviour {
 		// Character combines all three of the above layer masks
 		characterLayerMask = parasiteLayerMask + npcLayerMask + hunterLayerMask;
 		spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
+		OnStart();
 	}
 
+	// Overridden by child classes to be called by the base Start() method
+	protected virtual void OnStart() {}
 	
 	public virtual void Update () {
 		// Called once per frame for each Character

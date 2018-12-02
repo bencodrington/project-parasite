@@ -7,11 +7,20 @@ using System;
 public class Hunter : Character {
 
 	private float jumpVelocity = 30f;
+	const int MAX_ORB_COUNT = 3;
 
 	// Used when getting user input to determine if key was down last frame
 	private bool oldUp = false;
 
 	public GameObject orbPrefab;
+
+	Queue<Orb> orbs;
+
+	protected override void OnStart() {
+		if (isServer) {
+			orbs = new Queue<Orb>();
+		}
+	}
 
 	protected override void HandleInput()  {
 		// Movement
@@ -27,8 +36,11 @@ public class Hunter : Character {
 
 		// Place orb
 		if (Input.GetKeyDown(KeyCode.J)) {
-			// TODO: to decrease lag, spawn locally and then let server know
 			CmdSpawnOrb(transform.position);
+		}
+		// Recall orb
+		if (Input.GetKeyDown(KeyCode.K)) {
+			CmdRecallOrb();
 		}
 	}
 
@@ -46,9 +58,18 @@ public class Hunter : Character {
 
 	[Command]
 	void CmdSpawnOrb(Vector2 atPosition) {
+		if (orbs.Count >= MAX_ORB_COUNT) { return; }
 		// Create orb game object on the server
 		GameObject orbGameObject = Instantiate(orbPrefab, atPosition, Quaternion.identity);
+		// Add to queue
+		orbs.Enqueue(orbGameObject.GetComponent<Orb>());
 		// Propogate to all clients
 		NetworkServer.Spawn(orbGameObject);
+	}
+
+	[Command]
+	void CmdRecallOrb() {
+		if (orbs.Count <= 0) { return; }
+		NetworkServer.Destroy(orbs.Dequeue().gameObject);
 	}
 }
