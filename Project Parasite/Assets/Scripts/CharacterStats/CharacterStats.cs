@@ -5,4 +5,5 @@ public class CharacterStats : ScriptableObject {
 	public float height;
 	public float width;
 	public float movementSpeed;
+	public float accelerationSpeed;
 }

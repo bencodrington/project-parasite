@@ -3,6 +3,10 @@
 public class PhysicsEntity {
 
 	private const float DEFAULT_GRAVITY = -2f;
+	// While on the ground, horizontal velocity is divided by this constant
+	// 	a value of 1 indicates no friction
+	//  a value of 2 indicates that horizontal velocity should be halved each physics update
+	private const float DEFAULT_FRICTION_DENOMINATOR = 1.25f;
 
 	Transform transform;
 
@@ -14,10 +18,16 @@ public class PhysicsEntity {
 	float gravityAcceleration;
 	public float GravityAcceleration() { return gravityAcceleration; }
 
+	// TODO: this should be private
 	public float velocityX = 0f;
 	public float velocityY = 0f;
 
-	// public float pixelOffset = 0.05f;
+	// Maintain the velocity from movement input separately
+	// 	this allows us to limit movement speed on its own
+	float inputVelocity = 0f;
+	public void AddInputVelocity(float velocity) {
+		inputVelocity += velocity;
+	}
 
 	private Vector2 oldPixelBelow;
 	private Vector2 oldPixelAbove;
@@ -63,6 +73,7 @@ public class PhysicsEntity {
 			oldPixelBelow += new Vector2(0, velocityY);
 		}
 
+		// TODO: combine these two if statements?
 		if (applyGravity) {
 			// Apply Gravity
 			velocityY += gravityAcceleration;
@@ -70,8 +81,17 @@ public class PhysicsEntity {
 		if (applyGravity && _isOvercomingGravity) {
 			velocityY -= gravityAcceleration;
 		}
+		// Apply horizontal friction
+		if (applyGravity && _isOnGround) {
+			velocityX /= DEFAULT_FRICTION_DENOMINATOR;
+		}
+
 		// Store attempted new position
 		Vector2 newPosition = new Vector2(transform.position.x + velocityX * Time.deltaTime, transform.position.y + velocityY * Time.deltaTime);
+		// Add velocity from character movement input
+		newPosition += new Vector2(inputVelocity * Time.deltaTime, 0);
+		// Then reset, as this should be manually controlled by the character each frame
+		inputVelocity = 0;
 		// TODO: It may become necessary to loop the below line until it doesn't change
 		// Check for, and resolve, collisions below, and then beside
 		newPosition = CheckBeside(CheckAboveAndBelow(newPosition));

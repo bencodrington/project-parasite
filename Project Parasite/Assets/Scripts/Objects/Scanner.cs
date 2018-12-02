@@ -12,7 +12,7 @@ public class Scanner : NetworkBehaviour {
     private int npcLayerMask;
     private bool isBeingTriggered = false;
 
-    private Hunter owner;
+    // private Hunter owner;
 
     public Color detectingParasiteColour;
     public Color restingColour;
@@ -64,12 +64,13 @@ public class Scanner : NetworkBehaviour {
         if (isBeingTriggered) { return; }
         // First frame this has occured, notify clients
         isBeingTriggered = true;
-        owner.RpcOnScannerTriggered(transform.position);
+        // TODO:
+        // owner.RpcOnScannerTriggered(transform.position);
         RpcIsDetectingParasite();
     }
 
     public void SetOwner(Hunter owner) {
-        this.owner = owner;
+        // this.owner = owner;
     }
 
     // ClientRpc

@@ -244,14 +244,10 @@ public class PlayerObject : NetworkBehaviour {
 	[ClientRpc]
 	void RpcUpdateHud() {
 		if (!isLocalPlayer) { return; }
-		Character character = PlayerGrid.Instance.GetLocalCharacter();
 		CharacterType characterType = PlayerGrid.Instance.GetLocalCharacterType();
 		switch (characterType) {
-			case CharacterType.Hunter: 
-				topRightUiText.enabled = true;
-				Hunter hunter = ((Hunter) character);
-				hunter.RegisterOnArmourChangeCallback(UpdateHealthObject);
-				hunter.ArmourHealth = 150;
+			case CharacterType.Hunter:
+				topRightUiText.enabled = false;
 				controlsObject = Instantiate(HunterControlsPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
 				break;
 			case CharacterType.Parasite:

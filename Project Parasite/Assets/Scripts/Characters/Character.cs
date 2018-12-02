@@ -17,6 +17,14 @@ public abstract class Character : NetworkBehaviour {
 	protected int npcLayerMask;
 	protected int obstacleLayerMask;
 
+	// Horizontal movement is divided by this each physics update
+	// 	a value of 1 indicates that the character will never stop walking once they start
+	// 	a value of 2 indicates the walking speed will be halved each frame
+	const float MOVEMENT_INPUT_FRICTION = 2f;
+	bool isMovingRight;
+	bool isMovingLeft;
+	float inputVelocity = 0;
+
 	const float lagLerpFactor = 0.4f;
 
 	// Only initialized for Character objects on the server
@@ -68,6 +76,24 @@ public abstract class Character : NetworkBehaviour {
 
 	public virtual void FixedUpdate() {
 		if (hasAuthority && physicsEntity != null) {
+			// Based on input, accelerate in direction that's being pressed
+			if (isMovingLeft) {
+				inputVelocity -= stats.accelerationSpeed;
+			} else if (isMovingRight) {
+				inputVelocity += stats.accelerationSpeed;
+			} else {
+				inputVelocity /= MOVEMENT_INPUT_FRICTION;
+				// If inputVelocity is sufficiently close to 0
+				if (inputVelocity < 0.001) {
+					// snap to 0
+					inputVelocity = 0;
+				}
+			}
+			// Clamp to maximum input speed
+			inputVelocity = Mathf.Clamp(inputVelocity, -stats.movementSpeed, stats.movementSpeed);
+			// Pass calculated velocity to physics entity
+			physicsEntity.AddInputVelocity(inputVelocity);
+
 			physicsEntity.Update();
 			// Update the server's position
 			// TODO: clump these updates to improve network usage?
@@ -76,19 +102,18 @@ public abstract class Character : NetworkBehaviour {
 	}
 
 	protected void HandleHorizontalMovement() {
-		// TODO: add possibility for being moved outside of input
+		isMovingLeft = false;
+		isMovingRight = false;
 		bool right = Input.GetKey(KeyCode.D);
 		bool left = Input.GetKey(KeyCode.A);
 		if (right && !left) {
-			physicsEntity.velocityX = stats.movementSpeed;
+			isMovingRight = true;
 			SetSpriteFlip(false);
 			CmdSetSpriteFlip(false);
 		} else if (left && !right) {
-			physicsEntity.velocityX = -stats.movementSpeed;
+			isMovingLeft = true;
 			SetSpriteFlip(true);
 			CmdSetSpriteFlip(true);
-		} else {
-			physicsEntity.velocityX = 0;
 		}
 	}
 
