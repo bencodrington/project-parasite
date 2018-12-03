@@ -7,7 +7,10 @@ using System;
 public class Hunter : Character {
 
 	private float jumpVelocity = 30f;
-	const int MAX_ORB_COUNT = 3;
+	// The maximum number of orbs that this hunter can have spawned at any given time 
+	const int MAX_ORB_COUNT = 4;
+	// The maximum distance from the most recent orb
+	const float ORB_BEAM_RANGE = 6f;
 
 	// Used when getting user input to determine if key was down last frame
 	private bool oldUp = false;
@@ -60,6 +63,11 @@ public class Hunter : Character {
 		physicsEntity.AddVelocity(forceDirection.x, forceDirection.y);
 	}
 
+	bool MostRecentOrbInRange(Vector2 ofPosition) {
+		return mostRecentOrb != null &&
+				(Vector2.Distance(mostRecentOrb.transform.position, ofPosition) <= ORB_BEAM_RANGE);
+	}
+
 	// Commands
 
 	[Command]
@@ -70,8 +78,7 @@ public class Hunter : Character {
 		GameObject orbGameObject = Instantiate(orbPrefab, atPosition, Quaternion.identity);
 		Orb orb = orbGameObject.GetComponent<Orb>();
 
-		// TODO: extract to boolean function
-		if (mostRecentOrb != null && (Vector2.Distance(mostRecentOrb.transform.position, atPosition) <= 6f)) {
+		if (MostRecentOrbInRange(atPosition)) {
 			// Spawn beam halfway between orbs
 			beamSpawnPosition = Vector2.Lerp(mostRecentOrb.transform.position, atPosition, 0.5f);
 			OrbBeam orbBeam = Instantiate(orbBeamPrefab, beamSpawnPosition, Quaternion.identity).GetComponent<OrbBeam>();
