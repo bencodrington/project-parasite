@@ -11,25 +11,21 @@ public class Parasite : Character {
 
 	protected override void HandleInput()  {
 		// Movement
-		// TODO: add possibility for being moved outside of input
 		bool right = Input.GetKey(KeyCode.D);
 		bool left = Input.GetKey(KeyCode.A);
+		isMovingLeft = false;
+		isMovingRight = false;
 		if (right && !left) {
 			physicsEntity.applyGravity = !physicsEntity.IsOnRightWall();
-			physicsEntity.velocityX = stats.movementSpeed;
+			isMovingRight = true;
 		} else if (left && !right) {
 			physicsEntity.applyGravity = !physicsEntity.IsOnLeftWall();
-			physicsEntity.velocityX = -stats.movementSpeed;
+			isMovingLeft = true;
 		} else {
 			physicsEntity.applyGravity = true;
-			physicsEntity.velocityX = 0;
 		}
 
-		if (physicsEntity.IsOnLeftWall() || physicsEntity.IsOnRightWall()) {
-			// Don't maintain momentum from previous movement
-			physicsEntity.velocityY = 0;
-		}
-
+		// TODO: convert this to new input system
 		bool isOvercomingGravity = false;
 		bool up = Input.GetKey(KeyCode.W);
 		bool down = Input.GetKey(KeyCode.S);
