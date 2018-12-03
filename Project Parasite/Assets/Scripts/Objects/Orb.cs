@@ -10,6 +10,8 @@ public class Orb : NetworkBehaviour {
 	float energyRadius = 2f;
 	float energyForce = 1f;
 
+	OrbBeam beam;
+
 	void Start() {
 		energyCenterLayerMask = 1 << LayerMask.NameToLayer("EnergyCenters");
 	}
@@ -39,5 +41,15 @@ public class Orb : NetworkBehaviour {
 		// FORCE OUTPUT:   ^--FULL FORCE--^			       0
 		float t = (distance - fullForceCutoff) / (energyRadius - fullForceCutoff);
 		return Mathf.Lerp(energyForce, 0, t);
+	}
+
+	public void AttachBeam(OrbBeam beam) {
+		this.beam = beam;
+	}
+
+	void OnDestroy() {
+		if (beam != null) {
+			Destroy(beam.gameObject);
+		}
 	}
 }

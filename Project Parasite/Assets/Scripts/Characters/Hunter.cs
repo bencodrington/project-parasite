@@ -76,7 +76,8 @@ public class Hunter : Character {
 			beamSpawnPosition = Vector2.Lerp(mostRecentOrb.transform.position, atPosition, 0.5f);
 			OrbBeam orbBeam = Instantiate(orbBeamPrefab, beamSpawnPosition, Quaternion.identity).GetComponent<OrbBeam>();
 			orbBeam.Initialize(mostRecentOrb.transform.position, atPosition);
-			// TODO: Store beam in most recent orb so when the orb is destroyed it can take the beam with it
+			// Store beam in most recent orb so when the orb is destroyed it can take the beam with it
+			mostRecentOrb.AttachBeam(orbBeam);
 		}
 
 		// Add to queue
