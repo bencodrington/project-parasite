@@ -82,9 +82,11 @@ public class Hunter : Character {
 			// Spawn beam halfway between orbs
 			beamSpawnPosition = Vector2.Lerp(mostRecentOrb.transform.position, atPosition, 0.5f);
 			OrbBeam orbBeam = Instantiate(orbBeamPrefab, beamSpawnPosition, Quaternion.identity).GetComponent<OrbBeam>();
-			orbBeam.Initialize(mostRecentOrb.transform.position, atPosition);
 			// Store beam in most recent orb so when the orb is destroyed it can take the beam with it
 			mostRecentOrb.AttachBeam(orbBeam);
+			// Propogate to all clients
+			NetworkServer.Spawn(orbBeam.gameObject);
+			orbBeam.RpcInitialize(mostRecentOrb.transform.position, atPosition);
 		}
 
 		// Add to queue

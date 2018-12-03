@@ -36,6 +36,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4226460548308852}
   - component: {fileID: 114356152208690114}
+  - component: {fileID: 114201053319321340}
   m_Layer: 0
   m_Name: OrbBeam
   m_TagString: Untagged
@@ -70,6 +71,38 @@ Transform:
   m_Father: {fileID: 4226460548308852}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114201053319321340
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1599698830328778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 176
+    i1: 132
+    i2: 140
+    i3: 59
+    i4: 25
+    i5: 147
+    i6: 6
+    i7: 116
+    i8: 90
+    i9: 169
+    i10: 18
+    i11: 85
+    i12: 96
+    i13: 40
+    i14: 37
+    i15: 210
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0
 --- !u!114 &114356152208690114
 MonoBehaviour:
   m_ObjectHideFlags: 1

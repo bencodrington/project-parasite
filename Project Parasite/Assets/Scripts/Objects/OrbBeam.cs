@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class OrbBeam : MonoBehaviour {
+public class OrbBeam : NetworkBehaviour {
 
 	int energyCenterMask;
 
@@ -21,7 +22,7 @@ public class OrbBeam : MonoBehaviour {
 		energyCenterMask = 1 << LayerMask.NameToLayer("EnergyCenters");
 	}
 
-	public void Initialize(Vector2 startPoint, Vector2 endPoint) {
+	void Initialize(Vector2 startPoint, Vector2 endPoint) {
 		normal = Vector2.Perpendicular(endPoint - startPoint).normalized;
 		hitboxSize = new Vector2( Vector2.Distance(startPoint, endPoint), energyRadius);
 		hitboxAngle = Vector2.SignedAngle(Vector2.up, normal);
@@ -75,5 +76,12 @@ public class OrbBeam : MonoBehaviour {
 		// FORCE OUTPUT:	   ^--FULL FORCE--^			       0
 		float t = (distance - fullForceCutoff) / (energyRadius - fullForceCutoff);
 		return Mathf.Lerp(energyForce, 0, t);
+	}
+
+	// ClientRpc
+
+	[ClientRpc]
+	public void RpcInitialize(Vector2 startPoint, Vector2 endPoint) {
+		Initialize(startPoint, endPoint);
 	}
 }
