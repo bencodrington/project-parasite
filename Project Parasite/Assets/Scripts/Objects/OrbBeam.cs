@@ -71,12 +71,25 @@ public class OrbBeam : NetworkBehaviour {
 
 	void Fry() {
 		// Get the colliders of all NPCs that fall on the line
-		RaycastHit2D[] npcHits = Physics2D.LinecastAll(startPoint, endPoint, Utility.GetLayerMask(CharacterType.NPC));
+		RaycastHit2D[] hits = Physics2D.LinecastAll(startPoint, endPoint, Utility.GetLayerMask(CharacterType.NPC));
 		NonPlayerCharacter npc;
-		foreach (RaycastHit2D hit in npcHits) {
+		Parasite parasite;
+		// Fry each uninfected NPC on the server
+		foreach (RaycastHit2D hit in hits) {
 			npc = hit.transform.parent.GetComponent<NonPlayerCharacter>();
 			if (isServer && !npc.isInfected) {
 				FindObjectOfType<NpcManager>().DespawnNpc(npc.netId);
+			} else if (npc.isInfected && PlayerGrid.Instance.GetLocalCharacter() == npc) {
+				npc.CmdDespawnSelf();
+			}
+		}
+		
+		// Deal damage to parasite if it falls on the line (currently 1 per physics update)
+		RaycastHit2D parasiteHit = Physics2D.Linecast(startPoint, endPoint, Utility.GetLayerMask(CharacterType.Parasite));
+		if (parasiteHit != false) {
+			parasite = parasiteHit.transform.parent.GetComponent<Parasite>();
+			if (PlayerGrid.Instance.GetLocalCharacter() == parasite) {
+				PlayerGrid.Instance.GetLocalPlayerObject().ParasiteTakeDamage(1);
 			}
 		}
 	}

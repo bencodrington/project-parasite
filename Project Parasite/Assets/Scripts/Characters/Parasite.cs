@@ -95,5 +95,6 @@ public class Parasite : Character {
 		// Update client's camera and render settings to reflect new character
 		npc.RpcSetCameraFollow();
 		npc.RpcSetRenderLayer();
+		PlayerGrid.Instance.CmdSetCharacter(PlayerObject.netId, npc.netId);
 	}
 }

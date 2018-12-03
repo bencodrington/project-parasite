@@ -131,6 +131,12 @@ public class PlayerObject : NetworkBehaviour {
 		Destroy(gameOverScreen.gameObject);
 	}
 
+	public void ParasiteTakeDamage(int damage) {
+		if (isLocalPlayer) {
+			ParasiteHealth -= damage;
+		}
+	}
+
 	// Commands
 
 	[Command]
@@ -220,14 +226,7 @@ public class PlayerObject : NetworkBehaviour {
 		PlayerGrid.Instance.CmdSetPlayerName(netId, name);
 	}
 
-	// Client RPCs
-
-	[ClientRpc]
-	public void RpcParasiteTakeDamage(int damage) {
-		if (isLocalPlayer) {
-			ParasiteHealth -= damage;
-		}
-	}
+	// ClientRpc
 
 	[ClientRpc]
 	public void RpcDestroyTitleScreen() {
