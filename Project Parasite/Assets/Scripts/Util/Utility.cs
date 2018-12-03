@@ -10,6 +10,20 @@ public static class Utility {
 		}
 	}
 
+	// Valid keys: [ "character", "obstacle", "energyCenter", "potentialParasite" ]
+	public static int GetLayerMask(string key) {
+		switch (key) {
+			case "character": return 	GetLayerMask(CharacterType.Hunter) +
+										GetLayerMask(CharacterType.NPC) +
+										GetLayerMask(CharacterType.Parasite);
+			case "potentialParasite":	return 	GetLayerMask(CharacterType.NPC) +
+												GetLayerMask(CharacterType.Parasite);
+			case "obstacle": return 1 << LayerMask.NameToLayer("Obstacles");
+			case "energyCenter": return 1 << LayerMask.NameToLayer("EnergyCenters");
+			default: return -1;
+		}
+	}
+
 	public static Vector2 ProjectOntoRay2D(Vector2 point, Ray2D ray) {
 		// Projection of vector b onto vector a is 	c = ( (a . b) / ||a||^2 ) * a
 		// 	Assuming a is unit length, this can be simplified to	 c = (a . b) * a

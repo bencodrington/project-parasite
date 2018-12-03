@@ -10,15 +10,7 @@ public class ElevatorCallField : NetworkBehaviour {
 
 	public Vector2 size;
 
-	private int callerLayerMask;
 	private Collider2D caller;
-	
-	void Start() {
-		int hunterMask = 1 << LayerMask.NameToLayer("Hunters");
-		int npcMask = 1 << LayerMask.NameToLayer("NPCs");
-		int parasiteMask = 1 << LayerMask.NameToLayer("Parasites");
-		callerLayerMask = hunterMask + npcMask + parasiteMask;				
-	} 
 
 	void FixedUpdate() {
 		if (!isServer) { return; }
@@ -26,7 +18,7 @@ public class ElevatorCallField : NetworkBehaviour {
 		// Check for entity within borders
 		caller = Physics2D.OverlapArea(transform.position,
 										transform.position + new Vector3(size.x, size.y, 0),
-										callerLayerMask);
+										Utility.GetLayerMask("character"));
 		Debug.DrawLine(transform.position, transform.position + new Vector3(size.x, size.y, 0));
 		if (caller != null) {
 			CallElevator();

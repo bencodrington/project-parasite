@@ -5,8 +5,6 @@ using UnityEngine.Networking;
 
 public class OrbBeam : NetworkBehaviour {
 
-	int energyCenterMask;
-
 	float energyRadius = 2f;
 	float energyForce = 10f;
 
@@ -19,10 +17,6 @@ public class OrbBeam : NetworkBehaviour {
 	float hitboxAngle;
 
 	SpriteRenderer spriteRenderer;
-
-	void Start() {
-		energyCenterMask = 1 << LayerMask.NameToLayer("EnergyCenters");
-	}
 
 	void Initialize(Vector2 startPoint, Vector2 endPoint) {
 		this.startPoint = startPoint;
@@ -51,7 +45,7 @@ public class OrbBeam : NetworkBehaviour {
 		Vector2 projectionOntoOrbBeam, hunterPosition, forceDirection;
 		float distanceToHunter;
 		// Get the colliders of all hunters within range of the line
-		Collider2D[] energyCenterColliders = Physics2D.OverlapBoxAll(transform.position, hitboxSize, hitboxAngle, energyCenterMask);
+		Collider2D[] energyCenterColliders = Physics2D.OverlapBoxAll(transform.position, hitboxSize, hitboxAngle, Utility.GetLayerMask("energyCenter"));
 		foreach (Collider2D energyCenterCollider in energyCenterColliders) {
 			Hunter hunter = energyCenterCollider.transform.parent.GetComponent<Hunter>();
 			if ((Character)hunter == PlayerGrid.Instance.GetLocalCharacter()) {

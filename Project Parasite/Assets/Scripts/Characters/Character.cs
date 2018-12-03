@@ -10,12 +10,6 @@ public abstract class Character : NetworkBehaviour {
 
 	protected Vector3 serverPosition;
 	protected bool shouldSnapToServerPosition = false;
-	
-	protected int characterLayerMask;
-	protected int parasiteLayerMask;
-	protected int hunterLayerMask;
-	protected int npcLayerMask;
-	protected int obstacleLayerMask;
 
 	// Horizontal movement is divided by this each physics update
 	// 	a value of 1 indicates that the character will never stop walking once they start
@@ -46,14 +40,6 @@ public abstract class Character : NetworkBehaviour {
 	protected abstract void HandleInput();
 
 	void Start() {
-		// Initialize layer masks
-		obstacleLayerMask = 1 << LayerMask.NameToLayer("Obstacles");
-		
-		parasiteLayerMask = 1 << LayerMask.NameToLayer("Parasites");
-		npcLayerMask = 1 << LayerMask.NameToLayer("NPCs");
-		hunterLayerMask = 1 << LayerMask.NameToLayer("Hunters");
-		// Character combines all three of the above layer masks
-		characterLayerMask = parasiteLayerMask + npcLayerMask + hunterLayerMask;
 		spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
 		OnStart();
@@ -121,9 +107,7 @@ public abstract class Character : NetworkBehaviour {
 		}
 	}
 
-	protected virtual void OnCharacterDestroy() {
-		Debug.Log("ON CHARACTER DESTROY");
-	}
+	protected virtual void OnCharacterDestroy() {}
 
 	void SetSpriteFlip(bool isFacingLeft) {
 		spriteRenderer.flipX = isFacingLeft;

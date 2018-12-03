@@ -18,8 +18,8 @@ public class PhysicsEntity {
 	float gravityAcceleration;
 	public float GravityAcceleration() { return gravityAcceleration; }
 
+	float velocityX = 0f;
 	// TODO: this should be private
-	public float velocityX = 0f;
 	public float velocityY = 0f;
 
 	// Maintain the velocity from movement input separately
@@ -53,8 +53,6 @@ public class PhysicsEntity {
 		_isOvercomingGravity = isOvercomingGravity;
 	}
 
-	int obstacleLayerMask = 1 << LayerMask.NameToLayer("Obstacles");
-
 	public PhysicsEntity(Transform transform, float height = 0.5f, float width = 0.5f) {
 		this.transform = transform;
 		this.height = height;
@@ -73,13 +71,9 @@ public class PhysicsEntity {
 			oldPixelBelow += new Vector2(0, velocityY);
 		}
 
-		// TODO: combine these two if statements?
-		if (applyGravity) {
+		if (applyGravity && !_isOvercomingGravity) {
 			// Apply Gravity
 			velocityY += gravityAcceleration;
-		}
-		if (applyGravity && _isOvercomingGravity) {
-			velocityY -= gravityAcceleration;
 		}
 		// Apply horizontal friction
 		if (applyGravity && _isOnGround) {
@@ -108,10 +102,10 @@ public class PhysicsEntity {
 		_isOnGround = false;
 		_isOnCeiling = false;
 		// Check for obstacles encountered between current position and new position
-		obstacleBelow = Physics2D.OverlapArea(oldPixelBelow, pixelBelow, obstacleLayerMask);
+		obstacleBelow = Physics2D.OverlapArea(oldPixelBelow, pixelBelow, Utility.GetLayerMask("obstacle"));
 		if (velocityY >=0 ) {
 			// TODO: this if statement might be causing parasites to glitch through the roofs of moving elevators?
-			obstacleAbove = Physics2D.OverlapArea(oldPixelAbove, pixelAbove, obstacleLayerMask);
+			obstacleAbove = Physics2D.OverlapArea(oldPixelAbove, pixelAbove, Utility.GetLayerMask("obstacle"));
 		}
 		// Handle Collisions
 		if (obstacleBelow != null) {
@@ -152,9 +146,9 @@ public class PhysicsEntity {
 		Vector2 pixelToTheRight = GetPixelToTheRight(newPosition);
 		// If moving left
 		if (velocityX < 0) {
-			obstacleToTheLeft	= Physics2D.OverlapArea(oldPixelToTheLeft, pixelToTheLeft, obstacleLayerMask);
+			obstacleToTheLeft	= Physics2D.OverlapArea(oldPixelToTheLeft, pixelToTheLeft, Utility.GetLayerMask("obstacle"));
 		} else if (velocityX > 0) { // Moving right
-			obstacleToTheRight 	= Physics2D.OverlapArea(oldPixelToTheRight, pixelToTheRight, obstacleLayerMask);
+			obstacleToTheRight 	= Physics2D.OverlapArea(oldPixelToTheRight, pixelToTheRight, Utility.GetLayerMask("obstacle"));
 		}
 
 		// Handle Collisions

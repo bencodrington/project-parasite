@@ -19,16 +19,11 @@ public class Elevator : NetworkBehaviour {
 	bool isMoving = false;
 	
 	private Collider2D[] passengers;
-	private int passengerLayerMask;
 	private ElevatorButton[] buttons;
 
 	void Start() {
 		ElevatorButton button;
 		buttons = new ElevatorButton[stops.Length];
-		int hunterMask = 1 << LayerMask.NameToLayer("Hunters");
-		int npcMask = 1 << LayerMask.NameToLayer("NPCs");
-		int parasiteMask = 1 << LayerMask.NameToLayer("Parasites");
-		passengerLayerMask = hunterMask + npcMask + parasiteMask;	
 
 		Vector2 spawnPos = new Vector2(transform.position.x, transform.position.y + (size.y / 2));
 		// Spawn button prefabs based on # of stops
@@ -41,12 +36,6 @@ public class Elevator : NetworkBehaviour {
 		}
 
 	}
-
-	void Update() {
-		if (isServer) { return; }
-		// We're on a client machine, so
-		// 	Make sure we're in line with where the server says we should be
-	}
 	
 	void FixedUpdate() {
 		if (isServer) {
@@ -58,7 +47,7 @@ public class Elevator : NetworkBehaviour {
 				Vector2 halfSize = size / 2;
 				passengers = Physics2D.OverlapAreaAll((Vector2)transform.position - halfSize,
 												(Vector2)transform.position + halfSize,
-												passengerLayerMask);
+												Utility.GetLayerMask("character"));
 				Debug.DrawLine((Vector2)transform.position - halfSize, (Vector2)transform.position + halfSize);
 				if (passengers.Length > 0) {
 					// Show buttons on server

@@ -8,8 +8,6 @@ public class Scanner : NetworkBehaviour {
 	public SpriteRenderer spriteRenderer;
     private Vector2 ceilingPoint;
     private float MAX_DISTANCE = 24;
-    private int parasiteLayerMask;
-    private int npcLayerMask;
     private bool isBeingTriggered = false;
 
     // private Hunter owner;
@@ -18,12 +16,9 @@ public class Scanner : NetworkBehaviour {
     public Color restingColour;
 
 	void Start () {
-        parasiteLayerMask = 1 << LayerMask.NameToLayer("Parasites");
-        npcLayerMask = 1 << LayerMask.NameToLayer("NPCs");
         if (isServer) {
-            int obstacleLayerMask = 1 << LayerMask.NameToLayer("Obstacles");
             // Get coordinate of ceiling above scanner
-            RaycastHit2D ceiling = Physics2D.Raycast((Vector2)transform.position + new Vector2(0, 0.1f), Vector2.up, MAX_DISTANCE, obstacleLayerMask);
+            RaycastHit2D ceiling = Physics2D.Raycast((Vector2)transform.position + new Vector2(0, 0.1f), Vector2.up, MAX_DISTANCE, Utility.GetLayerMask("obstacle"));
             ceilingPoint = ceiling.point;
             float distanceToCeiling = ceilingPoint.y - transform.position.y;
             // Set beam sprite to extend to the maximum range
@@ -34,13 +29,13 @@ public class Scanner : NetworkBehaviour {
 	void FixedUpdate () {
         if (!isServer) { return; }
 		// Check area between scanner and ceiling above
-        Collider2D parasite = Physics2D.OverlapArea(transform.position, ceilingPoint, parasiteLayerMask);
+        Collider2D parasite = Physics2D.OverlapArea(transform.position, ceilingPoint, Utility.GetLayerMask(CharacterType.Parasite));
         if (parasite != null) {
             IsDetectingParasite();
             return;
         }
         // Check for infected NPCs
-        Collider2D[] npcColliders = Physics2D.OverlapAreaAll(transform.position, ceilingPoint, npcLayerMask);
+        Collider2D[] npcColliders = Physics2D.OverlapAreaAll(transform.position, ceilingPoint, Utility.GetLayerMask(CharacterType.NPC));
         NonPlayerCharacter npc;
         foreach (Collider2D npcCollider in npcColliders) {
             npc = npcCollider.transform.parent.GetComponentInChildren<NonPlayerCharacter>();

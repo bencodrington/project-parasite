@@ -49,7 +49,7 @@ public class Parasite : Character {
 
 		// Infect
 		if (Input.GetMouseButtonDown(0)) {
-			Collider2D npc = Physics2D.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition), npcLayerMask);
+			Collider2D npc = Physics2D.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition), Utility.GetLayerMask(CharacterType.NPC));
 			if (npc != null) {
 				CmdInfectNpc(npc.transform.parent.GetComponent<NetworkIdentity>().netId);
 				CmdDestroyParasite();
