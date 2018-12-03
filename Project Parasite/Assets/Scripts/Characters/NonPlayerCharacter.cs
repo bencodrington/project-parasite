@@ -102,7 +102,7 @@ public class NonPlayerCharacter : Character {
 		FindObjectOfType<NpcManager>().DespawnNpc(netId);
 	}
 
-	// CLIENTRPC
+	// ClientRpc
 
 	[ClientRpc]
 	public void RpcSetLocalPlayerAuthority(bool newValue) {
