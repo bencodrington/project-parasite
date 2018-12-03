@@ -5,18 +5,17 @@ using UnityEngine.Networking;
 
 public class Orb : NetworkBehaviour {
 
-	int hunterLayerMask;
+	int energyCenterLayerMask;
 
 	float energyRadius = 2f;
 	float energyForce = 1f;
 
 	void Start() {
-		hunterLayerMask = 1 << LayerMask.NameToLayer("EnergyCenters");
+		energyCenterLayerMask = 1 << LayerMask.NameToLayer("EnergyCenters");
 	}
 
 	void FixedUpdate() {
-		Collider2D[] hunterColliders = Physics2D.OverlapCircleAll(transform.position, energyRadius, hunterLayerMask);
-		Color lineColour = hunterColliders.Length == 0 ? Color.red : Color.green;
+		Collider2D[] hunterColliders = Physics2D.OverlapCircleAll(transform.position, energyRadius, energyCenterLayerMask);
 		Vector2 forceDirection;
 		foreach (Collider2D hunterCollider in hunterColliders) {
 			Hunter hunter = hunterCollider.transform.parent.GetComponent<Hunter>();
