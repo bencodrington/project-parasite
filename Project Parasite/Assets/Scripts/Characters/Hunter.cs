@@ -13,8 +13,10 @@ public class Hunter : Character {
 	private bool oldUp = false;
 
 	public GameObject orbPrefab;
+	public GameObject orbBeamPrefab;
 
 	Queue<Orb> orbs;
+	Orb mostRecentOrb;
 
 	protected override void OnStart() {
 		if (isServer) {
@@ -23,6 +25,12 @@ public class Hunter : Character {
 	}
 
 	protected override void HandleInput()  {
+
+		if (mostRecentOrb != null) {
+			// Debug.DrawLine(mostRecentOrb.transform.position, transform.position, Color.cyan);
+			// Debug.DrawLine(mostRecentOrb.transform.position, (Vector2)mostRecentOrb.transform.position + new Vector2(0, 6f), Color.black);
+		}
+
 		// Movement
 		HandleHorizontalMovement();
 
@@ -44,14 +52,12 @@ public class Hunter : Character {
 		}
 	}
 
-	public void Repel(Vector2 origin, float force) {
-		// Calculate vector from the repelling force's point of origin to this object's center
-		Vector2 displacement = (Vector2)transform.position - origin;
+	public void Repel(Vector2 forceDirection, float force) {
 		// Distribute the force between the x and y coordinates
-		displacement.Normalize();
-		displacement *= force;
+		forceDirection.Normalize();
+		forceDirection *= force;
 		// Transfer this force to the physics entity to handle it
-		physicsEntity.AddVelocity(displacement.x, displacement.y);
+		physicsEntity.AddVelocity(forceDirection.x, forceDirection.y);
 	}
 
 	// Commands
@@ -59,17 +65,41 @@ public class Hunter : Character {
 	[Command]
 	void CmdSpawnOrb(Vector2 atPosition) {
 		if (orbs.Count >= MAX_ORB_COUNT) { return; }
+		Vector2 beamSpawnPosition;
 		// Create orb game object on the server
 		GameObject orbGameObject = Instantiate(orbPrefab, atPosition, Quaternion.identity);
+		Orb orb = orbGameObject.GetComponent<Orb>();
+
+		// TODO: extract to boolean function
+		if (mostRecentOrb != null && (Vector2.Distance(mostRecentOrb.transform.position, atPosition) <= 6f)) {
+			// Spawn beam halfway between orbs
+			beamSpawnPosition = Vector2.Lerp(mostRecentOrb.transform.position, atPosition, 0.5f);
+			OrbBeam orbBeam = Instantiate(orbBeamPrefab, beamSpawnPosition, Quaternion.identity).GetComponent<OrbBeam>();
+			orbBeam.Initialize(mostRecentOrb.transform.position, atPosition);
+			// TODO: Store beam in most recent orb so when the orb is destroyed it can take the beam with it
+		}
+
 		// Add to queue
-		orbs.Enqueue(orbGameObject.GetComponent<Orb>());
+		orbs.Enqueue(orb);
 		// Propogate to all clients
 		NetworkServer.Spawn(orbGameObject);
+		RpcOnOrbSpawned(orb.netId);
+		mostRecentOrb = orb;
 	}
 
 	[Command]
 	void CmdRecallOrb() {
 		if (orbs.Count <= 0) { return; }
 		NetworkServer.Destroy(orbs.Dequeue().gameObject);
+	}
+
+	// ClientRpc
+
+	[ClientRpc]
+	void RpcOnOrbSpawned(NetworkInstanceId orbNetId) {
+		if (hasAuthority) {
+			// This client spawned the orb
+			mostRecentOrb = ClientScene.FindLocalObject(orbNetId).GetComponent<Orb>();
+		}
 	}
 }

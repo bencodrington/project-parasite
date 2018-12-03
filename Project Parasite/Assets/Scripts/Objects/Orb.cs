@@ -1,27 +1,28 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class Orb : MonoBehaviour {
+public class Orb : NetworkBehaviour {
 
 	int hunterLayerMask;
 
 	float energyRadius = 2f;
-	float energyForce = 10f;
+	float energyForce = 1f;
 
 	void Start() {
-		hunterLayerMask = 1 << LayerMask.NameToLayer("Hunters");
+		hunterLayerMask = 1 << LayerMask.NameToLayer("EnergyCenters");
 	}
 
 	void FixedUpdate() {
 		Collider2D[] hunterColliders = Physics2D.OverlapCircleAll(transform.position, energyRadius, hunterLayerMask);
 		Color lineColour = hunterColliders.Length == 0 ? Color.red : Color.green;
-		Debug.DrawLine(transform.position, (Vector2)transform.position + new Vector2(energyRadius, 0), lineColour);
-		Debug.DrawLine(transform.position, (Vector2)transform.position + new Vector2(0, energyRadius), lineColour);
+		Vector2 forceDirection;
 		foreach (Collider2D hunterCollider in hunterColliders) {
 			Hunter hunter = hunterCollider.transform.parent.GetComponent<Hunter>();
 			if ((Character)hunter == PlayerGrid.Instance.GetLocalCharacter()) {
-				hunter.Repel(transform.position, CalculateForce(hunter.transform.position));
+				forceDirection = hunterCollider.transform.position - transform.position;
+				hunter.Repel(forceDirection, CalculateForce(hunterCollider.transform.position));
 			}
 		}
 	}
