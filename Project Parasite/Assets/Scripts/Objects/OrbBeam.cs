@@ -15,6 +15,8 @@ public class OrbBeam : MonoBehaviour {
 	Vector2 hitboxSize;
 	float hitboxAngle;
 
+	SpriteRenderer spriteRenderer;
+
 	void Start() {
 		energyCenterMask = 1 << LayerMask.NameToLayer("EnergyCenters");
 	}
@@ -22,10 +24,17 @@ public class OrbBeam : MonoBehaviour {
 	public void Initialize(Vector2 startPoint, Vector2 endPoint) {
 		normal = Vector2.Perpendicular(endPoint - startPoint).normalized;
 		hitboxSize = new Vector2( Vector2.Distance(startPoint, endPoint), energyRadius);
-		hitboxAngle = Vector2.Angle(Vector2.up, normal);
+		hitboxAngle = Vector2.SignedAngle(Vector2.up, normal);
 		hitboxRay = new Ray2D(startPoint, endPoint - startPoint);
-		// TODO: remove
-		Debug.DrawLine(startPoint, endPoint, Color.cyan, 15f);
+		// Stretch sprite between connecting orbs
+		spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+		Vector3 spriteScale = new Vector3(
+			spriteRenderer.transform.localScale.x * hitboxSize.x,
+			spriteRenderer.transform.localScale.y,
+			spriteRenderer.transform.localScale.z
+		);
+		spriteRenderer.transform.localScale = spriteScale;
+		spriteRenderer.transform.Rotate(new Vector3(0, 0, hitboxAngle));
 	}
 
 	void FixedUpdate() {
