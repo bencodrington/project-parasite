@@ -1,6 +1,15 @@
 ﻿using UnityEngine;
 
 public static class Utility {
+	public static int GetLayerMask(CharacterType type) {
+		switch (type) {
+			case CharacterType.Hunter: return 1 << LayerMask.NameToLayer("Hunters");
+			case CharacterType.NPC: return 1 << LayerMask.NameToLayer("NPCs");
+			case CharacterType.Parasite: return 1 << LayerMask.NameToLayer("Parasites");
+			default: return -1;
+		}
+	}
+
 	public static Vector2 ProjectOntoRay2D(Vector2 point, Ray2D ray) {
 		// Projection of vector b onto vector a is 	c = ( (a . b) / ||a||^2 ) * a
 		// 	Assuming a is unit length, this can be simplified to	 c = (a . b) * a

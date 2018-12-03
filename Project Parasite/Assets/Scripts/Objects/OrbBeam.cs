@@ -10,8 +10,10 @@ public class OrbBeam : NetworkBehaviour {
 	float energyRadius = 2f;
 	float energyForce = 10f;
 
-	Vector2 normal;
+	Vector2 startPoint;
+	Vector2 endPoint;
 
+	Vector2 normal;
 	Ray2D hitboxRay;
 	Vector2 hitboxSize;
 	float hitboxAngle;
@@ -23,6 +25,8 @@ public class OrbBeam : NetworkBehaviour {
 	}
 
 	void Initialize(Vector2 startPoint, Vector2 endPoint) {
+		this.startPoint = startPoint;
+		this.endPoint = endPoint;
 		normal = Vector2.Perpendicular(endPoint - startPoint).normalized;
 		hitboxSize = new Vector2( Vector2.Distance(startPoint, endPoint), energyRadius);
 		hitboxAngle = Vector2.SignedAngle(Vector2.up, normal);
@@ -39,6 +43,11 @@ public class OrbBeam : NetworkBehaviour {
 	}
 
 	void FixedUpdate() {
+		Repel();
+		Fry();
+	}
+
+	void Repel() {
 		Vector2 projectionOntoOrbBeam, hunterPosition, forceDirection;
 		float distanceToHunter;
 		// Get the colliders of all hunters within range of the line
@@ -56,6 +65,18 @@ public class OrbBeam : NetworkBehaviour {
 				// Repel hunter away from projected point with a force that is greater if the hunter is
 				//	close to the orb beam
 				hunter.Repel(forceDirection, CalculateForce(distanceToHunter));
+			}
+		}
+	}
+
+	void Fry() {
+		// Get the colliders of all NPCs that fall on the line
+		RaycastHit2D[] npcHits = Physics2D.LinecastAll(startPoint, endPoint, Utility.GetLayerMask(CharacterType.NPC));
+		NonPlayerCharacter npc;
+		foreach (RaycastHit2D hit in npcHits) {
+			npc = hit.transform.parent.GetComponent<NonPlayerCharacter>();
+			if (isServer && !npc.isInfected) {
+				FindObjectOfType<NpcManager>().DespawnNpc(npc.netId);
 			}
 		}
 	}

@@ -88,7 +88,7 @@ public class NonPlayerCharacter : Character {
 	public IEnumerator Idle() {
 		yield return new WaitForSeconds(Random.Range(minTimeUntilNewPath, maxTimeUntilNewPath));
 		// Check that we are still uninfected and still exist
-		if (!isInfected && transform != null) { FindNewPath(); }
+		if (transform != null && !isInfected) { FindNewPath(); }
 		
 	}
 
