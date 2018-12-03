@@ -17,8 +17,7 @@ public class NonPlayerCharacter : Character {
 	private bool hasTarget = false;
 	private float maxTargetDistance = 5f;
 	private float minTargetDistance = 2f;
-
-	// TODO: update to use fixedupdate for physics
+	
 	public override void Update() {
 		if (isInfected && hasAuthority) {
 			// NPC is infected and this client is the Parasite player's client
