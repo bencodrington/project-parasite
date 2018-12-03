@@ -33,15 +33,6 @@ public class NonPlayerCharacter : Character {
 		}
 	}
 
-	public override void FixedUpdate() {
-		// If on owner's client
-		if (isInfected && hasAuthority || (!isInfected && isServer && physicsEntity != null)) {
-			// Run physics update and notify server
-			physicsEntity.Update();
-			CmdUpdatePosition(transform.position, false);
-		}
-	}
-
     protected override void HandleInput()
     {
 		// This function is only called when this NPC is infected,
@@ -56,19 +47,20 @@ public class NonPlayerCharacter : Character {
     }
 
 	void TraversePath() {
+		isMovingLeft = false;
+		isMovingRight = false;
 		if (!hasTarget) { return; }
 		if (Vector3.Distance(this.transform.position, target) < validDistanceFromTarget) {
 			// Reached target
 			StartCoroutine(Idle());
 			// Stop traversing path
-			physicsEntity.velocityX = 0;
 			hasTarget = false;
 		} else {
 			// Still moving
 			if (target.x >= transform.position.x) {
-				physicsEntity.velocityX = stats.movementSpeed;
+				isMovingRight = true;
 			} else {
-				physicsEntity.velocityX = -stats.movementSpeed;
+				isMovingLeft = true;
 			}
 		}
 	}
@@ -88,11 +80,11 @@ public class NonPlayerCharacter : Character {
 	public IEnumerator Idle() {
 		yield return new WaitForSeconds(Random.Range(minTimeUntilNewPath, maxTimeUntilNewPath));
 		// Check that we are still uninfected and still exist
-		if (transform != null && !isInfected) { FindNewPath(); }
+		if (this != null && !isInfected) { FindNewPath(); }
 		
 	}
 
-	// COMMANDS
+	// Commands
 
 	[Command]
 	public void CmdDespawnSelf() {
@@ -111,7 +103,6 @@ public class NonPlayerCharacter : Character {
 
 	[ClientRpc]
 	public void RpcInfect() {
-		// TODO: update PlayerGrid
 		isInfected = true;
 		if (hasAuthority) {
 			// Only update sprite if on the Parasite player's client

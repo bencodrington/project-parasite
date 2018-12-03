@@ -21,8 +21,8 @@ public abstract class Character : NetworkBehaviour {
 	// 	a value of 1 indicates that the character will never stop walking once they start
 	// 	a value of 2 indicates the walking speed will be halved each frame
 	const float MOVEMENT_INPUT_FRICTION = 2f;
-	bool isMovingRight;
-	bool isMovingLeft;
+	protected bool isMovingRight;
+	protected bool isMovingLeft;
 	float inputVelocity = 0;
 
 	const float lagLerpFactor = 0.4f;
