@@ -15,6 +15,10 @@ public class Hunter : Character {
 	// Used when getting user input to determine if key was down last frame
 	private bool oldUp = false;
 
+	bool isSuitActivated = true;
+
+	Color SuitDeactivatedColour = Color.blue;
+
 	public GameObject orbPrefab;
 	public GameObject orbBeamPrefab;
 
@@ -53,9 +57,13 @@ public class Hunter : Character {
 		if (Input.GetKeyDown(KeyCode.K)) {
 			CmdRecallOrb();
 		}
+		// De-activate suit
+		isSuitActivated = !Input.GetKey(KeyCode.LeftShift);
+		spriteRenderer.color = isSuitActivated ? Color.white : SuitDeactivatedColour;
 	}
 
 	public void Repel(Vector2 forceDirection, float force) {
+		if (!isSuitActivated) return;
 		// Distribute the force between the x and y coordinates
 		forceDirection.Normalize();
 		forceDirection *= force;
