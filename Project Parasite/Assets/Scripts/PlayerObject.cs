@@ -34,6 +34,10 @@ public class PlayerObject : NetworkBehaviour {
 	private int ParasiteHealth {
 		get { return _parasiteHealth; }
 		set {
+			if (value < _parasiteHealth) {
+				// Notify parasite that it is taking damage
+				((Parasite)PlayerGrid.Instance.GetLocalCharacter()).OnTakingDamage();
+			}
 			_parasiteHealth = value;
 			UpdateHealthObject(value);
 			if (value <= 0) {

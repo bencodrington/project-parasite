@@ -56,7 +56,33 @@ public class Parasite : Character {
 		}
 	}
 
-	// COMMANDS
+	public void OnTakingDamage() {
+		StartCoroutine(FlashColours());
+	}
+
+	IEnumerator FlashColours() {
+		// How long to flash for
+		float timeRemaining = 0.5f;
+		Color currentColour = spriteRenderer.color;
+		// Used for cycling colours
+		Dictionary<Color, Color> nextColour = new Dictionary<Color, Color>();
+		nextColour.Add(Color.red, Color.cyan);
+		nextColour.Add(Color.cyan, Color.yellow);
+		nextColour.Add(Color.yellow, Color.red);
+		while (timeRemaining > 0) {
+			timeRemaining -= Time.deltaTime;
+			// Switch to next colour
+			nextColour.TryGetValue(currentColour, out currentColour);
+			// Update spriterenderer
+			spriteRenderer.color = currentColour;
+			yield return null;
+		}
+		// Return to default colour
+		spriteRenderer.color = Color.red;
+
+	}
+
+	// Commands
 
 	[Command]
 	void CmdDestroyParasite() {
