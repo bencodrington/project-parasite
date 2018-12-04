@@ -11,6 +11,8 @@ public class RoundManager : MonoBehaviour {
 	Vector2 parasiteSpawnPoint;
 	Vector2 hunterSpawnPoint;
 
+	public bool isGameOver = false;
+
 	bool huntersOnlyMode = false;
 
 	void Start () {

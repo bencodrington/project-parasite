@@ -172,6 +172,9 @@ public class PlayerObject : NetworkBehaviour {
 
 	[Command]
 	public void CmdShowGameOverScreen(CharacterType victorType) {
+		RoundManager rm = FindObjectOfType<RoundManager>();
+		if (rm.isGameOver) { return; }
+		rm.isGameOver = true;
 		RpcShowGameOverScreen(victorType);
 	}
 
