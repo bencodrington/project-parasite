@@ -17,6 +17,8 @@ public class NpcManager : NetworkBehaviour {
 	const float SPAWN_RANGE_X = 6;
 	const float SPAWN_RANGE_Y = 2;
 
+	bool DEBUG_MODE = true;
+
 	void Start () {
 		NpcList = new List<NonPlayerCharacter>();
 		SpawnNPCs();
@@ -50,6 +52,7 @@ public class NpcManager : NetworkBehaviour {
 	}
 
 	void SpawnNPCs() {
+		if (DEBUG_MODE) { return; }
 		int npcCount = Random.Range(MIN_NPC_COUNT, MAX_NPC_COUNT + 1);
 		// TODO: there has to be a more efficient way of updating this
 		foreach (PlayerObject playerObject in FindObjectsOfType<PlayerObject>()) {
