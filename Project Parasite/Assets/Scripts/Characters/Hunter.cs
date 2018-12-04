@@ -28,6 +28,7 @@ public class Hunter : Character {
 	protected override void OnStart() {
 		if (isServer) {
 			orbs = new Queue<Orb>();
+			PlayerObject.RegisterOnCharacterDestroyCallback(DestroyAllOrbs);
 		}
 	}
 
@@ -71,9 +72,15 @@ public class Hunter : Character {
 		physicsEntity.AddVelocity(forceDirection.x, forceDirection.y);
 	}
 
-	bool MostRecentOrbInRange(Vector2 ofPosition) {
+	bool isMostRecentOrbInRange(Vector2 ofPosition) {
 		return mostRecentOrb != null &&
 				(Vector2.Distance(mostRecentOrb.transform.position, ofPosition) <= ORB_BEAM_RANGE);
+	}
+
+	void DestroyAllOrbs() {
+		while (orbs.Count > 0) {
+			CmdRecallOrb();
+		}
 	}
 
 	// Commands
@@ -86,7 +93,7 @@ public class Hunter : Character {
 		GameObject orbGameObject = Instantiate(orbPrefab, atPosition, Quaternion.identity);
 		Orb orb = orbGameObject.GetComponent<Orb>();
 
-		if (MostRecentOrbInRange(atPosition)) {
+		if (isMostRecentOrbInRange(atPosition)) {
 			// Spawn beam halfway between orbs
 			beamSpawnPosition = Vector2.Lerp(mostRecentOrb.transform.position, atPosition, 0.5f);
 			OrbBeam orbBeam = Instantiate(orbBeamPrefab, beamSpawnPosition, Quaternion.identity).GetComponent<OrbBeam>();
