@@ -6,6 +6,8 @@ public class RoundManager : MonoBehaviour {
 
 	PlayerObject[] connectedPlayers;
 
+	ObjectManager objectManager;
+
 	public Vector2[] spawnPoints;
 
 	Vector2 parasiteSpawnPoint;
@@ -21,6 +23,8 @@ public class RoundManager : MonoBehaviour {
 		// Cache Player Objects
 		connectedPlayers = FindObjectsOfType<PlayerObject>();
 		// TODO: uncache on leave
+		objectManager = FindObjectOfType<ObjectManager>();
+		objectManager.OnRoundStart();
 		SelectSpawnPoints();
 		SelectParasite();
 	}
@@ -64,6 +68,7 @@ public class RoundManager : MonoBehaviour {
 			player.CmdEndRound();
 		}
 		transform.GetComponentInChildren<NpcManager>().DespawnNPCs();
+		objectManager.OnRoundEnd();
 	}
 
 }

@@ -9,7 +9,7 @@ public class Elevator : NetworkBehaviour {
 	const float MOVEMENT_SPEED = 4f;
 	const float BUTTON_OFFSET = 0.5f;
 
-	public Vector2[] stops;
+	public float[] stops;
 	public Vector2 size;
 
 	public GameObject buttonPrefab;
@@ -21,7 +21,7 @@ public class Elevator : NetworkBehaviour {
 	private Collider2D[] passengers;
 	private ElevatorButton[] buttons;
 
-	void Start() {
+	public void InitializeButtons() {
 		ElevatorButton button;
 		buttons = new ElevatorButton[stops.Length];
 
@@ -65,7 +65,7 @@ public class Elevator : NetworkBehaviour {
 	void MoveToTargetStop() {
 			Vector2 targetPosition;
 			float potentialMovement = MOVEMENT_SPEED * Time.deltaTime;
-				targetPosition = stops[targetStop];
+				targetPosition = new Vector2(transform.position.x, stops[targetStop]);
 				if (Vector3.Distance(transform.position, targetPosition) < potentialMovement) {
 					// Destination reached
 					transform.position = targetPosition;
