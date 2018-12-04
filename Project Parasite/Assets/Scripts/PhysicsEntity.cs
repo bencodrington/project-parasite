@@ -19,14 +19,19 @@ public class PhysicsEntity {
 	public float GravityAcceleration() { return gravityAcceleration; }
 
 	float velocityX = 0f;
-	// TODO: this should be private
-	public float velocityY = 0f;
+	float velocityY = 0f;
+	public void AddVelocity(float x, float y) {
+		velocityX += x;
+		velocityY += y;
+	}
 
 	// Maintain the velocity from movement input separately
 	// 	this allows us to limit movement speed on its own
-	float inputVelocity = 0f;
-	public void AddInputVelocity(float velocity) {
-		inputVelocity += velocity;
+	float inputVelocityX = 0f;
+	float inputVelocityY = 0f;
+	public void AddInputVelocity(float velocityX, float velocityY) {
+		inputVelocityX += velocityX;
+		inputVelocityY += velocityY;
 	}
 
 	private Vector2 oldPixelBelow;
@@ -45,6 +50,7 @@ public class PhysicsEntity {
 	public bool IsOnLeftWall() { return _isOnLeftWall; }
 	private bool _isOnRightWall = false;
 	public bool IsOnRightWall() { return _isOnRightWall; }
+	public bool IsOnWall() { return _isOnLeftWall || _isOnRightWall; }
 
 	public bool applyGravity = true;
 
@@ -61,6 +67,9 @@ public class PhysicsEntity {
 		oldPixelBelow = transform.position;
 	}
 
+	// Called by the component that this entity simulates the physics for
+	// 	Should be called in the FixedUpdate() method of that MonoBehaviour
+	//	Therefore, should run every physics update, every ~0.02 seconds
 	public void Update () {
 		Vector2 floorVelocity;
 
@@ -79,18 +88,23 @@ public class PhysicsEntity {
 		if (applyGravity && _isOnGround) {
 			velocityX /= DEFAULT_FRICTION_DENOMINATOR;
 		}
+		// Apply vertical friction
+		if (IsOnWall()) {
+			velocityY /= DEFAULT_FRICTION_DENOMINATOR;
+		}
 
 		// Store attempted new position
-		Vector2 newPosition = new Vector2(transform.position.x + velocityX * Time.deltaTime, transform.position.y + velocityY * Time.deltaTime);
+		Vector2 newPosition = (Vector2)transform.position + new Vector2(velocityX, velocityY) * Time.deltaTime;
 		// Add velocity from character movement input
-		newPosition += new Vector2(inputVelocity * Time.deltaTime, 0);
-		// Then reset, as this should be manually controlled by the character each frame
-		inputVelocity = 0;
+		newPosition += new Vector2(inputVelocityX, inputVelocityY) * Time.deltaTime;
 		// TODO: It may become necessary to loop the below line until it doesn't change
 		// Check for, and resolve, collisions below, and then beside
 		newPosition = CheckBeside(CheckAboveAndBelow(newPosition));
 		// Set new position
 		transform.position = newPosition;
+		// Reset inputVelocity, as this should be manually controlled by the character each frame
+		inputVelocityX = 0;
+		inputVelocityY = 0;
 	}
 
 	Vector2 CheckAboveAndBelow(Vector2 newPosition) {
@@ -103,7 +117,7 @@ public class PhysicsEntity {
 		_isOnCeiling = false;
 		// Check for obstacles encountered between current position and new position
 		obstacleBelow = Physics2D.OverlapArea(oldPixelBelow, pixelBelow, Utility.GetLayerMask("obstacle"));
-		if (velocityY >=0 ) {
+		if (velocityY + inputVelocityY >=0 ) {
 			// TODO: this if statement might be causing parasites to glitch through the roofs of moving elevators?
 			obstacleAbove = Physics2D.OverlapArea(oldPixelAbove, pixelAbove, Utility.GetLayerMask("obstacle"));
 		}
@@ -145,9 +159,9 @@ public class PhysicsEntity {
 		Vector2 pixelToTheLeft 	= GetPixelToTheLeft(newPosition);
 		Vector2 pixelToTheRight = GetPixelToTheRight(newPosition);
 		// If moving left
-		if (velocityX < 0) {
+		if (velocityX + inputVelocityX < 0) {
 			obstacleToTheLeft	= Physics2D.OverlapArea(oldPixelToTheLeft, pixelToTheLeft, Utility.GetLayerMask("obstacle"));
-		} else if (velocityX > 0) { // Moving right
+		} else if (velocityX + inputVelocityX > 0) { // Moving right
 			obstacleToTheRight 	= Physics2D.OverlapArea(oldPixelToTheRight, pixelToTheRight, Utility.GetLayerMask("obstacle"));
 		}
 
@@ -177,11 +191,6 @@ public class PhysicsEntity {
 		oldPixelToTheLeft = pixelToTheLeft;
 		oldPixelToTheRight = pixelToTheRight;
 		return newPosition;
-	}
-
-	public void AddVelocity(float x, float y) {
-		velocityX += x;
-		velocityY += y;
 	}
 
 	Vector2 GetPixelBelow(Vector2 position) {

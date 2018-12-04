@@ -25,27 +25,26 @@ public class Parasite : Character {
 			physicsEntity.applyGravity = true;
 		}
 
-		// TODO: convert this to new input system
 		bool isOvercomingGravity = false;
 		bool up = Input.GetKey(KeyCode.W);
 		bool down = Input.GetKey(KeyCode.S);
+		isMovingUp = false;
+		isMovingDown = false;
 		if (up && !oldUp && physicsEntity.IsOnGround()) {
 			// Jump
 			physicsEntity.AddVelocity(0, jumpVelocity);
 		} else if (up && physicsEntity.IsOnCeiling()) {
 			// Stick to ceiling
 			isOvercomingGravity = true;
-		} else if (up && isOnWall()) {
+		} else if (up && physicsEntity.IsOnWall()) {
 			// Climb Up
-			physicsEntity.velocityY = stats.movementSpeed;
-		}
-		if (down && isOnWall()) {
+			isMovingUp = true;
+		} else if (down && physicsEntity.IsOnWall()) {
 			// Climb Down
-			physicsEntity.velocityY = -stats.movementSpeed;
+			isMovingDown = true;
 		}
 		oldUp = up;
 		physicsEntity.SetIsOvercomingGravity(isOvercomingGravity);
-
 
 		// Infect
 		if (Input.GetMouseButtonDown(0)) {
@@ -55,10 +54,6 @@ public class Parasite : Character {
 				CmdDestroyParasite();
 			}
 		}
-	}
-
-	bool isOnWall() {
-		return physicsEntity.IsOnLeftWall() || physicsEntity.IsOnRightWall();
 	}
 
 	// COMMANDS

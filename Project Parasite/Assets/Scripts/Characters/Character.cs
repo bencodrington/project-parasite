@@ -17,7 +17,10 @@ public abstract class Character : NetworkBehaviour {
 	const float MOVEMENT_INPUT_FRICTION = 2f;
 	protected bool isMovingRight;
 	protected bool isMovingLeft;
-	float inputVelocity = 0;
+	protected bool isMovingUp;
+	protected bool isMovingDown;
+	float inputVelocityX = 0;
+	float inputVelocityY = 0;
 
 	const float lagLerpFactor = 0.4f;
 
@@ -67,22 +70,37 @@ public abstract class Character : NetworkBehaviour {
 	public virtual void FixedUpdate() {
 		if (hasAuthority && physicsEntity != null) {
 			// Based on input, accelerate in direction that's being pressed
+			// Horizontal
 			if (isMovingLeft) {
-				inputVelocity -= stats.accelerationSpeed;
+				inputVelocityX -= stats.accelerationSpeed;
 			} else if (isMovingRight) {
-				inputVelocity += stats.accelerationSpeed;
+				inputVelocityX += stats.accelerationSpeed;
 			} else {
-				inputVelocity /= MOVEMENT_INPUT_FRICTION;
+				inputVelocityX /= MOVEMENT_INPUT_FRICTION;
 				// If inputVelocity is sufficiently close to 0
-				if (inputVelocity < 0.001) {
+				if (inputVelocityX < 0.001) {
 					// snap to 0
-					inputVelocity = 0;
+					inputVelocityX = 0;
+				}
+			}
+			// Vertical
+			if (isMovingDown) {
+				inputVelocityY -= stats.accelerationSpeed;
+			} else if (isMovingUp) {
+				inputVelocityY += stats.accelerationSpeed;
+			} else {
+				inputVelocityY /= MOVEMENT_INPUT_FRICTION;
+				// If inputVelocity is sufficiently close to 0
+				if (inputVelocityY < 0.001) {
+					// snap to 0
+					inputVelocityY = 0;
 				}
 			}
 			// Clamp to maximum input speed
-			inputVelocity = Mathf.Clamp(inputVelocity, -stats.movementSpeed, stats.movementSpeed);
+			inputVelocityX = Mathf.Clamp(inputVelocityX, -stats.movementSpeed, stats.movementSpeed);
+			inputVelocityY = Mathf.Clamp(inputVelocityY, -stats.movementSpeed, stats.movementSpeed);
 			// Pass calculated velocity to physics entity
-			physicsEntity.AddInputVelocity(inputVelocity);
+			physicsEntity.AddInputVelocity(inputVelocityX, inputVelocityY);
 
 			physicsEntity.Update();
 			// Update the server's position
