@@ -42,6 +42,9 @@ public class PhysicsEntity {
 	private Collider2D obstacleBelow;
 	private Vector2 obstacleBelowOldPosition;
 
+	private Collider2D obstacleAbove;
+	private Vector2 obstacleAboveOldPosition;
+
 	private bool _isOnGround = false;
 	public bool IsOnGround() { return _isOnGround; }
 	private bool _isOnCeiling = false;
@@ -54,9 +57,9 @@ public class PhysicsEntity {
 
 	public bool applyGravity = true;
 
-	bool _isOvercomingGravity = false;
-	public void SetIsOvercomingGravity(bool isOvercomingGravity) {
-		_isOvercomingGravity = isOvercomingGravity;
+	bool _isStuckToCeiling = false;
+	public void SetIsStuckToCeiling(bool isStuckToCeiling) {
+		_isStuckToCeiling = isStuckToCeiling;
 	}
 
 	public PhysicsEntity(Transform transform, float height = 0.5f, float width = 0.5f) {
@@ -71,16 +74,10 @@ public class PhysicsEntity {
 	// 	Should be called in the FixedUpdate() method of that MonoBehaviour
 	//	Therefore, should run every physics update, every ~0.02 seconds
 	public void Update () {
-		Vector2 floorVelocity;
+		float floorVelocity = 0;
+		float ceilingVelocity = 0;
 
-		// Check if obstacle below has moved
-		if (obstacleBelow != null && (Vector2)obstacleBelow.transform.position != obstacleBelowOldPosition) {
-			floorVelocity = (Vector2)obstacleBelow.transform.position - obstacleBelowOldPosition;
-			velocityY += floorVelocity.y;
-			oldPixelBelow += new Vector2(0, velocityY);
-		}
-
-		if (applyGravity && !_isOvercomingGravity) {
+		if (applyGravity && !_isStuckToCeiling) {
 			// Apply Gravity
 			velocityY += gravityAcceleration;
 		}
@@ -93,8 +90,25 @@ public class PhysicsEntity {
 			velocityY /= DEFAULT_FRICTION_DENOMINATOR;
 		}
 
+		// Check if obstacle below has moved
+		if (obstacleBelow != null && (Vector2)obstacleBelow.transform.position != obstacleBelowOldPosition) {
+			floorVelocity = obstacleBelow.transform.position.y - obstacleBelowOldPosition.y;
+		}
+		// Check if obstacle above has moved
+		if (obstacleAbove != null && (Vector2)obstacleAbove.transform.position != obstacleAboveOldPosition) {
+			ceilingVelocity = obstacleAbove.transform.position.y - obstacleAboveOldPosition.y;
+			// Only maintain upward velocity if we're stuck to ceiling
+			if (ceilingVelocity > 0 && !_isStuckToCeiling) {
+				ceilingVelocity = 0;
+			}
+		}
+
 		// Store attempted new position
 		Vector2 newPosition = (Vector2)transform.position + new Vector2(velocityX, velocityY) * Time.deltaTime;
+		// Don't multiply floor/ceiling velocities by Time.deltaTime
+		//	because they are calculated based on displacement since last frame
+		newPosition.y += floorVelocity;
+		newPosition.y += ceilingVelocity;
 		// Add velocity from character movement input
 		newPosition += new Vector2(inputVelocityX, inputVelocityY) * Time.deltaTime;
 		// TODO: It may become necessary to loop the below line until it doesn't change
@@ -110,15 +124,21 @@ public class PhysicsEntity {
 	Vector2 CheckAboveAndBelow(Vector2 newPosition) {
 		float obstacleHeight;
 		obstacleBelow = null;
-		Collider2D obstacleAbove = null;
+		obstacleAbove = null;
 		Vector2 pixelBelow = GetPixelBelow(newPosition);
 		Vector2 pixelAbove = GetPixelAbove(newPosition);
 		_isOnGround = false;
 		_isOnCeiling = false;
 		// Check for obstacles encountered between current position and new position
-		obstacleBelow = Physics2D.OverlapArea(oldPixelBelow, pixelBelow, Utility.GetLayerMask("obstacle"));
-		if (velocityY + inputVelocityY >=0 ) {
-			// TODO: this if statement might be causing parasites to glitch through the roofs of moving elevators?
+		if (velocityY + inputVelocityY < 0 && !_isStuckToCeiling) {
+			// Only check for obstacles below us if:
+			// -- after all forces have been applied, we are descending and
+			// -- we're not stuck to the ceiling
+			obstacleBelow = Physics2D.OverlapArea(oldPixelBelow, pixelBelow, Utility.GetLayerMask("obstacle"));
+		} else if (velocityY + inputVelocityY >= 0 || _isStuckToCeiling) {
+			// Only check for obstacles above us if:
+			// -- after all forces have been applied, we are ascending ( // TODO: or stationary?)
+			// -- OR, we're stuck to the ceiling already
 			obstacleAbove = Physics2D.OverlapArea(oldPixelAbove, pixelAbove, Utility.GetLayerMask("obstacle"));
 		}
 		// Handle Collisions
@@ -138,6 +158,7 @@ public class PhysicsEntity {
 			velocityY = 0;
 			obstacleHeight = obstacleAbove.transform.localScale.y / 2;
 			newPosition.y = obstacleAbove.transform.position.y - obstacleHeight - height;
+			obstacleAboveOldPosition = obstacleAbove.transform.position;
 			// Re-update triggers
 			pixelBelow = GetPixelBelow(newPosition);
 			pixelAbove = GetPixelAbove(newPosition);
@@ -145,6 +166,7 @@ public class PhysicsEntity {
 		// Technically the below should occur after the CheckBeside() call is made, might fix some bugs,
 		// 	but is only definitely responsible for misplaced 'drawline trail' for pixelbelow
 		Debug.DrawLine(oldPixelBelow, pixelBelow);
+		Debug.DrawLine(oldPixelAbove, pixelAbove);
 		oldPixelBelow = pixelBelow;
 		oldPixelAbove = pixelAbove;
 		return newPosition;
@@ -194,7 +216,7 @@ public class PhysicsEntity {
 	}
 
 	Vector2 GetPixelBelow(Vector2 position) {
-		return position + new Vector2(0, -height + 0.03f);
+		return position + new Vector2(0, -height);
 	}Vector2 GetPixelAbove(Vector2 position) {
 		return position + new Vector2(0, height);
 	}

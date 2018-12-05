@@ -25,7 +25,7 @@ public class Parasite : Character {
 			physicsEntity.applyGravity = true;
 		}
 
-		bool isOvercomingGravity = false;
+		bool isStuckToCeiling = false;
 		bool up = Input.GetKey(KeyCode.W);
 		bool down = Input.GetKey(KeyCode.S);
 		isMovingUp = false;
@@ -35,7 +35,7 @@ public class Parasite : Character {
 			physicsEntity.AddVelocity(0, jumpVelocity);
 		} else if (up && physicsEntity.IsOnCeiling()) {
 			// Stick to ceiling
-			isOvercomingGravity = true;
+			isStuckToCeiling = true;
 		} else if (up && physicsEntity.IsOnWall()) {
 			// Climb Up
 			isMovingUp = true;
@@ -44,7 +44,7 @@ public class Parasite : Character {
 			isMovingDown = true;
 		}
 		oldUp = up;
-		physicsEntity.SetIsOvercomingGravity(isOvercomingGravity);
+		physicsEntity.SetIsStuckToCeiling(isStuckToCeiling);
 
 		// Infect
 		if (Input.GetMouseButtonDown(0)) {
