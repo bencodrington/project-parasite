@@ -68,6 +68,21 @@ public class ObjectManager : NetworkBehaviour {
 		SpawnElevators();
 	}
 
+	public void OnRoundEnd() {
+		DestroyElevators();
+		DestroyCallFields();
+	}
+
+	public void PhysicsUpdate() {
+		if (elevators == null) { return; }
+		foreach (Elevator elevator in elevators) {
+			elevator.PhysicsUpdate();
+		}
+		foreach (ElevatorCallField callField in callFields) {
+			callField.PhysicsUpdate();
+		}
+	}
+
 	void SpawnElevators() {
 		// Initialize server master lists of elevators & callfields(a.k.a. stops)
 		elevators = new List<Elevator>();
@@ -132,11 +147,6 @@ public class ObjectManager : NetworkBehaviour {
 		xCoordinate += stop.isOnRightSide ? STOP_X_OFFSET - 1f : -STOP_X_OFFSET - 1f;
 		// TODO: replace magic number, half of elevator height
 		return new Vector2(xCoordinate, stop.yCoordinate - 1.5f);
-	}
-
-	public void OnRoundEnd() {
-		DestroyElevators();
-		DestroyCallFields();
 	}
 
 	void DestroyElevators() {

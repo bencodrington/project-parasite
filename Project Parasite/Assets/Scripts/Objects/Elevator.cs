@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 public class Elevator : NetworkBehaviour {
 	
 	const float LAG_LERP_FACTOR = 0.4f;
-	const float MOVEMENT_SPEED = 4f;
+	const float MOVEMENT_SPEED = 8f;
 	const float BUTTON_OFFSET = 0.5f;
 
 	public float[] stops;
@@ -37,7 +37,7 @@ public class Elevator : NetworkBehaviour {
 
 	}
 	
-	void FixedUpdate() {
+	public void PhysicsUpdate() {
 		if (isServer) {
 			if (isMoving) {
 				MoveToTargetStop();

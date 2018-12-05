@@ -67,7 +67,7 @@ public abstract class Character : NetworkBehaviour {
 		}
 	}
 
-	public virtual void FixedUpdate() {
+	public void PhysicsUpdate() {
 		if (hasAuthority && physicsEntity != null) {
 			// Based on input, accelerate in direction that's being pressed
 			// Horizontal

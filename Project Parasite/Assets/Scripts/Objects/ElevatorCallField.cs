@@ -12,7 +12,7 @@ public class ElevatorCallField : NetworkBehaviour {
 
 	private Collider2D caller;
 
-	void FixedUpdate() {
+	public void PhysicsUpdate() {
 		if (!isServer) { return; }
 		// TODO: this probably doesn't need to run every single physics update
 		// Check for entity within borders
