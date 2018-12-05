@@ -10,7 +10,7 @@ public class Elevator : NetworkBehaviour {
 	const float BUTTON_OFFSET = 0.5f;
 
 	public float[] stops;
-	public Vector2 size;
+	public Vector2 SIZE = new Vector2(2, 3);
 
 	public GameObject buttonPrefab;
 
@@ -21,11 +21,11 @@ public class Elevator : NetworkBehaviour {
 	private Collider2D[] passengers;
 	private ElevatorButton[] buttons;
 
-	public void InitializeButtons() {
+	void InitializeButtons() {
 		ElevatorButton button;
 		buttons = new ElevatorButton[stops.Length];
 
-		Vector2 spawnPos = new Vector2(transform.position.x, transform.position.y + (size.y / 2));
+		Vector2 spawnPos = new Vector2(transform.position.x, transform.position.y + (SIZE.y / 2));
 		// Spawn button prefabs based on # of stops
 		for (int i = 0; i < stops.Length; i++) {
 			spawnPos.y += BUTTON_OFFSET;
@@ -44,7 +44,7 @@ public class Elevator : NetworkBehaviour {
 			} else {
 				// TODO: this probably doesn't need to run every single physics update
 				// Check for entity within borders
-				Vector2 halfSize = size / 2;
+				Vector2 halfSize = SIZE / 2;
 				passengers = Physics2D.OverlapAreaAll((Vector2)transform.position - halfSize,
 												(Vector2)transform.position + halfSize,
 												Utility.GetLayerMask("character"));
@@ -108,5 +108,9 @@ public class Elevator : NetworkBehaviour {
 		}
 	}
 
-
+	[ClientRpc]
+	public void RpcSetStopCoordinates(float[] stops) {
+		this.stops = stops;
+		InitializeButtons();
+	}
 }

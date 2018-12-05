@@ -61,34 +61,40 @@ public class ObjectManager : NetworkBehaviour {
 		})
 	};
 
+	List<Elevator> elevators;
+	List<ElevatorCallField> callFields;
+
 	public void OnRoundStart() {
 		SpawnElevators();
 	}
 
 	void SpawnElevators() {
+		// Initialize server master lists of elevators & callfields(a.k.a. stops)
+		elevators = new List<Elevator>();
+		callFields = new List<ElevatorCallField>();
 		foreach (ElevatorData elevatorData in elevatorDataArray) {
 			SpawnElevator(elevatorData);
 		}
 	}
 
 	void SpawnElevator(ElevatorData elevatorData) {
-		// TODO: spawn as children
+		// Instantiate GameObject
 		GameObject elevatorGameObject = GameObject.Instantiate(
 											elevatorPrefab,
 											GetElevatorSpawnCoordinates(elevatorData),
 											Quaternion.identity);
+		// Share with clients
 		NetworkServer.Spawn(elevatorGameObject);
 		Elevator elevator = elevatorGameObject.GetComponent<Elevator>();
 		float[] yCoordinates = new float[elevatorData.stops.Length];
 		for (int i = 0; i < yCoordinates.Length; i++) {
 			yCoordinates[i] = elevatorData.stops[i].yCoordinate;
 		}
-		// TODO: RPC set stops & initialize buttons
-		elevator.stops = yCoordinates;
-		elevator.size = new Vector2(2, 3); // TODO: extract magic numbers
-		elevator.InitializeButtons();
-
-		// TODO: RPC set elevator
+		// Let all copies of the elevator know what their stops are
+		elevator.RpcSetStopCoordinates(yCoordinates);
+		// Add to server master list of elevators
+		elevators.Add(elevator);
+		// Spawn the stops that belong to it
 		SpawnStops(elevatorData, elevator);
 	}
 
@@ -105,16 +111,19 @@ public class ObjectManager : NetworkBehaviour {
 	}
 
 	void SpawnStop(StopData stop, int index, float xCoordinate, Elevator elevator) {
+		// Instantiate GameObject
 		GameObject callFieldGameObject = GameObject.Instantiate(
 								elevatorCallFieldPrefab,
 								GetStopSpawnCoordinates(stop, xCoordinate),
 								Quaternion.identity);
+		// Share with clients
 		NetworkServer.Spawn(callFieldGameObject);
 		ElevatorCallField callField = callFieldGameObject.GetComponent<ElevatorCallField>();
-		// TODO: extract magic numbers
-		callField.size = new Vector2(2, 4);
+		// Client callfields don't need to know their elevator nor stopIndex
+		// 	because all checking for callers and calling is done server-side
 		callField.elevator = elevator;
 		callField.stopIndex = index;
+		callFields.Add(callField);
 	}
 
 	Vector2 GetStopSpawnCoordinates(StopData stop, float xCoordinate) {
@@ -122,11 +131,23 @@ public class ObjectManager : NetworkBehaviour {
 		// TODO: that can be cleaner
 		xCoordinate += stop.isOnRightSide ? STOP_X_OFFSET - 1f : -STOP_X_OFFSET - 1f;
 		// TODO: replace magic number, half of elevator height
-		return new Vector2(xCoordinate, stop.yCoordinate -= 1.5f);
+		return new Vector2(xCoordinate, stop.yCoordinate - 1.5f);
 	}
 
 	public void OnRoundEnd() {
-		// TODO: destroy elevators
-		// TODO: destroy callfields (done on elevator destroy?)
+		DestroyElevators();
+		DestroyCallFields();
+	}
+
+	void DestroyElevators() {
+		foreach(Elevator elevator in elevators) {
+			NetworkServer.Destroy(elevator.gameObject);
+		}
+	}
+
+	void DestroyCallFields() {
+		foreach(ElevatorCallField callField in callFields) {
+			NetworkServer.Destroy(callField.gameObject);
+		}
 	}
 }
