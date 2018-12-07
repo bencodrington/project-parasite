@@ -39,8 +39,12 @@ public class Hunter : Character {
 			orbUiManager.setMaxOrbCount(MAX_ORB_COUNT);
 			// Cache reference to orb beam range manager
 			orbBeamRangeManager = GetComponentInChildren<OrbBeamRangeManager>();
+		} else if (isServer) {
+			// The server still needs a reference to orb beam range manager
+			orbBeamRangeManager = GetComponentInChildren<OrbBeamRangeManager>();
+			orbBeamRangeManager.shouldShowMarkers = false;
 		} else {
-			Destroy(GetComponent<OrbBeamRangeManager>().gameObject);
+			Destroy(GetComponentInChildren<OrbBeamRangeManager>().gameObject);
 		}
 	}
 
