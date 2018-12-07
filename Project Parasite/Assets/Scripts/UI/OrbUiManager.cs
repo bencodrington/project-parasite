@@ -7,24 +7,34 @@ public class OrbUiManager : MonoBehaviour {
 	public GameObject orbSpritePrefab;
 	Stack<GameObject> orbSprites;
 
+	const float DISTANCE_BETWEEN_ORB_SPRITES = 10;
+	const float ORB_SPRITE_WIDTH = 50;
+	// Space to the edge of the canvas
+	Vector2 CANVAS_PADDING = new Vector2(-420, 20);
+
 	int maxOrbCount;
+
+	void Start() {
+		GetComponent<RectTransform>().anchoredPosition = CANVAS_PADDING;
+	}
+
 	public void setMaxOrbCount(int maxOrbCount) {
 		this.maxOrbCount = maxOrbCount;
 		orbSprites = new Stack<GameObject>();
-		UpdateOrbSpriteCount(maxOrbCount);
+		UpdateOrbSpriteCount(0);
 	}
-	public void OnOrbCountChange(int newCount) {
-		UpdateOrbSpriteCount(newCount);
+	public void OnOrbCountChange(int numberOfOrbsPlaced) {
+		UpdateOrbSpriteCount(numberOfOrbsPlaced);
 	}
 
-	void UpdateOrbSpriteCount(int newCount) {
+	void UpdateOrbSpriteCount(int numberOfOrbsPlaced) {
 		// TODO: optimize by disabling/enabling instead of spawning & destroying
-		int orbsRemaining = maxOrbCount - newCount;
+		int orbsRemaining = maxOrbCount - numberOfOrbsPlaced;
 		GameObject orbSprite;
 		while (orbSprites.Count < orbsRemaining) {
 			// Add orb sprite
 			orbSprite = Instantiate(orbSpritePrefab);
-			orbSprite.transform.SetParent(this.transform);
+			orbSprite.transform.SetParent(transform);
 			orbSprite.GetComponent<RectTransform>().anchoredPosition = getNewOrbSpritePosition();
 			orbSprites.Push(orbSprite);
 		}
@@ -37,7 +47,7 @@ public class OrbUiManager : MonoBehaviour {
 	Vector2 getNewOrbSpritePosition() {
 		// Note: at this point, orbSprites.Count does not include the new orbSprite
 		// 	therefore, it will be in the range [0..maxOrbCount - 1]
-		float x = (-60 * orbSprites.Count) - 45;
+		float x = (-(DISTANCE_BETWEEN_ORB_SPRITES + ORB_SPRITE_WIDTH) * orbSprites.Count) - ORB_SPRITE_WIDTH;
 		return new Vector2(x, 0);
 	}
 }

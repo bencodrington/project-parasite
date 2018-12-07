@@ -37,7 +37,6 @@ public class Hunter : Character {
 			orbUiManager = Instantiate(orbUiManagerPrefab).GetComponent<OrbUiManager>();
 			// Anchor it to the bottom right corner
 			orbUiManager.transform.SetParent(FindObjectOfType<Canvas>().transform);
-			orbUiManager.GetComponent<RectTransform>().anchoredPosition = new Vector2(-420, 20);
 			// Initialize it with the maximum orbs to spawn
 			orbUiManager.setMaxOrbCount(MAX_ORB_COUNT);
 		}
