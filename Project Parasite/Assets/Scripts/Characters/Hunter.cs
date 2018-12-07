@@ -21,6 +21,8 @@ public class Hunter : Character {
 
 	public GameObject orbPrefab;
 	public GameObject orbBeamPrefab;
+	public GameObject orbUiManagerPrefab;
+	OrbUiManager orbUiManager;
 
 	Queue<Orb> orbs;
 	Orb mostRecentOrb;
@@ -29,6 +31,15 @@ public class Hunter : Character {
 		if (isServer) {
 			orbs = new Queue<Orb>();
 			PlayerObject.RegisterOnCharacterDestroyCallback(DestroyAllOrbs);
+		}
+		if (hasAuthority) {
+			// Spawn orb UI manager to display how many orbs are remaining
+			orbUiManager = Instantiate(orbUiManagerPrefab).GetComponent<OrbUiManager>();
+			// Anchor it to the bottom right corner
+			orbUiManager.transform.SetParent(FindObjectOfType<Canvas>().transform);
+			orbUiManager.GetComponent<RectTransform>().anchoredPosition = new Vector2(-420, 20);
+			// Initialize it with the maximum orbs to spawn
+			orbUiManager.setMaxOrbCount(MAX_ORB_COUNT);
 		}
 	}
 
@@ -83,6 +94,10 @@ public class Hunter : Character {
 		}
 	}
 
+	protected override void OnCharacterDestroy() {
+		Destroy(orbUiManager.gameObject);
+	}
+
 	// Commands
 
 	[Command]
@@ -108,7 +123,7 @@ public class Hunter : Character {
 		orbs.Enqueue(orb);
 		// Propogate to all clients
 		NetworkServer.Spawn(orbGameObject);
-		RpcOnOrbSpawned(orb.netId);
+		RpcOnOrbSpawned(orb.netId, orbs.Count);
 		mostRecentOrb = orb;
 	}
 
@@ -116,15 +131,27 @@ public class Hunter : Character {
 	void CmdRecallOrb() {
 		if (orbs.Count <= 0) { return; }
 		NetworkServer.Destroy(orbs.Dequeue().gameObject);
+		RpcOnOrbRecalled(orbs.Count);
 	}
 
 	// ClientRpc
 
 	[ClientRpc]
-	void RpcOnOrbSpawned(NetworkInstanceId orbNetId) {
+	void RpcOnOrbSpawned(NetworkInstanceId orbNetId, int newOrbCount) {
 		if (hasAuthority) {
 			// This client spawned the orb
+			// Update reference to most recent orb for displaying distance limit to player
 			mostRecentOrb = ClientScene.FindLocalObject(orbNetId).GetComponent<Orb>();
+			// Update the number of remaining orbs currently displayed onscreen
+			orbUiManager.OnOrbCountChange(newOrbCount);
+		}
+	}
+
+	[ClientRpc]
+	void RpcOnOrbRecalled(int newOrbCount) {
+		if (hasAuthority) {
+			// Update the number of remaining orbs currently displayed onscreen
+			orbUiManager.OnOrbCountChange(newOrbCount);
 		}
 	}
 }
