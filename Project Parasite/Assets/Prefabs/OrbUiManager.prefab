@@ -38,6 +38,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1506019d1dee19444917f21d1993020f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  orbSpritePrefab: {fileID: 1726688208290994, guid: 478bc99dae53e0143b31762815e35bed,
+    type: 2}
 --- !u!224 &224025393040386462
 RectTransform:
   m_ObjectHideFlags: 1

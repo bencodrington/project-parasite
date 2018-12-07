@@ -9,8 +9,6 @@ public class Hunter : Character {
 	private float jumpVelocity = 30f;
 	// The maximum number of orbs that this hunter can have spawned at any given time 
 	const int MAX_ORB_COUNT = 4;
-	// The maximum distance from the most recent orb
-	const float ORB_BEAM_RANGE = 6f;
 
 	// Used when getting user input to determine if key was down last frame
 	private bool oldUp = false;
@@ -23,9 +21,9 @@ public class Hunter : Character {
 	public GameObject orbBeamPrefab;
 	public GameObject orbUiManagerPrefab;
 	OrbUiManager orbUiManager;
+	OrbBeamRangeManager orbBeamRangeManager;
 
 	Queue<Orb> orbs;
-	Orb mostRecentOrb;
 
 	protected override void OnStart() {
 		if (isServer) {
@@ -39,12 +37,16 @@ public class Hunter : Character {
 			orbUiManager.transform.SetParent(FindObjectOfType<Canvas>().transform);
 			// Initialize it with the maximum orbs to spawn
 			orbUiManager.setMaxOrbCount(MAX_ORB_COUNT);
+			// Cache reference to orb beam range manager
+			orbBeamRangeManager = GetComponentInChildren<OrbBeamRangeManager>();
+		} else {
+			Destroy(GetComponent<OrbBeamRangeManager>().gameObject);
 		}
 	}
 
 	protected override void HandleInput()  {
 
-		if (mostRecentOrb != null) {
+		if (orbBeamRangeManager.mostRecentOrb != null) {
 			// Debug.DrawLine(mostRecentOrb.transform.position, transform.position, Color.cyan);
 			// Debug.DrawLine(mostRecentOrb.transform.position, (Vector2)mostRecentOrb.transform.position + new Vector2(0, 6f), Color.black);
 		}
@@ -82,11 +84,6 @@ public class Hunter : Character {
 		physicsEntity.AddVelocity(forceDirection.x, forceDirection.y);
 	}
 
-	bool isMostRecentOrbInRange(Vector2 ofPosition) {
-		return mostRecentOrb != null &&
-				(Vector2.Distance(mostRecentOrb.transform.position, ofPosition) <= ORB_BEAM_RANGE);
-	}
-
 	void DestroyAllOrbs() {
 		while (orbs.Count > 0) {
 			CmdRecallOrb();
@@ -107,15 +104,15 @@ public class Hunter : Character {
 		GameObject orbGameObject = Instantiate(orbPrefab, atPosition, Quaternion.identity);
 		Orb orb = orbGameObject.GetComponent<Orb>();
 
-		if (isMostRecentOrbInRange(atPosition)) {
+		if (orbBeamRangeManager.isInRange(atPosition)) {
 			// Spawn beam halfway between orbs
-			beamSpawnPosition = Vector2.Lerp(mostRecentOrb.transform.position, atPosition, 0.5f);
+			beamSpawnPosition = Vector2.Lerp(orbBeamRangeManager.mostRecentOrb.transform.position, atPosition, 0.5f);
 			OrbBeam orbBeam = Instantiate(orbBeamPrefab, beamSpawnPosition, Quaternion.identity).GetComponent<OrbBeam>();
 			// Store beam in most recent orb so when the orb is destroyed it can take the beam with it
-			mostRecentOrb.AttachBeam(orbBeam);
+			orbBeamRangeManager.mostRecentOrb.AttachBeam(orbBeam);
 			// Propogate to all clients
 			NetworkServer.Spawn(orbBeam.gameObject);
-			orbBeam.RpcInitialize(mostRecentOrb.transform.position, atPosition);
+			orbBeam.RpcInitialize(orbBeamRangeManager.mostRecentOrb.transform.position, atPosition);
 		}
 
 		// Add to queue
@@ -123,7 +120,7 @@ public class Hunter : Character {
 		// Propogate to all clients
 		NetworkServer.Spawn(orbGameObject);
 		RpcOnOrbSpawned(orb.netId, orbs.Count);
-		mostRecentOrb = orb;
+		orbBeamRangeManager.mostRecentOrb = orb;
 	}
 
 	[Command]
@@ -140,9 +137,13 @@ public class Hunter : Character {
 		if (hasAuthority) {
 			// This client spawned the orb
 			// Update reference to most recent orb for displaying distance limit to player
-			mostRecentOrb = ClientScene.FindLocalObject(orbNetId).GetComponent<Orb>();
+			orbBeamRangeManager.mostRecentOrb = ClientScene.FindLocalObject(orbNetId).GetComponent<Orb>();
 			// Update the number of remaining orbs currently displayed onscreen
 			orbUiManager.OnOrbCountChange(newOrbCount);
+			// Hide markers if the user can't place more orbs
+			if (newOrbCount == MAX_ORB_COUNT) {
+				orbBeamRangeManager.shouldShowMarkers = false;
+			}
 		}
 	}
 
@@ -151,6 +152,8 @@ public class Hunter : Character {
 		if (hasAuthority) {
 			// Update the number of remaining orbs currently displayed onscreen
 			orbUiManager.OnOrbCountChange(newOrbCount);
+			// User can definitely place at least one orb, so show markers
+			orbBeamRangeManager.shouldShowMarkers = true;
 		}
 	}
 }

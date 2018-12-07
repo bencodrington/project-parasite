@@ -11,6 +11,22 @@ Prefab:
   m_SourcePrefab: {fileID: 0}
   m_RootGameObject: {fileID: 1404862278284056}
   m_IsPrefabAsset: 1
+--- !u!1 &1021746490472002
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4003754245239084}
+  - component: {fileID: 114748616885869460}
+  m_Layer: 0
+  m_Name: OrbBeamRangeManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1300585489529532
 GameObject:
   m_ObjectHideFlags: 0
@@ -61,6 +77,19 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!4 &4003754245239084
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1021746490472002}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4793340472743614}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4793340472743614
 Transform:
   m_ObjectHideFlags: 1
@@ -73,6 +102,7 @@ Transform:
   m_Children:
   - {fileID: 4840247208092610}
   - {fileID: 4898661068887374}
+  - {fileID: 4003754245239084}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -201,6 +231,21 @@ MonoBehaviour:
     type: 2}
   orbUiManagerPrefab: {fileID: 1009069422560828, guid: 6e19b3cf438c2fe4baa425b29810bea5,
     type: 2}
+--- !u!114 &114748616885869460
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1021746490472002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 295af49870b08614cbfe1da1b6c18eaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  orbBeamRangeMarkerPrefab: {fileID: 1560553297825558, guid: da9a392ec156b834f818186a3b8c48a0,
+    type: 2}
+  mostRecentOrb: {fileID: 0}
+  shouldShowMarkers: 1
 --- !u!212 &212268207162185018
 SpriteRenderer:
   m_ObjectHideFlags: 1
