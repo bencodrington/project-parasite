@@ -24,6 +24,10 @@ public class PhysicsEntity {
 		velocityX += x;
 		velocityY += y;
 	}
+	public void AddVelocity(Vector2 velocity) {
+		velocityX += velocity.x;
+		velocityY += velocity.y;
+	}
 
 	// Maintain the velocity from movement input separately
 	// 	this allows us to limit movement speed on its own

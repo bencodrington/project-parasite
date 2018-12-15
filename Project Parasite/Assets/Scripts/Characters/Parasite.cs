@@ -6,8 +6,25 @@ using UnityEngine.Networking;
 public class Parasite : Character {
 
 	private float jumpVelocity = 30f;
-	// Whether the "UP" key was being pressed last frame
+	private const float MAX_POUNCE_VELOCITY = 45f;
+	// Whether the directional keys were being pressed last frame
 	private bool oldUp = false;
+	private bool oldRight = false;
+	private bool oldLeft = false;
+	// Whether the action1 key was being pressed last frame
+	private bool oldAction1 = false;
+
+	// How many seconds the parasite has been charging to pounce
+	private float timeSpentCharging = 0f;
+	// The pounce speed will be capped off after this many seconds
+	private const float MAX_CHARGE_TIME = 2f;
+	// The angle at which the parasite is currently set to pounce, UP by default
+	private float pounceAngle = 90f;
+	// The number of degrees by which to modify the angle each key press
+	private const float POUNCE_ANGLE_INCREMENT = 15f;
+	private bool IsChargingPounce() {
+		return timeSpentCharging > 0f;
+	}
 
 	protected override void HandleInput()  {
 		// Movement
@@ -15,15 +32,27 @@ public class Parasite : Character {
 		bool left = Input.GetKey(KeyCode.A);
 		isMovingLeft = false;
 		isMovingRight = false;
-		if (right && !left) {
-			physicsEntity.applyGravity = !physicsEntity.IsOnRightWall();
-			isMovingRight = true;
-		} else if (left && !right) {
-			physicsEntity.applyGravity = !physicsEntity.IsOnLeftWall();
-			isMovingLeft = true;
+		if (IsChargingPounce()) {
+			if (right && !oldRight) {
+				// Tilt angle to the right
+				pounceAngle -= POUNCE_ANGLE_INCREMENT;
+			} else if (left && !oldLeft) {
+				// Tilt angle to the left
+				pounceAngle += POUNCE_ANGLE_INCREMENT;
+			}
 		} else {
-			physicsEntity.applyGravity = true;
+			if (right && !left) {
+				physicsEntity.applyGravity = !physicsEntity.IsOnRightWall();
+				isMovingRight = true;
+			} else if (left && !right) {
+				physicsEntity.applyGravity = !physicsEntity.IsOnLeftWall();
+				isMovingLeft = true;
+			} else {
+				physicsEntity.applyGravity = true;
+			}
 		}
+		oldRight = right;
+		oldLeft = left;
 
 		bool isStuckToCeiling = false;
 		bool up = Input.GetKey(KeyCode.W);
@@ -46,6 +75,21 @@ public class Parasite : Character {
 		oldUp = up;
 		physicsEntity.SetIsStuckToCeiling(isStuckToCeiling);
 
+		bool action1 = Input.GetKey(KeyCode.J);
+		if (action1) {
+			// Action key is down
+			// Charge leap
+			timeSpentCharging += Time.deltaTime;
+		} else if (oldAction1 && !action1 && physicsEntity.IsOnGround()) {
+			// On action button release
+			// Pounce
+			physicsEntity.AddVelocity(CalculatePounceVelocity());
+		}
+		if (!action1) {
+			ResetPounceVariables();
+		}
+		oldAction1 = action1;
+
 		// Infect
 		if (Input.GetMouseButtonDown(0)) {
 			Collider2D npc = Physics2D.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition), Utility.GetLayerMask(CharacterType.NPC));
@@ -54,6 +98,21 @@ public class Parasite : Character {
 				CmdDestroyParasite();
 			}
 		}
+	}
+
+	Vector2 CalculatePounceVelocity() {
+		float speed = Mathf.Lerp(0, MAX_POUNCE_VELOCITY, timeSpentCharging / MAX_CHARGE_TIME);
+		Debug.Log(speed);
+		float pounceAngleRads = Mathf.Deg2Rad * pounceAngle;
+		Vector2 velocity = new Vector2(Mathf.Cos(pounceAngleRads), Mathf.Sin(pounceAngleRads));
+		Debug.Log(velocity);
+		velocity *= speed;
+		return velocity;
+	}
+
+	void ResetPounceVariables() {
+		timeSpentCharging = 0f;
+		pounceAngle = 90f;
 	}
 
 	public void OnTakingDamage() {
