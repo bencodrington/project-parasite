@@ -13,5 +13,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   height: 0.25
   width: 0.5
-  movementSpeed: 12
-  accelerationSpeed: 4
+  movementSpeed: 3.6
+  accelerationSpeed: 1.8
