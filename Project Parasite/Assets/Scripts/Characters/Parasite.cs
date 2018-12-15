@@ -106,21 +106,20 @@ public class Parasite : Character {
 		bool down = Input.GetKey(KeyCode.S);
 		isMovingUp = false;
 		isMovingDown = false;
-		if (up && !oldUp && physicsEntity.IsOnGround()) {
+		if (up && !oldUp && physicsEntity.IsOnGround() && !IsChargingPounce()) {
 			// Jump
 			physicsEntity.AddVelocity(0, jumpVelocity);
 		} else if (up && physicsEntity.IsOnCeiling()) {
 			// Stick to ceiling
 			isStuckToCeiling = true;
-		} else if (up && physicsEntity.IsOnWall()) {
+		} else if (up && physicsEntity.IsOnWall() && !IsChargingPounce()) {
 			// Climb Up
 			isMovingUp = true;
-		} else if (down && physicsEntity.IsOnWall()) {
+		} else if (down && physicsEntity.IsOnWall() && !IsChargingPounce()) {
 			// Climb Down
 			isMovingDown = true;
 		}
 		oldUp = up;
-		physicsEntity.SetIsStuckToCeiling(isStuckToCeiling);
 
 		bool action1 = Input.GetKey(KeyCode.J);
 		if (action1 && !oldAction1) {
@@ -139,11 +138,13 @@ public class Parasite : Character {
 			if (CanPounce()) {
 				// Pounce
 				physicsEntity.AddVelocity(CalculatePounceVelocity());
+				isStuckToCeiling = false;
 			}
 			ResetPounceCharge();
 			PounceIndicator.Hide();
 		}
 		oldAction1 = action1;
+		physicsEntity.SetIsStuckToCeiling(isStuckToCeiling);
 
 		// Infect
 		if (Input.GetKey(KeyCode.K)) {
@@ -161,11 +162,11 @@ public class Parasite : Character {
 			// Point down
 			PounceAngle = 270f;
 		} else if (physicsEntity.IsOnLeftWall()) {
-			// Point right
-			PounceAngle = 0f;
+			// Point up-right
+			PounceAngle = 60f;
 		} else if (physicsEntity.IsOnRightWall()) {
-			// Point left
-			PounceAngle = 180f;
+			// Point up-left
+			PounceAngle = 120f;
 		}
 	}
 
