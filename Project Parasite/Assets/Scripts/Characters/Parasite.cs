@@ -17,18 +17,35 @@ public class Parasite : Character {
 	// How many seconds the parasite has been charging to pounce
 	private float timeSpentCharging = 0f;
 	// The pounce speed will be capped off after this many seconds
-	private const float MAX_CHARGE_TIME = 2f;
+	private const float MAX_CHARGE_TIME = 1.5f;
 	// The angle at which the parasite is currently set to pounce, UP by default
 	private float pounceAngle = 90f;
+	float PounceAngle {
+		get {
+			return pounceAngle;
+		}
+		set {
+			pounceAngle = value;
+			pounceIndicator.SetAngle(pounceAngle);
+		}
+	}
 	// The number of degrees by which to modify the angle each key press
 	private const float POUNCE_ANGLE_INCREMENT = 15f;
 	private bool IsChargingPounce() {
 		return timeSpentCharging > 0f;
 	}
 
+	PounceIndicator pounceIndicator;
+
 	// The direction that the parasite is attached to (left wall, right wall, ceiling)
 	// 	when it began charging a pounce
 	private Utility.Directions attachedDirection = Utility.Directions.Null;
+
+	protected override void OnStart() {
+		if (hasAuthority) {
+			pounceIndicator = GetComponentInChildren<PounceIndicator>();
+		}
+	}
 
 	protected override void HandleInput()  {
 		// Movement
@@ -42,18 +59,18 @@ public class Parasite : Character {
 				// Reverse tilt controls if stuck to ceiling
 				if (right && !oldRight) {
 					// Tilt angle to the right
-					pounceAngle += POUNCE_ANGLE_INCREMENT;
+					PounceAngle += POUNCE_ANGLE_INCREMENT;
 				} else if (left && !oldLeft) {
 					// Tilt angle to the left
-					pounceAngle -= POUNCE_ANGLE_INCREMENT;
+					PounceAngle -= POUNCE_ANGLE_INCREMENT;
 				}
 			} else {
 				if (right && !oldRight) {
 					// Tilt angle to the right
-					pounceAngle -= POUNCE_ANGLE_INCREMENT;
+					PounceAngle -= POUNCE_ANGLE_INCREMENT;
 				} else if (left && !oldLeft) {
 					// Tilt angle to the left
-					pounceAngle += POUNCE_ANGLE_INCREMENT;
+					PounceAngle += POUNCE_ANGLE_INCREMENT;
 				}
 
 			}
@@ -105,16 +122,21 @@ public class Parasite : Character {
 			// Action key just pressed
 			InitializePounceAngle();
 			UpdateAttachedDirection();
+			pounceIndicator.Show();
 		}
 		if (action1) {
 			// Action key is down
 			// Charge leap
 			timeSpentCharging += Time.deltaTime;
-		} else if (oldAction1 && !action1 && CanPounce()) {
+			pounceIndicator.SetPercentage(PounceChargePercentage());
+		} else if (oldAction1 && !action1) {
 			// On action button release
-			// Pounce
-			physicsEntity.AddVelocity(CalculatePounceVelocity());
+			if (CanPounce()) {
+				// Pounce
+				physicsEntity.AddVelocity(CalculatePounceVelocity());
+			}
 			ResetPounceCharge();
+			pounceIndicator.Hide();
 		}
 		oldAction1 = action1;
 
@@ -129,16 +151,16 @@ public class Parasite : Character {
 	}
 
 	void InitializePounceAngle() {
-		pounceAngle = 90f;
+		PounceAngle = 90f;
 		if (physicsEntity.IsOnCeiling()) {
 			// Point down
-			pounceAngle = 270f;
+			PounceAngle = 270f;
 		} else if (physicsEntity.IsOnLeftWall()) {
 			// Point right
-			pounceAngle = 0f;
+			PounceAngle = 0f;
 		} else if (physicsEntity.IsOnRightWall()) {
 			// Point left
-			pounceAngle = 180f;
+			PounceAngle = 180f;
 		}
 	}
 
@@ -154,11 +176,15 @@ public class Parasite : Character {
 	}
 
 	Vector2 CalculatePounceVelocity() {
-		float speed = Mathf.Lerp(0, MAX_POUNCE_VELOCITY, timeSpentCharging / MAX_CHARGE_TIME);
-		float pounceAngleRads = Mathf.Deg2Rad * pounceAngle;
+		float speed = Mathf.Lerp(0, MAX_POUNCE_VELOCITY, PounceChargePercentage());
+		float pounceAngleRads = Mathf.Deg2Rad * PounceAngle;
 		Vector2 velocity = new Vector2(Mathf.Cos(pounceAngleRads), Mathf.Sin(pounceAngleRads));
 		velocity *= speed;
 		return velocity;
+	}
+
+	float PounceChargePercentage() {
+		return Mathf.Clamp01(timeSpentCharging / MAX_CHARGE_TIME);
 	}
 
 	bool CanPounce() {
