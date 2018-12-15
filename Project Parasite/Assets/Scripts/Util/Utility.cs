@@ -39,4 +39,12 @@ public static class Utility {
 		// Return c in world space
 		return ray.origin + displacement;
 	}
+
+	public enum Directions {
+		Up,
+		Down,
+		Left,
+		Right,
+		Null
+	}
 }

@@ -26,19 +26,45 @@ public class Parasite : Character {
 		return timeSpentCharging > 0f;
 	}
 
+	// The direction that the parasite is attached to (left wall, right wall, ceiling)
+	// 	when it began charging a pounce
+	private Utility.Directions attachedDirection = Utility.Directions.Null;
+
 	protected override void HandleInput()  {
 		// Movement
 		bool right = Input.GetKey(KeyCode.D);
 		bool left = Input.GetKey(KeyCode.A);
 		isMovingLeft = false;
 		isMovingRight = false;
+		bool isStuckToCeiling = false;
 		if (IsChargingPounce()) {
-			if (right && !oldRight) {
-				// Tilt angle to the right
-				pounceAngle -= POUNCE_ANGLE_INCREMENT;
-			} else if (left && !oldLeft) {
-				// Tilt angle to the left
-				pounceAngle += POUNCE_ANGLE_INCREMENT;
+			if (attachedDirection == Utility.Directions.Up) {
+				// Reverse tilt controls if stuck to ceiling
+				if (right && !oldRight) {
+					// Tilt angle to the right
+					pounceAngle += POUNCE_ANGLE_INCREMENT;
+				} else if (left && !oldLeft) {
+					// Tilt angle to the left
+					pounceAngle -= POUNCE_ANGLE_INCREMENT;
+				}
+			} else {
+				if (right && !oldRight) {
+					// Tilt angle to the right
+					pounceAngle -= POUNCE_ANGLE_INCREMENT;
+				} else if (left && !oldLeft) {
+					// Tilt angle to the left
+					pounceAngle += POUNCE_ANGLE_INCREMENT;
+				}
+
+			}
+			// Make sure physicsEntity keeps checking for walls we're attached to
+			// 	so that CanPounce() resolves to true.
+			if (!physicsEntity.IsOnGround()) {
+				switch (attachedDirection) {
+					case Utility.Directions.Right: isMovingRight = true; break;
+					case Utility.Directions.Left: isMovingLeft = true; break;
+					case Utility.Directions.Up: isStuckToCeiling = true; break;
+				}
 			}
 		} else {
 			if (right && !left) {
@@ -54,7 +80,6 @@ public class Parasite : Character {
 		oldRight = right;
 		oldLeft = left;
 
-		bool isStuckToCeiling = false;
 		bool up = Input.GetKey(KeyCode.W);
 		bool down = Input.GetKey(KeyCode.S);
 		isMovingUp = false;
@@ -76,17 +101,20 @@ public class Parasite : Character {
 		physicsEntity.SetIsStuckToCeiling(isStuckToCeiling);
 
 		bool action1 = Input.GetKey(KeyCode.J);
+		if (action1 && !oldAction1) {
+			// Action key just pressed
+			InitializePounceAngle();
+			UpdateAttachedDirection();
+		}
 		if (action1) {
 			// Action key is down
 			// Charge leap
 			timeSpentCharging += Time.deltaTime;
-		} else if (oldAction1 && !action1 && physicsEntity.IsOnGround()) {
+		} else if (oldAction1 && !action1 && CanPounce()) {
 			// On action button release
 			// Pounce
 			physicsEntity.AddVelocity(CalculatePounceVelocity());
-		}
-		if (!action1) {
-			ResetPounceVariables();
+			ResetPounceCharge();
 		}
 		oldAction1 = action1;
 
@@ -100,19 +128,45 @@ public class Parasite : Character {
 		}
 	}
 
+	void InitializePounceAngle() {
+		pounceAngle = 90f;
+		if (physicsEntity.IsOnCeiling()) {
+			// Point down
+			pounceAngle = 270f;
+		} else if (physicsEntity.IsOnLeftWall()) {
+			// Point right
+			pounceAngle = 0f;
+		} else if (physicsEntity.IsOnRightWall()) {
+			// Point left
+			pounceAngle = 180f;
+		}
+	}
+
+	void UpdateAttachedDirection() {
+		attachedDirection = Utility.Directions.Null;
+		if (physicsEntity.IsOnCeiling()) {
+			attachedDirection = Utility.Directions.Up;
+		} else if (physicsEntity.IsOnLeftWall()) {
+			attachedDirection = Utility.Directions.Left;
+		} else if (physicsEntity.IsOnRightWall()) {
+			attachedDirection = Utility.Directions.Right;
+		}
+	}
+
 	Vector2 CalculatePounceVelocity() {
 		float speed = Mathf.Lerp(0, MAX_POUNCE_VELOCITY, timeSpentCharging / MAX_CHARGE_TIME);
-		Debug.Log(speed);
 		float pounceAngleRads = Mathf.Deg2Rad * pounceAngle;
 		Vector2 velocity = new Vector2(Mathf.Cos(pounceAngleRads), Mathf.Sin(pounceAngleRads));
-		Debug.Log(velocity);
 		velocity *= speed;
 		return velocity;
 	}
 
-	void ResetPounceVariables() {
+	bool CanPounce() {
+		return physicsEntity.IsOnGround() || physicsEntity.IsOnCeiling() || physicsEntity.IsOnWall();
+	}
+
+	void ResetPounceCharge() {
 		timeSpentCharging = 0f;
-		pounceAngle = 90f;
 	}
 
 	public void OnTakingDamage() {
