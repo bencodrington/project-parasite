@@ -39,7 +39,7 @@ public class NonPlayerCharacter : Character {
 		// Movement
 		HandleHorizontalMovement();
 		// Self Destruct
-		if (Input.GetMouseButtonDown(0)) {
+		if (Input.GetKeyDown(KeyCode.K)) {
 			// Destroy this NPC
 			CmdDespawnSelf();
 		}

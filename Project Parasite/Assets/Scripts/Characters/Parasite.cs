@@ -26,7 +26,7 @@ public class Parasite : Character {
 		}
 		set {
 			pounceAngle = value;
-			pounceIndicator.SetAngle(pounceAngle);
+			PounceIndicator.SetAngle(pounceAngle);
 		}
 	}
 	// The number of degrees by which to modify the angle each key press
@@ -37,15 +37,20 @@ public class Parasite : Character {
 
 	PounceIndicator pounceIndicator;
 
+	PounceIndicator PounceIndicator {
+		get {
+			if (pounceIndicator == null) {
+				pounceIndicator = GetComponentInChildren<PounceIndicator>();
+			}
+			return pounceIndicator;
+		}
+	}
+
 	// The direction that the parasite is attached to (left wall, right wall, ceiling)
 	// 	when it began charging a pounce
 	private Utility.Directions attachedDirection = Utility.Directions.Null;
-
-	protected override void OnStart() {
-		if (hasAuthority) {
-			pounceIndicator = GetComponentInChildren<PounceIndicator>();
-		}
-	}
+	// The distance from the parasite that it can infect NPCs
+	const float INFECT_RADIUS = 1f;
 
 	protected override void HandleInput()  {
 		// Movement
@@ -122,13 +127,13 @@ public class Parasite : Character {
 			// Action key just pressed
 			InitializePounceAngle();
 			UpdateAttachedDirection();
-			pounceIndicator.Show();
+			PounceIndicator.Show();
 		}
 		if (action1) {
 			// Action key is down
 			// Charge leap
 			timeSpentCharging += Time.deltaTime;
-			pounceIndicator.SetPercentage(PounceChargePercentage());
+			PounceIndicator.SetPercentage(PounceChargePercentage());
 		} else if (oldAction1 && !action1) {
 			// On action button release
 			if (CanPounce()) {
@@ -136,13 +141,13 @@ public class Parasite : Character {
 				physicsEntity.AddVelocity(CalculatePounceVelocity());
 			}
 			ResetPounceCharge();
-			pounceIndicator.Hide();
+			PounceIndicator.Hide();
 		}
 		oldAction1 = action1;
 
 		// Infect
-		if (Input.GetMouseButtonDown(0)) {
-			Collider2D npc = Physics2D.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition), Utility.GetLayerMask(CharacterType.NPC));
+		if (Input.GetKey(KeyCode.K)) {
+			Collider2D npc = Physics2D.OverlapCircle(transform.position, INFECT_RADIUS, Utility.GetLayerMask(CharacterType.NPC));
 			if (npc != null) {
 				CmdInfectNpc(npc.transform.parent.GetComponent<NetworkIdentity>().netId);
 				CmdDestroyParasite();
