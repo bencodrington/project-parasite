@@ -171,6 +171,7 @@ public class PhysicsEntity {
 		Vector2 pixelToTheRight = GetPixelToTheRight(newPosition);
 		obstacleToTheRight = Physics2D.OverlapArea(oldPixelToTheRight, pixelToTheRight, Utility.GetLayerMask("obstacle"));
 	}
+	
 	Vector2 ResolveCollisionsAbove(Vector2 newPosition) {
 		float obstacleHeight;
 		_isOnCeiling = false;
@@ -231,7 +232,7 @@ public class PhysicsEntity {
 		bool shouldCollide = true;
 		// TODO: implement the below
 		// -- our downward velocity is higher than the obstacle above's downward velocity
-		if (!MovingUp()) {
+		if (!isMovingUp()) {
 			shouldCollide = false;
 		}
 		// -- and not stuck to the ceiling
@@ -245,7 +246,7 @@ public class PhysicsEntity {
 		bool shouldCollide = true;
 		// TODO: implement the below
 		// -- our upward velocity is higher than the obstacle below's upward velocity
-		if (MovingUp()) {
+		if (isMovingUp()) {
 			shouldCollide = false;
 		}
 		return shouldCollide;
@@ -254,7 +255,7 @@ public class PhysicsEntity {
 		// Return true unless
 		bool shouldCollide = true;
 		// -- we're moving right
-		if (MovingRight()) {
+		if (isMovingRight()) {
 			shouldCollide = false;
 		}
 		return shouldCollide;
@@ -263,19 +264,19 @@ public class PhysicsEntity {
 		// Return true unless
 		bool shouldCollide = true;
 		// -- we're moving left
-		if (MovingLeft()) {
+		if (isMovingLeft()) {
 			shouldCollide = false;
 		}
 		return shouldCollide;
 	}
 	
-	bool MovingUp() {
+	bool isMovingUp() {
 		return velocityY + inputVelocityY > 0;
 	}
-	bool MovingLeft() {
+	bool isMovingLeft() {
 		return velocityX + inputVelocityX < 0;
 	}
-	bool MovingRight() {
+	bool isMovingRight() {
 		return velocityX + inputVelocityX > 0;
 	}
 
@@ -283,7 +284,8 @@ public class PhysicsEntity {
 		oldPixelAbove = GetPixelAbove(newPosition);
 		oldPixelBelow = GetPixelBelow(newPosition);
 		oldPixelToTheLeft = GetPixelToTheLeft(newPosition);
-		oldPixelToTheRight = GetPixelToTheRight(newPosition);}
+		oldPixelToTheRight = GetPixelToTheRight(newPosition);
+	}
 
 	Vector2 GetPixelBelow(Vector2 position) {
 		return position + new Vector2(0, -height);
