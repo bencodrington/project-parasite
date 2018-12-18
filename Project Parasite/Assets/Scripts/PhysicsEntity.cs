@@ -37,6 +37,9 @@ public class PhysicsEntity {
 		inputVelocityX = 0;
 		inputVelocityY = 0;
 	}
+	// The (currently only vertical) velocity of kinematic objects affecting this entity
+	//	e.g. elevators, etc.
+	float movingObstacleVelocity;
 	/// Objects ///
 	Transform transform;
 	// Keep track of obstacles for determining how far they've moved since last frame
@@ -65,9 +68,12 @@ public class PhysicsEntity {
 	public bool IsOnRightWall() { return _isOnRightWall; }
 	public bool IsOnWall() { return _isOnLeftWall || _isOnRightWall; }
 	public bool applyGravity = true;
-	bool _isStuckToCeiling = false;
-	public void SetIsStuckToCeiling(bool isStuckToCeiling) {
-		_isStuckToCeiling = isStuckToCeiling;
+	bool _isTryingToStickToCeiling = false;
+	public void SetIsTryingToStickToCeiling(bool isTryingToStickToCeiling) {
+		_isTryingToStickToCeiling = isTryingToStickToCeiling;
+	}
+	bool IsStuckToCeiling() {
+		return _isTryingToStickToCeiling && IsOnCeiling();
 	}
 	/// Constructor and Methods ///
 	public PhysicsEntity(Transform transform, float height = 0.5f, float width = 0.5f) {
@@ -84,15 +90,19 @@ public class PhysicsEntity {
 	public void Update () {
 		HandleGravity();
 		ApplyFriction();
-		// Store attempted new position
-		Vector2 newPosition = (Vector2)transform.position + new Vector2(velocityX, velocityY) * Time.deltaTime;
 		// Add velocity from moving obstacles nearby
 		// Note: movingObstacleVelocity is currently only in the y dimension as there do not currently exist
 		// 	any objects that can move the player horizontally
-		float movingObstacleVelocity = GetMovingObstacleVelocity();
+		movingObstacleVelocity = GetMovingObstacleVelocity();
+		Vector2 attemptedDisplacement = new Vector2(velocityX, velocityY) * Time.deltaTime;
 		// Don't multiply movingObstacleVelocity by Time.deltaTime
 		//	because it is calculated based on displacement since last frame
-		newPosition.y += movingObstacleVelocity;
+		attemptedDisplacement += new Vector2(0, movingObstacleVelocity);
+		// Store scaled up version of movingObstacleVelocity in velocityY
+		// 	to incorporate it's changes in future frames
+		velocityY += movingObstacleVelocity / Time.deltaTime;
+		// Store attempted new position
+		Vector2 newPosition = (Vector2)transform.position + attemptedDisplacement;
 		// Add velocity from character movement input
 		newPosition += new Vector2(inputVelocityX, inputVelocityY) * Time.deltaTime;
 		// Check for and resolve collisions
@@ -106,7 +116,7 @@ public class PhysicsEntity {
 	}
 
 	void HandleGravity() {
-		if (applyGravity && !_isStuckToCeiling) {
+		if (applyGravity && !IsStuckToCeiling()) {
 			// Apply Gravity
 			velocityY += gravityAcceleration;
 		}
@@ -126,28 +136,45 @@ public class PhysicsEntity {
 	float GetMovingObstacleVelocity() {
 		float floorVelocity = 0;
 		float ceilingVelocity = 0;
-		float collisionVelocity;
+		// TODO: refactor this function
 		// Check if obstacle below has moved
 		// Note that obstacleBelow is leftover from last frame
 		if (obstacleBelow != null && (Vector2)obstacleBelow.transform.position != obstacleBelowOldPosition) {
 			floorVelocity = obstacleBelow.transform.position.y - obstacleBelowOldPosition.y;
+			// Ignore floor velocity if entity is moving up faster than the floor is (jumping off it)
+			if (getVerticalVelocity() > floorVelocity && floorVelocity > 0) {
+				floorVelocity = 0;
+			}
 		}
 		// Check if obstacle above has moved
 		if (obstacleAbove != null && (Vector2)obstacleAbove.transform.position != obstacleAboveOldPosition) {
 			ceilingVelocity = obstacleAbove.transform.position.y - obstacleAboveOldPosition.y;
+			// Ignore ceiling velocity if entity is moving down faster than the ceiling is (falling from it)
+			if (getVerticalVelocity() < ceilingVelocity && ceilingVelocity < 0) {
+				ceilingVelocity = 0;
+			}
 		}
-		collisionVelocity = floorVelocity;
-		// Don't transfer upward velocity unless we're stuck to ceiling
-		collisionVelocity += (ceilingVelocity > 0 && !_isStuckToCeiling) ? 0 : ceilingVelocity;
-		return collisionVelocity;
+		return floorVelocity + ceilingVelocity;
+	}
+
+	float getVerticalVelocity() {
+		// Get the current velocity in the y dimension this frame
+		// 	Note that this value changes over the course of the update cycle as
+		//	additional factors are considered and added to velocityY
+		return (velocityY + inputVelocityY) * Time.deltaTime;
 	}
 
 	Vector2 ResolveCollisionsAt(Vector2 newPosition) {
+		// TODO: may be required to change the order of collision check and resolution
+		// TODO:	based off of velocity, as currently an entity travelling upward too fast
+		// TODO:	will check below first, which could result in a 'below' collision with the
+		// TODO:	ceiling, teleporting the entity outside the map.
+		// TODO:	Currently ordered this way because gravity can more easily surpass this limit
 		// Always check for relevant collisions at the most recent version of newPosition
-		CheckCollisionsAbove(newPosition);
-		newPosition = ResolveCollisionsAbove(newPosition);
 		CheckCollisionsBelow(newPosition);
 		newPosition = ResolveCollisionsBelow(newPosition);
+		CheckCollisionsAbove(newPosition);
+		newPosition = ResolveCollisionsAbove(newPosition);
 		CheckCollisionsLeftOf(newPosition);
 		newPosition = ResolveCollisionsLeftOf(newPosition);
 		CheckCollisionsRightOf(newPosition);
@@ -228,28 +255,12 @@ public class PhysicsEntity {
 	}
 
 	bool ShouldCollideWithObstacleAbove() {
-		// Return true unless
-		bool shouldCollide = true;
-		// TODO: implement the below
-		// -- our downward velocity is higher than the obstacle above's downward velocity
-		if (!isMovingUp()) {
-			shouldCollide = false;
-		}
-		// -- and not stuck to the ceiling
-		if (_isStuckToCeiling) {
-			shouldCollide = true;
-		}
-		return shouldCollide;
+		// Return true unless entity is moving down faster than ceiling is (e.g. falling away from it);
+		return !(getVerticalVelocity() < movingObstacleVelocity);
 	}
 	bool ShouldCollideWithObstacleBelow() {
-		// Return true unless
-		bool shouldCollide = true;
-		// TODO: implement the below
-		// -- our upward velocity is higher than the obstacle below's upward velocity
-		if (isMovingUp()) {
-			shouldCollide = false;
-		}
-		return shouldCollide;
+		// Return true unless our upward velocity is higher than the obstacle below's upward velocity
+		return !(getVerticalVelocity() > movingObstacleVelocity);
 	}
 	bool ShouldCollideWithObstacleToTheLeft() {
 		// Return true unless
@@ -268,10 +279,6 @@ public class PhysicsEntity {
 			shouldCollide = false;
 		}
 		return shouldCollide;
-	}
-	
-	bool isMovingUp() {
-		return velocityY + inputVelocityY > 0;
 	}
 	bool isMovingLeft() {
 		return velocityX + inputVelocityX < 0;

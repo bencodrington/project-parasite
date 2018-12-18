@@ -58,7 +58,7 @@ public class Parasite : Character {
 		bool left = Input.GetKey(KeyCode.A);
 		isMovingLeft = false;
 		isMovingRight = false;
-		bool isStuckToCeiling = false;
+		bool isTryingToStickToCeiling = false;
 		if (IsChargingPounce()) {
 			if (attachedDirection == Utility.Directions.Up) {
 				// Reverse tilt controls if stuck to ceiling
@@ -85,7 +85,7 @@ public class Parasite : Character {
 				switch (attachedDirection) {
 					case Utility.Directions.Right: isMovingRight = true; break;
 					case Utility.Directions.Left: isMovingLeft = true; break;
-					case Utility.Directions.Up: isStuckToCeiling = true; break;
+					case Utility.Directions.Up: isTryingToStickToCeiling = true; break;
 				}
 			}
 		} else {
@@ -109,15 +109,16 @@ public class Parasite : Character {
 		if (up && !oldUp && physicsEntity.IsOnGround() && !IsChargingPounce()) {
 			// Jump
 			physicsEntity.AddVelocity(0, jumpVelocity);
-		} else if (up && physicsEntity.IsOnCeiling()) {
-			// Stick to ceiling
-			isStuckToCeiling = true;
-		} else if (up && physicsEntity.IsOnWall() && !IsChargingPounce()) {
+		}  else if (up && physicsEntity.IsOnWall() && !IsChargingPounce()) {
 			// Climb Up
 			isMovingUp = true;
 		} else if (down && physicsEntity.IsOnWall() && !IsChargingPounce()) {
 			// Climb Down
 			isMovingDown = true;
+		}
+		if (up) {
+			// Attempt to stick to ceiling
+			isTryingToStickToCeiling = true;
 		}
 		oldUp = up;
 
@@ -138,13 +139,13 @@ public class Parasite : Character {
 			if (CanPounce()) {
 				// Pounce
 				physicsEntity.AddVelocity(CalculatePounceVelocity());
-				isStuckToCeiling = false;
+				isTryingToStickToCeiling = false;
 			}
 			ResetPounceCharge();
 			PounceIndicator.Hide();
 		}
 		oldAction1 = action1;
-		physicsEntity.SetIsStuckToCeiling(isStuckToCeiling);
+		physicsEntity.SetIsTryingToStickToCeiling(isTryingToStickToCeiling);
 
 		// Infect
 		if (Input.GetKey(KeyCode.K)) {
