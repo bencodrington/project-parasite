@@ -35,6 +35,21 @@ public class Parasite : Character {
 		return timeSpentCharging > 0f;
 	}
 
+	bool _isAttemptingInfection = false;
+	bool IsAttemptingInfection {
+		get { return _isAttemptingInfection; }
+		set {
+			if (value != _isAttemptingInfection) {
+				// Update sprite
+				SetIsAttemptingInfectionSprite(value);
+				_isAttemptingInfection = value;
+			}
+		}
+	}
+	void SetIsAttemptingInfectionSprite(bool isAttempting) {
+		spriteRenderer.color = new Color(1, isAttempting ? .5f : 0, 0, 1);
+	}
+
 	PounceIndicator pounceIndicator;
 
 	PounceIndicator PounceIndicator {
@@ -149,11 +164,14 @@ public class Parasite : Character {
 
 		// Infect
 		if (Input.GetKey(KeyCode.K)) {
+			IsAttemptingInfection = true;
 			Collider2D npc = Physics2D.OverlapCircle(transform.position, INFECT_RADIUS, Utility.GetLayerMask(CharacterType.NPC));
 			if (npc != null) {
 				CmdInfectNpc(npc.transform.parent.GetComponent<NetworkIdentity>().netId);
 				CmdDestroyParasite();
 			}
+		} else {
+			IsAttemptingInfection = false;
 		}
 	}
 
