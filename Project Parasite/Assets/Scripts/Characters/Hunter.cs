@@ -15,7 +15,8 @@ public class Hunter : Character {
 
 	bool isSuitActivated = true;
 
-	Color SuitDeactivatedColour = Color.blue;
+	Color SuitActivatedColour = new Color(0, 1f, 1f, 1);
+	Color SuitDeactivatedColour = new Color(0, .5f, 0.6f, 1);
 
 	public GameObject orbPrefab;
 	public GameObject orbBeamPrefab;
@@ -76,7 +77,7 @@ public class Hunter : Character {
 		}
 		// De-activate suit
 		isSuitActivated = !Input.GetKey(KeyCode.LeftShift);
-		spriteRenderer.color = isSuitActivated ? Color.white : SuitDeactivatedColour;
+		spriteRenderer.color = isSuitActivated ? SuitActivatedColour : SuitDeactivatedColour;
 	}
 
 	public void Repel(Vector2 forceDirection, float force) {
