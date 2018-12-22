@@ -65,15 +65,31 @@ public class NonPlayerCharacter : Character {
 	}
 
 	void FindNewPath() {
-		// TODO: While path target is not reachable
 		// Randomly select offset that is +/-[minTargetDistance, maxTargetDistance]
 		float rangeDifference = maxTargetDistance - minTargetDistance;
 		float offset = Random.Range(-rangeDifference, rangeDifference);
 		offset += (offset >= 0) ? minTargetDistance : -minTargetDistance;
 		// Set target relative to current location
 		target = new Vector3(transform.position.x + offset, transform.position.y, 0);
+		// If there is a wall/ beam in the way, don't move to new target
+		target = ModifyTargetToAvoidObstacles(target);
 		// Begin traversing
 		hasTarget = true;
+	}
+
+	Vector2 ModifyTargetToAvoidObstacles(Vector2 target) {
+		Vector2 pathHitboxSize = new Vector2(target.x - transform.position.x, spriteRenderer.transform.localScale.y);
+		// TODO: the below can cause npcs to walk into beams at head height,
+		//  but also stops the hitbox from being triggered by the floor
+		pathHitboxSize.y -= 0.1f;
+		// Calculate corners of hitbox
+		Vector2 pathHitboxTopStart = new Vector2(transform.position.x, transform.position.y + pathHitboxSize.y / 2);
+		Vector2 pathHitboxBottomEnd = new Vector2(target.x, target.y - pathHitboxSize.y / 2);
+		bool isObstacleInTheWay = Physics2D.OverlapArea(pathHitboxTopStart, pathHitboxBottomEnd, Utility.GetLayerMask("npcPathObstacle"));
+		if (isObstacleInTheWay) {
+			target = transform.position;
+		}
+		return target;
 	}
 
 	public IEnumerator Idle() {

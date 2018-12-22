@@ -20,6 +20,10 @@ public static class Utility {
 												GetLayerMask(CharacterType.Parasite);
 			case "obstacle": return 1 << LayerMask.NameToLayer("Obstacles");
 			case "energyCenter": return 1 << LayerMask.NameToLayer("EnergyCenters");
+			case "energyBeam": return 1 << LayerMask.NameToLayer("EnergyBeams");
+			case "npcPathObstacle": return	GetLayerMask("obstacle") +
+											GetLayerMask("energyCenter") +
+											GetLayerMask("energyBeam");
 			default: return -1;
 		}
 	}
