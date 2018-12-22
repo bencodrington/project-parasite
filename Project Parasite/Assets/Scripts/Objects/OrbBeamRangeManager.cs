@@ -8,7 +8,7 @@ public class OrbBeamRangeManager : MonoBehaviour {
 	const int MARKER_COUNT = 6;
 	// The maximum distance from the most recent orb that another can be placed
 	//	to connect them
-	const float ORB_BEAM_RANGE = 6f;
+	const float ORB_BEAM_RANGE = 9f;
 
 	public GameObject orbBeamRangeMarkerPrefab;
 

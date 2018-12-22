@@ -35,7 +35,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 497, y: 85.8}
+  m_SizeDelta: {x: 497, y: 112.91}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &222429103750588656
 CanvasRenderer:
@@ -82,4 +82,6 @@ MonoBehaviour:
 
     [J] Place Power Orb
 
-    [K] Recall Power Orb'
+    [K] Recall Power Orb
+
+    [Shift] Hold to deactivate suit'
