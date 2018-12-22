@@ -46,12 +46,8 @@ public class PhysicsEntity {
 	// 	so that this object can absorb their momentum (elevators, etc.)
 	private Collider2D obstacleBelow;
 	private Collider2D obstacleAbove;
-	// These obstacles do not currently require their oldPosition to be stored
-	//	because there do not yet exist any obstacles that can move the player horizontally
 	Collider2D obstacleToTheLeft;
 	Collider2D obstacleToTheRight;
-	private Vector2 obstacleBelowOldPosition;
-	private Vector2 obstacleAboveOldPosition;
 	// The old position of the entity, used for collision checking
 	private Vector2 oldPixelBelow;
 	private Vector2 oldPixelAbove;
@@ -116,9 +112,9 @@ public class PhysicsEntity {
 	}
 
 	void HandleGravity() {
-		if (applyGravity && !IsStuckToCeiling()) {
+		if (applyGravity) {
 			// Apply Gravity
-			velocityY += gravityAcceleration;
+			velocityY += IsStuckToCeiling() ? -gravityAcceleration : gravityAcceleration;
 		}
 	}
 
@@ -128,33 +124,41 @@ public class PhysicsEntity {
 			velocityX /= DEFAULT_FRICTION_DENOMINATOR;
 		}
 		// Apply vertical friction
+		// TODO: if moving towards wall
 		if (IsOnWall()) {
 			velocityY /= DEFAULT_FRICTION_DENOMINATOR;
 		}
 	}
 
 	float GetMovingObstacleVelocity() {
-		float floorVelocity = 0;
-		float ceilingVelocity = 0;
-		// TODO: refactor this function
+		float relativeFloorVelocity = GetRelativeFloorVelocity();
+		float relativeCeilingVelocity = GetRelativeCeilingVelocity();
+		return relativeFloorVelocity + relativeCeilingVelocity;
+	}
+
+	float GetRelativeFloorVelocity() {
+		float relativeFloorVelocity = 0;
 		// Check if obstacle below has moved
 		// Note that obstacleBelow is leftover from last frame
-		if (obstacleBelow != null && (Vector2)obstacleBelow.transform.position != obstacleBelowOldPosition) {
-			floorVelocity = obstacleBelow.transform.position.y - obstacleBelowOldPosition.y;
-			// Ignore floor velocity if entity is moving up faster than the floor is (jumping off it)
-			if (getVerticalVelocity() > floorVelocity && floorVelocity > 0) {
-				floorVelocity = 0;
+		if (obstacleBelow != null) {
+			relativeFloorVelocity = GetKinematicObstacleVelocity(obstacleBelow.gameObject) - getVerticalVelocity();
+			if (relativeFloorVelocity < 0) {
+				relativeFloorVelocity = 0;
 			}
 		}
+		return relativeFloorVelocity;
+	}
+
+	float GetRelativeCeilingVelocity() {
+		float relativeCeilingVelocity = 0;
 		// Check if obstacle above has moved
-		if (obstacleAbove != null && (Vector2)obstacleAbove.transform.position != obstacleAboveOldPosition) {
-			ceilingVelocity = obstacleAbove.transform.position.y - obstacleAboveOldPosition.y;
-			// Ignore ceiling velocity if entity is moving down faster than the ceiling is (falling from it)
-			if (getVerticalVelocity() < ceilingVelocity && ceilingVelocity < 0) {
-				ceilingVelocity = 0;
+		if (obstacleAbove != null) {
+			relativeCeilingVelocity = GetKinematicObstacleVelocity(obstacleAbove.gameObject) - getVerticalVelocity();
+			if (relativeCeilingVelocity > 0) {
+				relativeCeilingVelocity = 0;
 			}
 		}
-		return floorVelocity + ceilingVelocity;
+		return relativeCeilingVelocity;
 	}
 
 	float getVerticalVelocity() {
@@ -201,29 +205,29 @@ public class PhysicsEntity {
 	
 	Vector2 ResolveCollisionsAbove(Vector2 newPosition) {
 		float obstacleHeight;
-		_isOnCeiling = false;
-		if (obstacleAbove != null && ShouldCollideWithObstacleAbove()) {
-			// Then new velocityY is 0 and position self directly below the obstacle
-			velocityY = 0;
+		// Set "is on ceiling" sensor to true whether we need to take it's velocity or not
+		// 	this lets us stick to a ceiling that's ascending faster than we are, for example
+		_isOnCeiling = obstacleAbove != null;
+		if (_isOnCeiling && ShouldCollideWithObstacleAbove()) {
+			// Set velocityY to the speed of the obstacle above
+			velocityY = GetKinematicObstacleVelocity(obstacleAbove.gameObject) / Time.deltaTime;
+			// Position self directly below the obstacle
 			obstacleHeight = obstacleAbove.transform.localScale.y / 2;
 			newPosition.y = obstacleAbove.transform.position.y - obstacleHeight - height;
-			// Cache obstacle position for calculating displacement next frame
-			obstacleAboveOldPosition = obstacleAbove.transform.position;
-			_isOnCeiling = true;
 		}
 		return newPosition;
 	}
 	Vector2 ResolveCollisionsBelow(Vector2 newPosition) {
 		float obstacleHeight;
-		_isOnGround = false;
-		if (obstacleBelow != null && ShouldCollideWithObstacleBelow()) {
-			// Then new velocityY is 0 and position self directly above the obstacle
-			velocityY = 0;
+		// Set "is on ground" sensor to true whether we need to take it's velocity or not
+		// 	this lets us jump off a platform that's descending faster than we are, for example
+		_isOnGround = obstacleBelow != null;
+		if (_isOnGround && ShouldCollideWithObstacleBelow()) {
+			// Set velocityY to the speed of the platform below
+			velocityY = GetKinematicObstacleVelocity(obstacleBelow.gameObject) / Time.deltaTime;
+			// Position self directly above the obstacle
 			obstacleHeight = obstacleBelow.transform.localScale.y / 2;
 			newPosition.y = obstacleBelow.transform.position.y + obstacleHeight + height;
-			// Cache obstacle position for calculating displacement next frame
-			obstacleBelowOldPosition = obstacleBelow.transform.position;
-			_isOnGround = true;
 		}
 		return newPosition;
 	}
@@ -256,11 +260,11 @@ public class PhysicsEntity {
 
 	bool ShouldCollideWithObstacleAbove() {
 		// Return true unless entity is moving down faster than ceiling is (e.g. falling away from it);
-		return !(getVerticalVelocity() < movingObstacleVelocity);
+		return getVerticalVelocity() >= GetKinematicObstacleVelocity(obstacleAbove.gameObject);
 	}
 	bool ShouldCollideWithObstacleBelow() {
 		// Return true unless our upward velocity is higher than the obstacle below's upward velocity
-		return !(getVerticalVelocity() > movingObstacleVelocity);
+		return GetKinematicObstacleVelocity(obstacleBelow.gameObject) >= getVerticalVelocity();
 	}
 	bool ShouldCollideWithObstacleToTheLeft() {
 		// Return true unless
@@ -292,6 +296,11 @@ public class PhysicsEntity {
 		oldPixelBelow = GetPixelBelow(newPosition);
 		oldPixelToTheLeft = GetPixelToTheLeft(newPosition);
 		oldPixelToTheRight = GetPixelToTheRight(newPosition);
+	}
+
+	float GetKinematicObstacleVelocity(GameObject obstacle) {
+		KinematicPhysicsEntity obstaclePhysicsEntity = obstacle.GetComponent<KinematicPhysicsEntity>();
+		return obstaclePhysicsEntity == null ? 0 : obstaclePhysicsEntity.GetVelocity().y;
 	}
 
 	Vector2 GetPixelBelow(Vector2 position) {

@@ -21,6 +21,12 @@ public class Elevator : NetworkBehaviour {
 	private Collider2D[] passengers;
 	private ElevatorButton[] buttons;
 
+	private KinematicPhysicsEntity[] kinematicPhysicsEntities;
+
+	void Start() {
+		kinematicPhysicsEntities = GetComponentsInChildren<KinematicPhysicsEntity>();
+	}
+
 	void InitializeButtons() {
 		ElevatorButton button;
 		buttons = new ElevatorButton[stops.Length];
@@ -59,6 +65,10 @@ public class Elevator : NetworkBehaviour {
 			RpcUpdateServerPosition(transform.position);
 		} else {
 			transform.position = Vector3.Lerp(transform.position, serverPosition, LAG_LERP_FACTOR);
+		}
+		// Update each kinematicPhysicsEntity in this component's children (floor/ceiling)
+		foreach(KinematicPhysicsEntity entity in kinematicPhysicsEntities) {
+			entity.PhysicsUpdate();
 		}
 	}
 
