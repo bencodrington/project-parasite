@@ -96,7 +96,9 @@ public class Hunter : Character {
 	}
 
 	protected override void OnCharacterDestroy() {
-		Destroy(orbUiManager.gameObject);
+		if (hasAuthority) {
+			Destroy(orbUiManager.gameObject);
+		}
 	}
 
 	// Commands
