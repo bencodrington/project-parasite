@@ -8,17 +8,7 @@ public class CustomNetworkManager : NetworkManager {
 	public override void OnClientConnect(NetworkConnection conn) {
 
 		base.OnClientConnect(conn);
-		NetworkDiscoveryClient networkDiscoveryClient = FindObjectOfType<NetworkDiscoveryClient>();
-		if (networkDiscoveryClient == null) {
-			// Only print warning if network discovery server is not found
-			if (FindObjectOfType<NetworkDiscoveryServer>() == null) {
-				Debug.Log("CustomNetworkManager: Network Discovery Client not found.");
-			}
-			return;
-		}
 		Debug.Log("CustomNetworkManager: Client: Connected to " + conn.connectionId + ", host ID: " + conn.hostId);
-		networkDiscoveryClient.StopBroadcast();
-		Destroy(networkDiscoveryClient.gameObject);
 	}
 
 	public override void OnServerConnect(NetworkConnection conn) {

@@ -77,7 +77,8 @@ public class PhysicsEntity {
 		this.height = height;
 		this.width = width;
 		this.gravityAcceleration = DEFAULT_GRAVITY;
-		oldPixelBelow = transform.position;
+		// Ensure that first collision check isn't from default positions (0, 0) to starting positions
+		CacheSensorPixels(transform.position);
 	}
 
 	// Called by the component that this entity simulates the physics for
