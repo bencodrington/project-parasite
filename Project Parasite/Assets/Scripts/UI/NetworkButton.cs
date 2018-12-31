@@ -4,9 +4,22 @@ using UnityEngine;
 
 public class NetworkButton : MonoBehaviour {
 
-	public GameObject networkIdentityPrefab;
+	public enum NetworkEntityType {
+		Host,
+		Client
+	}
+
+	public NetworkEntityType networkEntityType;
 
 	public void OnClick() {
-		Instantiate(networkIdentityPrefab);
+		MatchManager matchManager = FindObjectOfType<MatchManager>();
+		if (matchManager == null) {
+			Debug.LogError("NetworkButton: OnClick(): MatchManager not found. NetworkEntityType: " + networkEntityType);
+			return;
+		}
+		switch (networkEntityType) {
+			case NetworkEntityType.Host: matchManager.CreateRoom(); break;
+			case NetworkEntityType.Client: matchManager.ListMatches(); break;
+		}
 	}
 }
