@@ -143,6 +143,10 @@ public class Parasite : Character {
 		} else {
 			IsAttemptingInfection = false;
 		}
+
+		if (Input.GetKeyDown(KeyCode.E)) {
+			InteractWithObjectsInRange();
+		}
 	}
 
 	void UpdateAttachedDirection() {

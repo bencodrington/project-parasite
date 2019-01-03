@@ -8,6 +8,8 @@ public abstract class Character : NetworkBehaviour {
 	protected SpriteRenderer spriteRenderer;
 	protected PhysicsEntity physicsEntity;
 
+	protected List<NetworkInstanceId> objectsInRange = new List<NetworkInstanceId>();
+
 	protected Vector3 serverPosition;
 	protected bool shouldSnapToServerPosition = false;
 
@@ -125,6 +127,18 @@ public abstract class Character : NetworkBehaviour {
 		}
 	}
 
+	protected void InteractWithObjectsInRange() {
+		foreach (NetworkInstanceId netId in objectsInRange) {
+			GameObject gameObject;
+			if (isServer) { 
+				gameObject = NetworkServer.FindLocalObject(netId);
+			} else {
+				gameObject = ClientScene.FindLocalObject(netId);
+			}
+			gameObject.GetComponentInChildren<InteractableObject>().OnInteract();
+		}
+	}
+
 	protected virtual void OnCharacterDestroy() {}
 
 	void SetSpriteFlip(bool isFacingLeft) {
@@ -189,6 +203,20 @@ public abstract class Character : NetworkBehaviour {
 	void RpcSetSpriteFlip(bool isFacingLeft) {
 		if (!hasAuthority) {
 			SetSpriteFlip(isFacingLeft);
+		}
+	}
+
+	[ClientRpc]
+	public void RpcRegisterObject(NetworkInstanceId netId) {
+		if (hasAuthority) {
+			objectsInRange.Add(netId);
+		}
+	}
+
+	[ClientRpc]
+	public void RpcUnregisterObject(NetworkInstanceId netId) {
+		if (hasAuthority) {
+			objectsInRange.Remove(netId);
 		}
 	}
 

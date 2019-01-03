@@ -67,6 +67,10 @@ public class Hunter : Character {
 		}
 		oldUp = up;
 
+		if (Input.GetKeyDown(KeyCode.E)) {
+			InteractWithObjectsInRange();
+		}
+
 		// Place orb
 		if (Input.GetMouseButtonDown(0)) {
 			CmdSpawnOrb(Utility.GetMousePos());
