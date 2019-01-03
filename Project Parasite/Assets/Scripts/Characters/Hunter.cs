@@ -68,11 +68,11 @@ public class Hunter : Character {
 		oldUp = up;
 
 		// Place orb
-		if (Input.GetKeyDown(KeyCode.J)) {
-			CmdSpawnOrb(transform.position);
+		if (Input.GetMouseButtonDown(0)) {
+			CmdSpawnOrb(Utility.GetMousePos());
 		}
 		// Recall orb
-		if (Input.GetKeyDown(KeyCode.K)) {
+		if (Input.GetMouseButtonDown(1)) {
 			CmdRecallOrb();
 		}
 		// De-activate suit

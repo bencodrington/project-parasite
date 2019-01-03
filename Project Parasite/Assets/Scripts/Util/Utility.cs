@@ -44,6 +44,10 @@ public static class Utility {
 		return ray.origin + displacement;
 	}
 
+	public static Vector2 GetMousePos() {
+		return Camera.main.ScreenToWorldPoint(Input.mousePosition);
+	}
+
 	public enum Directions {
 		Up,
 		Down,

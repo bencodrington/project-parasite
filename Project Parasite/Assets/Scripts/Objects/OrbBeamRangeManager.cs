@@ -30,7 +30,7 @@ public class OrbBeamRangeManager : MonoBehaviour {
 	}
 
 	void Update() {
-		if (isInRange(transform.position) && shouldShowMarkers) {
+		if (isInRange(Utility.GetMousePos()) && shouldShowMarkers) {
 			ShowMarkers();
 			PositionMarkers();
 		} else {
@@ -64,7 +64,7 @@ public class OrbBeamRangeManager : MonoBehaviour {
 	void PositionMarkers() {
 		GameObject marker;
 		Vector2 start = mostRecentOrb.transform.position;
-		Vector2 end = transform.position;
+		Vector2 end = Utility.GetMousePos();
 		for (int i = 0; i < MARKER_COUNT; i++) {
 			marker = markers[i];
 			// Include an imaginary marker on either end of the calculations
