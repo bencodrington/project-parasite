@@ -48,6 +48,10 @@ public static class Utility {
 		return Camera.main.ScreenToWorldPoint(Input.mousePosition);
 	}
 
+	public static float GetAngleToMouse(Vector2 point) {
+		return Vector2.SignedAngle(Vector2.right, GetMousePos() - point);
+	}
+
 	public enum Directions {
 		Up,
 		Down,

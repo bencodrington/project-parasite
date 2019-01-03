@@ -18,19 +18,6 @@ public class Parasite : Character {
 	private float timeSpentCharging = 0f;
 	// The pounce speed will be capped off after this many seconds
 	private const float MAX_CHARGE_TIME = 1.5f;
-	// The angle at which the parasite is currently set to pounce, UP by default
-	private float pounceAngle = 90f;
-	float PounceAngle {
-		get {
-			return pounceAngle;
-		}
-		set {
-			pounceAngle = value;
-			PounceIndicator.SetAngle(pounceAngle);
-		}
-	}
-	// The number of degrees by which to modify the angle each key press
-	private const float POUNCE_ANGLE_INCREMENT = 15f;
 	private bool IsChargingPounce() {
 		return timeSpentCharging > 0f;
 	}
@@ -74,26 +61,10 @@ public class Parasite : Character {
 		isMovingLeft = false;
 		isMovingRight = false;
 		bool isTryingToStickToCeiling = false;
+		float pounceAngle;
 		if (IsChargingPounce()) {
-			if (attachedDirection == Utility.Directions.Up) {
-				// Reverse tilt controls if stuck to ceiling
-				if (right && !oldRight) {
-					// Tilt angle to the right
-					PounceAngle += POUNCE_ANGLE_INCREMENT;
-				} else if (left && !oldLeft) {
-					// Tilt angle to the left
-					PounceAngle -= POUNCE_ANGLE_INCREMENT;
-				}
-			} else {
-				if (right && !oldRight) {
-					// Tilt angle to the right
-					PounceAngle -= POUNCE_ANGLE_INCREMENT;
-				} else if (left && !oldLeft) {
-					// Tilt angle to the left
-					PounceAngle += POUNCE_ANGLE_INCREMENT;
-				}
-
-			}
+			pounceAngle = Utility.GetAngleToMouse(transform.position);
+			PounceIndicator.SetAngle(pounceAngle);
 			// Make sure physicsEntity keeps checking for walls we're attached to
 			// 	so that CanPounce() resolves to true.
 			if (!physicsEntity.IsOnGround()) {
@@ -137,12 +108,11 @@ public class Parasite : Character {
 		}
 		oldUp = up;
 
-		bool action1 = Input.GetKey(KeyCode.J);
+		bool action1 = Input.GetMouseButton(0);
 		if (action1 && !oldAction1) {
 			// Action key just pressed
-			InitializePounceAngle();
-			UpdateAttachedDirection();
 			PounceIndicator.Show();
+			UpdateAttachedDirection();
 		}
 		if (action1) {
 			// Action key is down
@@ -163,7 +133,7 @@ public class Parasite : Character {
 		physicsEntity.SetIsTryingToStickToCeiling(isTryingToStickToCeiling);
 
 		// Infect
-		if (Input.GetKey(KeyCode.K)) {
+		if (Input.GetMouseButton(1)) {
 			IsAttemptingInfection = true;
 			Collider2D npc = Physics2D.OverlapCircle(transform.position, INFECT_RADIUS, Utility.GetLayerMask(CharacterType.NPC));
 			if (npc != null) {
@@ -172,20 +142,6 @@ public class Parasite : Character {
 			}
 		} else {
 			IsAttemptingInfection = false;
-		}
-	}
-
-	void InitializePounceAngle() {
-		PounceAngle = 90f;
-		if (physicsEntity.IsOnCeiling()) {
-			// Point down
-			PounceAngle = 270f;
-		} else if (physicsEntity.IsOnLeftWall()) {
-			// Point up-right
-			PounceAngle = 60f;
-		} else if (physicsEntity.IsOnRightWall()) {
-			// Point up-left
-			PounceAngle = 120f;
 		}
 	}
 
@@ -202,7 +158,7 @@ public class Parasite : Character {
 
 	Vector2 CalculatePounceVelocity() {
 		float speed = Mathf.Lerp(0, MAX_POUNCE_VELOCITY, PounceChargePercentage());
-		float pounceAngleRads = Mathf.Deg2Rad * PounceAngle;
+		float pounceAngleRads = Mathf.Deg2Rad * Utility.GetAngleToMouse(transform.position);
 		Vector2 velocity = new Vector2(Mathf.Cos(pounceAngleRads), Mathf.Sin(pounceAngleRads));
 		velocity *= speed;
 		return velocity;
