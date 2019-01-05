@@ -976,8 +976,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1092008076}
-  - component: {fileID: 1092008077}
-  - component: {fileID: 1092008075}
   - component: {fileID: 1092008078}
   m_Layer: 0
   m_Name: GameManager
@@ -986,22 +984,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1092008075
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1092008074}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6aa1e1995ea9bc243838dce406dbab57, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  elevatorPrefab: {fileID: 1009200510114302, guid: ecc1121d7c76816448f88a024b0d363a,
-    type: 3}
-  elevatorCallFieldPrefab: {fileID: 1071992796203306, guid: 25d1080c17a5fad428d3d1dec9ffdab9,
-    type: 3}
 --- !u!4 &1092008076
 Transform:
   m_ObjectHideFlags: 0
@@ -1016,18 +998,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1092008077
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1092008074}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42324b7a77e913f49930856bdf36a99e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1092008078
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1903,6 +1873,8 @@ MonoBehaviour:
   - {fileID: 1599698830328778, guid: b0848c3b199306745aa91255602825d2, type: 3}
   - {fileID: 1009200510114302, guid: ecc1121d7c76816448f88a024b0d363a, type: 3}
   - {fileID: 1071992796203306, guid: 25d1080c17a5fad428d3d1dec9ffdab9, type: 3}
+  - {fileID: 1463329413419142, guid: 64e476012ce7af140b598b86d5a34da9, type: 3}
+  - {fileID: 6443559730030799925, guid: 12e852027c4ce8f41b7c7ec0c714e361, type: 3}
   m_CustomConfig: 0
   m_MaxConnections: 4
   m_ConnectionConfig:

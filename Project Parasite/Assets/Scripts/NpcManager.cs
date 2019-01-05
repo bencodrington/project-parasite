@@ -17,9 +17,10 @@ public class NpcManager : NetworkBehaviour {
 	const float SPAWN_RANGE_X = 6;
 	const float SPAWN_RANGE_Y = 2;
 
-	bool DEBUG_MODE = true;
+	bool DEBUG_MODE = false;
 
 	void Start () {
+		if (!isServer) { return; }
 		NpcList = new List<NonPlayerCharacter>();
 		SpawnNPCs();
 	}

@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class RoundManager : MonoBehaviour {
+public class RoundManager : NetworkBehaviour {
 
 	PlayerObject[] connectedPlayers;
 
+	public GameObject objectManagerPrefab;
 	ObjectManager objectManager;
 
 	public Vector2[] spawnPoints;
@@ -18,15 +20,25 @@ public class RoundManager : MonoBehaviour {
 	bool huntersOnlyMode = false;
 
 	void Start () {
-		// FIXME
-		// huntersOnlyMode = true;
+		if (!isServer) { return; }
 		// Cache Player Objects
-		connectedPlayers = FindObjectsOfType<PlayerObject>();
 		// TODO: uncache on leave
-		objectManager = FindObjectOfType<ObjectManager>();
-		objectManager.OnRoundStart();
+		connectedPlayers = FindObjectsOfType<PlayerObject>();
+		CmdSpawnObjectManager();
 		SelectSpawnPoints();
 		SelectParasite();
+	}
+
+	void FixedUpdate() {
+		if (objectManager != null) {
+			// Update all objects in the scene
+			objectManager.PhysicsUpdate();
+		}
+		// Update all characters in the scene
+		// TODO: optimize (maybe by going through the cached players and calling PhysicsUpdate for them?)
+		foreach(Character character in FindObjectsOfType<Character>()) {
+			character.PhysicsUpdate();
+		}
 	}
 
 	void SelectParasite() {
@@ -69,6 +81,22 @@ public class RoundManager : MonoBehaviour {
 		}
 		transform.GetComponentInChildren<NpcManager>().DespawnNPCs();
 		objectManager.OnRoundEnd();
+	}
+
+	// Commands
+	[Command]
+	void CmdSpawnObjectManager() {
+		// Create new ObjectManager game object on the server
+		GameObject objectManagerGameObject = Instantiate(objectManagerPrefab);
+		NetworkServer.Spawn(objectManagerGameObject);
+		RpcSetObjectManager(objectManagerGameObject.GetComponent<NetworkIdentity>().netId);
+	}
+
+	// ClientRpc
+	[ClientRpc]
+	void RpcSetObjectManager(NetworkInstanceId objectManagerNetId) {
+		objectManager = Utility.GetLocalObject(objectManagerNetId, isServer).GetComponentInChildren<ObjectManager>();
+		objectManager.OnRoundStart();
 	}
 
 }

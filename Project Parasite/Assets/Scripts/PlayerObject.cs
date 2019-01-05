@@ -22,6 +22,7 @@ public class PlayerObject : NetworkBehaviour {
 	private GameObject npcCountObject;
 	private GameObject controlsObject;
 	private GameObject gameOverScreen;
+	private RoundManager roundManager;
 
 	// The text shown on the game over screen
 	private const string HUNTERS_WIN = "HUNTERS WIN!";
@@ -176,9 +177,11 @@ public class PlayerObject : NetworkBehaviour {
 
 	[Command]
 	public void CmdShowGameOverScreen(CharacterType victorType) {
-		RoundManager rm = FindObjectOfType<RoundManager>();
-		if (rm.isGameOver) { return; }
-		rm.isGameOver = true;
+		if (roundManager == null) {
+			return;
+		}
+		if (roundManager.isGameOver) { return; }
+		roundManager.isGameOver = true;
 		RpcShowGameOverScreen(victorType);
 	}
 
@@ -191,12 +194,15 @@ public class PlayerObject : NetworkBehaviour {
 	public void CmdStartGame() {
 		RpcDestroyTitleScreen();
 		RpcDestroyGameOverScreen();
-		foreach (RoundManager rm in FindObjectsOfType<RoundManager>()) {
-			rm.EndRound();
-			Destroy(rm.gameObject);
+		// Destroying any previous roundManager means this function can be used to restart games as well
+		if (roundManager != null) {
+			NetworkServer.Destroy(roundManager.gameObject);
 		}
 		// Create new RoundManager game object on the server
-		Instantiate(RoundManagerPrefab);
+		GameObject roundManagerGameObject = Instantiate(RoundManagerPrefab);
+		// Spawn it on clients as well
+		NetworkServer.Spawn(roundManagerGameObject);
+		roundManager = roundManagerGameObject.GetComponentInChildren<RoundManager>();
 	}
 
 	[Command]

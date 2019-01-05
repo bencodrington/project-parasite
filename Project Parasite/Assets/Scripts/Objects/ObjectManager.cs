@@ -65,19 +65,26 @@ public class ObjectManager : NetworkBehaviour {
 	List<ElevatorCallField> callFields;
 
 	public void OnRoundStart() {
+		if (!isServer) { return; }
 		SpawnElevators();
 	}
 
 	public void OnRoundEnd() {
+		if (!isServer) { return; }
 		DestroyElevators();
 		DestroyCallFields();
 	}
 
 	public void PhysicsUpdate() {
+		// Note: each object that needs to be updated every physics update needs to be
+		// 	added (via Rpc) to the client ObjectManager's list of objects to update
 		if (elevators == null) { return; }
 		foreach (Elevator elevator in elevators) {
 			elevator.PhysicsUpdate();
 		}
+		// Call fields are only updated every physics update on the server, and are
+		// 	not stored on the client ObjectManager
+		if (!isServer) { return; }
 		foreach (ElevatorCallField callField in callFields) {
 			callField.PhysicsUpdate();
 		}
@@ -87,12 +94,14 @@ public class ObjectManager : NetworkBehaviour {
 		// Initialize server master lists of elevators & callfields(a.k.a. stops)
 		elevators = new List<Elevator>();
 		callFields = new List<ElevatorCallField>();
+		NetworkInstanceId elevatorNetId;
 		foreach (ElevatorData elevatorData in elevatorDataArray) {
-			SpawnElevator(elevatorData);
+			elevatorNetId = SpawnElevator(elevatorData);
+			RpcStoreElevator(elevatorNetId);
 		}
 	}
 
-	void SpawnElevator(ElevatorData elevatorData) {
+	NetworkInstanceId SpawnElevator(ElevatorData elevatorData) {
 		// Instantiate GameObject
 		GameObject elevatorGameObject = GameObject.Instantiate(
 											elevatorPrefab,
@@ -111,6 +120,7 @@ public class ObjectManager : NetworkBehaviour {
 		elevators.Add(elevator);
 		// Spawn the stops that belong to it
 		SpawnStops(elevatorData, elevator);
+		return elevator.netId;
 	}
 
 	Vector2 GetElevatorSpawnCoordinates(ElevatorData elevator) {
@@ -159,5 +169,20 @@ public class ObjectManager : NetworkBehaviour {
 		foreach(ElevatorCallField callField in callFields) {
 			NetworkServer.Destroy(callField.gameObject);
 		}
+	}
+
+	// ClientRpc
+	[ClientRpc]
+	void RpcStoreElevator(NetworkInstanceId elevatorNetId) {
+		// This function is used to cache references (on the client) to elevators that have been spawned
+		// 	on the server. Otherwise the client ObjectManager will not know which elevators to update
+		// 	each PhysicsUpdate.
+		if (isServer) { return; }
+		Elevator elevator = Utility.GetLocalObject(elevatorNetId, isServer).GetComponentInChildren<Elevator>();
+		// TODO: cleanup: ensure that elevators list has been instantiated before adding to it
+		if (elevators == null) {
+			elevators = new List<Elevator>();
+		}
+		elevators.Add(elevator);
 	}
 }
