@@ -129,12 +129,7 @@ public abstract class Character : NetworkBehaviour {
 
 	protected void InteractWithObjectsInRange() {
 		foreach (NetworkInstanceId netId in objectsInRange) {
-			GameObject gameObject;
-			if (isServer) { 
-				gameObject = NetworkServer.FindLocalObject(netId);
-			} else {
-				gameObject = ClientScene.FindLocalObject(netId);
-			}
+			GameObject gameObject = Utility.GetLocalObject(netId, isServer);
 			gameObject.GetComponentInChildren<InteractableObject>().OnInteract();
 		}
 	}
@@ -209,7 +204,10 @@ public abstract class Character : NetworkBehaviour {
 	[ClientRpc]
 	public void RpcRegisterObject(NetworkInstanceId netId) {
 		if (hasAuthority) {
+			// TODO: just get the InteractableObject and store that
 			objectsInRange.Add(netId);
+			// Show 'E' help key
+			Utility.GetLocalObject(netId, isServer).GetComponentInChildren<InteractableObject>().SetIsInRange(true);
 		}
 	}
 
@@ -217,6 +215,8 @@ public abstract class Character : NetworkBehaviour {
 	public void RpcUnregisterObject(NetworkInstanceId netId) {
 		if (hasAuthority) {
 			objectsInRange.Remove(netId);
+			// Hide 'E' help key
+			Utility.GetLocalObject(netId, isServer).GetComponentInChildren<InteractableObject>().SetIsInRange(false);
 		}
 	}
 

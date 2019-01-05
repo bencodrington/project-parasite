@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 
 public static class Utility {
 	public static int GetLayerMask(CharacterType type) {
@@ -50,6 +51,12 @@ public static class Utility {
 
 	public static float GetAngleToMouse(Vector2 point) {
 		return Vector2.SignedAngle(Vector2.right, GetMousePos() - point);
+	}
+
+	public static GameObject GetLocalObject(NetworkInstanceId netId, bool isServer) {
+		return isServer ? 
+			NetworkServer.FindLocalObject(netId) :
+			ClientScene.FindLocalObject(netId);
 	}
 
 	public enum Directions {
