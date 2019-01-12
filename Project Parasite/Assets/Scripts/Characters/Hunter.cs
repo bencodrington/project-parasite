@@ -68,7 +68,7 @@ public class Hunter : Character {
 		oldUp = up;
 
 		if (Input.GetKeyDown(KeyCode.E)) {
-			InteractWithObjectsInRange();
+			CmdInteractWithObjectsInRange();
 		}
 
 		// Place orb

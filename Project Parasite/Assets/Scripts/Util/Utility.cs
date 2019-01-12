@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections;
+using UnityEngine;
 using UnityEngine.Networking;
 
 public static class Utility {
@@ -58,6 +60,11 @@ public static class Utility {
 			NetworkServer.FindLocalObject(netId) :
 			ClientScene.FindLocalObject(netId);
 	}
+
+	public static IEnumerator WaitXSeconds(float x, Action callback) {
+        yield return new WaitForSeconds(x);
+        callback();
+    }
 
 	public enum Directions {
 		Up,

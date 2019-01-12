@@ -1,8 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Networking.Match;
+using UnityEngine.Networking.Types;
 using UnityEngine.UI;
 
 public class MatchManager : MonoBehaviour {
@@ -11,6 +13,17 @@ public class MatchManager : MonoBehaviour {
 	bool matchCreated;
     // The prefab for the object used to persist client names across menus
     public GameObject ClientInformationPrefab;
+    // The prefab for the button that's spawned for each available server when listing open matches
+    public GameObject OpenServerButtonPrefab;
+    // List of available server buttons
+    List<GameObject> openServerButtons;
+
+    // How often the list of servers should be refreshed (seconds between refreshes)
+    const float SERVER_LIST_REFRESH_RATE = 1f;
+    // The current client's name, stored here for easy access when creating matches
+    string clientName;
+    // The coroutine for refreshing the server list
+    Coroutine listMatchCoroutine;
 
     // Prefabs for the various menu item sets this flow requires
     public MenuItemSet searchingForMatchMenuItemSet;
@@ -19,11 +32,12 @@ public class MatchManager : MonoBehaviour {
 
 
     void Start() {
+        openServerButtons = new List<GameObject>();
         NetworkManager.singleton.StartMatchMaker();
     }
 
     void StoreClientName(string defaultName) {
-        string clientName = GetClientName(defaultName);
+        clientName = GetClientName(defaultName);
         Instantiate(ClientInformationPrefab).GetComponent<ClientInformation>().clientName = clientName;
     }
 
@@ -51,13 +65,12 @@ public class MatchManager : MonoBehaviour {
 
     // Server
 	public void CreateRoom() {
-		string matchName = "room";
 		uint matchSize = 4;
 		bool matchAdvertise = true;
 		string matchPassword = "";
 
         StoreClientName("Anonymous Server");
-        NetworkManager.singleton.matchMaker.CreateMatch(matchName, matchSize, matchAdvertise, matchPassword, "", "", 0, 0, OnMatchCreate);
+        NetworkManager.singleton.matchMaker.CreateMatch(clientName, matchSize, matchAdvertise, matchPassword, "", "", 0, 0, OnMatchCreate);
         TransitionToMenuItemSet(searchingForPlayersMenuItemSet);
 	}
 
@@ -73,21 +86,63 @@ public class MatchManager : MonoBehaviour {
     }
 
     // Client
-    public void ListMatches() {
+    public void TransitionToListMatches() {
         StoreClientName("Anonymous Client");
-        string matchName = "";
-        NetworkManager.singleton.matchMaker.ListMatches(0, 10, matchName, true, 0, 0, OnMatchList);
+        ListMatches();
         TransitionToMenuItemSet(searchingForMatchMenuItemSet);
     }
 
+    void ListMatches() {
+        string matchName = "";
+        NetworkManager.singleton.matchMaker.ListMatches(0, 10, matchName, true, 0, 0, OnMatchList);
+        if (listMatchCoroutine != null) {
+            StopCoroutine(listMatchCoroutine);
+        }
+        listMatchCoroutine = StartCoroutine(Utility.WaitXSeconds(1, ListMatches));
+    }
+
     public void OnMatchList(bool success, string extendedInfo, List<MatchInfoSnapshot> matches) {
-        if (success && matches != null && matches.Count > 0) {
-            NetworkManager.singleton.matchMaker.JoinMatch(matches[0].networkId, "", "", "", 0, 0, OnMatchJoined);
+        if (success && matches != null) {
+            UpdateOpenServerList(matches);
         } else if (!success) {
             Debug.LogError("MatchManager[On Client]: OnMatchList: Couldn't connect to match maker: " + extendedInfo);
         }
+    }
 
-        // TODO: if no matches, try again in x amount of time
+    void UpdateOpenServerList(List<MatchInfoSnapshot> matches) {
+        // TODO: this can be optimized by diffing previous matches with current matches
+        GameObject newButton;
+        Menu menu = FindObjectOfType<Menu>();
+        if (menu == null) {
+            Debug.LogError("MatchManager: UpdateOpenServerList: Menu not found");
+            return;
+        }
+        // Remove current match buttons
+        foreach(GameObject button in openServerButtons) {
+            menu.RemoveMenuItem(button);
+            Destroy(button);
+        }
+        // Remove references to freshly destroyed button objects
+        openServerButtons.Clear();
+        // Find menu
+        // Create new match buttons
+        foreach(MatchInfoSnapshot match in matches) {
+            // Create new button as the second-last child of the menu ("searching..." text is the last one)
+            newButton = menu.AddNewItemAtIndex(OpenServerButtonPrefab, menu.transform.childCount - 1);
+            // Set its text to reflect the match's name
+            newButton.GetComponentInChildren<Text>().text = match.name + "'s game";
+            // Join match on button press
+            newButton.GetComponentInChildren<Button>().onClick.AddListener(delegate { JoinMatch(match.networkId); });
+            // Store it for removal next update
+            openServerButtons.Add(newButton);
+        }
+    }
+
+    void JoinMatch(NetworkID matchNetworkId) {
+        NetworkManager.singleton.matchMaker.JoinMatch(matchNetworkId, "", "", "", 0, 0, OnMatchJoined);
+        if (listMatchCoroutine != null) {
+            StopCoroutine(listMatchCoroutine);
+        }
     }
 
     public void OnMatchJoined(bool success, string extendedInfo, MatchInfo matchInfo) {

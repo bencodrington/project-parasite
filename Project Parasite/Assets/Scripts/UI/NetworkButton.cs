@@ -19,7 +19,7 @@ public class NetworkButton : MonoBehaviour {
 		}
 		switch (networkEntityType) {
 			case NetworkEntityType.Host: matchManager.CreateRoom(); break;
-			case NetworkEntityType.Client: matchManager.ListMatches(); break;
+			case NetworkEntityType.Client: matchManager.TransitionToListMatches(); break;
 		}
 	}
 }

@@ -127,13 +127,6 @@ public abstract class Character : NetworkBehaviour {
 		}
 	}
 
-	protected void InteractWithObjectsInRange() {
-		foreach (NetworkInstanceId netId in objectsInRange) {
-			GameObject gameObject = Utility.GetLocalObject(netId, isServer);
-			gameObject.GetComponentInChildren<InteractableObject>().OnInteract();
-		}
-	}
-
 	protected virtual void OnCharacterDestroy() {}
 
 	void SetSpriteFlip(bool isFacingLeft) {
@@ -160,6 +153,14 @@ public abstract class Character : NetworkBehaviour {
 	[Command]
 	void CmdSetSpriteFlip(bool isFacingLeft) {
 		RpcSetSpriteFlip(isFacingLeft);
+	}
+
+	[Command]
+	protected void CmdInteractWithObjectsInRange() {
+		foreach (NetworkInstanceId netId in objectsInRange) {
+			GameObject gameObject = Utility.GetLocalObject(netId, isServer);
+			gameObject.GetComponentInChildren<InteractableObject>().OnInteract();
+		}
 	}
 
 	// CLIENTRPC
@@ -203,9 +204,9 @@ public abstract class Character : NetworkBehaviour {
 
 	[ClientRpc]
 	public void RpcRegisterObject(NetworkInstanceId netId) {
+		objectsInRange.Add(netId);
+		// TODO: just get the InteractableObject and store that
 		if (hasAuthority) {
-			// TODO: just get the InteractableObject and store that
-			objectsInRange.Add(netId);
 			// Show 'E' help key
 			Utility.GetLocalObject(netId, isServer).GetComponentInChildren<InteractableObject>().SetIsInRange(true);
 		}
@@ -213,8 +214,8 @@ public abstract class Character : NetworkBehaviour {
 
 	[ClientRpc]
 	public void RpcUnregisterObject(NetworkInstanceId netId) {
+		objectsInRange.Remove(netId);
 		if (hasAuthority) {
-			objectsInRange.Remove(netId);
 			// Hide 'E' help key
 			Utility.GetLocalObject(netId, isServer).GetComponentInChildren<InteractableObject>().SetIsInRange(false);
 		}

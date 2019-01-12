@@ -1012,6 +1012,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ClientInformationPrefab: {fileID: 1688660268600780, guid: a66ab832ed462b244b3b8512c591559b,
     type: 3}
+  OpenServerButtonPrefab: {fileID: 200412425913333963, guid: cddce59a91545ad4c83c31e4daba8825,
+    type: 3}
   searchingForMatchMenuItemSet: {fileID: 11400000, guid: 67f0d3c585c833844ac983ba749e5af0,
     type: 2}
   searchingForPlayersMenuItemSet: {fileID: 11400000, guid: 11d287f6b955cc74aa0c1b2321d33972,

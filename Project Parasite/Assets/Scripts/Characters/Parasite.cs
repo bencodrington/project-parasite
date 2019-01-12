@@ -145,7 +145,7 @@ public class Parasite : Character {
 		}
 
 		if (Input.GetKeyDown(KeyCode.E)) {
-			InteractWithObjectsInRange();
+			CmdInteractWithObjectsInRange();
 		}
 	}
 
