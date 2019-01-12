@@ -11,7 +11,9 @@ public class NonPlayerCharacter : Character {
 
 	// Pathfinding
 	private float validDistanceFromTarget = .5f;
-	private Vector3 target;
+	// Note that target is currently only used to move horizontally,
+	//	and as a result is only the x coordinate of the target location
+	private float targetX;
 	private float minTimeUntilNewPath = 2f;
 	private float maxTimeUntilNewPath = 5f;
 	private bool hasTarget = false;
@@ -49,14 +51,14 @@ public class NonPlayerCharacter : Character {
 		isMovingLeft = false;
 		isMovingRight = false;
 		if (!hasTarget) { return; }
-		if (Vector3.Distance(this.transform.position, target) < validDistanceFromTarget) {
+		if (Mathf.Abs(this.transform.position.x - targetX) < validDistanceFromTarget) {
 			// Reached target
 			StartCoroutine(Idle());
 			// Stop traversing path
 			hasTarget = false;
 		} else {
 			// Still moving
-			if (target.x >= transform.position.x) {
+			if (targetX >= transform.position.x) {
 				isMovingRight = true;
 			} else {
 				isMovingLeft = true;
@@ -70,24 +72,24 @@ public class NonPlayerCharacter : Character {
 		float offset = Random.Range(-rangeDifference, rangeDifference);
 		offset += (offset >= 0) ? minTargetDistance : -minTargetDistance;
 		// Set target relative to current location
-		target = new Vector3(transform.position.x + offset, transform.position.y, 0);
+		targetX = transform.position.x + offset;
 		// If there is a wall/ beam in the way, don't move to new target
-		target = ModifyTargetToAvoidObstacles(target);
+		targetX = ModifyTargetToAvoidObstacles(targetX);
 		// Begin traversing
 		hasTarget = true;
 	}
 
-	Vector2 ModifyTargetToAvoidObstacles(Vector2 target) {
-		Vector2 pathHitboxSize = new Vector2(target.x - transform.position.x, spriteRenderer.transform.localScale.y);
+	float ModifyTargetToAvoidObstacles(float target) {
+		Vector2 pathHitboxSize = new Vector2(target - transform.position.x, spriteRenderer.transform.localScale.y);
 		// TODO: the below can cause npcs to walk into beams at head height,
 		//  but also stops the hitbox from being triggered by the floor
 		pathHitboxSize.y -= 0.1f;
 		// Calculate corners of hitbox
 		Vector2 pathHitboxTopStart = new Vector2(transform.position.x, transform.position.y + pathHitboxSize.y / 2);
-		Vector2 pathHitboxBottomEnd = new Vector2(target.x, target.y - pathHitboxSize.y / 2);
+		Vector2 pathHitboxBottomEnd = new Vector2(target, transform.position.y - pathHitboxSize.y / 2);
 		bool isObstacleInTheWay = Physics2D.OverlapArea(pathHitboxTopStart, pathHitboxBottomEnd, Utility.GetLayerMask("npcPathObstacle"));
 		if (isObstacleInTheWay) {
-			target = transform.position;
+			target = transform.position.x;
 		}
 		return target;
 	}
