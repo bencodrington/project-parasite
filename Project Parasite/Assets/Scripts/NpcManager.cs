@@ -9,13 +9,17 @@ public class NpcManager : NetworkBehaviour {
 	List<NonPlayerCharacter> NpcList;
 
 	// How many NPCs are being spawned each round
-	const int MIN_NPC_COUNT = 1;
-	const int MAX_NPC_COUNT = 5;
+	const int MIN_NPC_COUNT = 3;
+	const int MAX_NPC_COUNT = 7;
 
 	// Each NPC will be spawned at position
 	// 	([-SPAWN_RANGE_X...SPAWN_RANGE_X], [-SPAWN_RANGE_Y...SPAWN_RANGE_Y])
+	// 	around its spawn center
 	const float SPAWN_RANGE_X = 6;
 	const float SPAWN_RANGE_Y = 2;
+
+	// The points around which groups of NPCs will be spawned
+	public Vector2[] spawnCenters;
 
 	bool DEBUG_MODE = false;
 
@@ -54,30 +58,42 @@ public class NpcManager : NetworkBehaviour {
 
 	void SpawnNPCs() {
 		if (DEBUG_MODE) { return; }
-		int npcCount = Random.Range(MIN_NPC_COUNT, MAX_NPC_COUNT + 1);
+		foreach(Vector2 spawnCenter in spawnCenters) {
+			SpawnNpcGroup(spawnCenter);
+		}
 		// TODO: there has to be a more efficient way of updating this
 		foreach (PlayerObject playerObject in FindObjectsOfType<PlayerObject>()) {
-			playerObject.RpcUpdateRemainingNpcCount(npcCount);
+			playerObject.RpcUpdateRemainingNpcCount(NpcList.Count);
 		}
-		Vector3 spawnPos;
+	}
+
+	void SpawnNpcGroup(Vector2 spawnCenter) {
+		int npcCount = SelectNpcGroupSize();
+		Vector2 spawnPosition;
 		NonPlayerCharacter npc;
 		for (int i = 0; i < npcCount; i++) {
-			spawnPos = new Vector3(
-				Random.Range(-SPAWN_RANGE_X, SPAWN_RANGE_X),
-				Random.Range(-SPAWN_RANGE_Y, SPAWN_RANGE_Y),
-				0
-			);
-			npc = Instantiate(NpcPrefab, spawnPos, Quaternion.identity).GetComponentInChildren<NonPlayerCharacter>();
+			spawnPosition = SelectSpawnPosition(spawnCenter);
+			npc = Instantiate(NpcPrefab, spawnPosition, Quaternion.identity).GetComponentInChildren<NonPlayerCharacter>();
 			NpcList.Add(npc);
 
 			// Propogate to all clients
 			NetworkServer.Spawn(npc.gameObject);
-
 			npc.RpcGeneratePhysicsEntity(Vector2.zero);
-			// Ensure npc snaps to it's starting position on all clients
-			npc.CmdUpdatePosition(spawnPos, true);
+			// Ensure npc snaps to its starting position on all clients
+			npc.CmdUpdatePosition(spawnPosition, true);
 			StartCoroutine(npc.Idle());
 		}
+	}
+
+	int SelectNpcGroupSize() {
+		return Random.Range(MIN_NPC_COUNT, MAX_NPC_COUNT + 1);
+	}
+
+	Vector2 SelectSpawnPosition(Vector2 spawnCenter) {
+		return spawnCenter + new Vector2(
+				Random.Range(-SPAWN_RANGE_X, SPAWN_RANGE_X),
+				Random.Range(-SPAWN_RANGE_Y, SPAWN_RANGE_Y)
+			);
 	}
 
 }
