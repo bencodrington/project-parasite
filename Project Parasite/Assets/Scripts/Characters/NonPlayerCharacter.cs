@@ -19,6 +19,11 @@ public class NonPlayerCharacter : Character {
 	private bool hasTarget = false;
 	private float maxTargetDistance = 5f;
 	private float minTargetDistance = 2f;
+
+	// The exclamation mark that is shown when orbs are placed nearby
+	public GameObject alertIconPrefab;
+	// How far from the npc's center to display the icon
+	Vector2 ALERT_ICON_OFFSET = new Vector2(0, 1);
 	
 	public override void Update() {
 		if (isInfected && hasAuthority) {
@@ -158,7 +163,9 @@ public class NonPlayerCharacter : Character {
 
 	[ClientRpc]
 	public void RpcNearbyOrbAlert(Vector2 atPosition) {
-		// TODO: show exclamation mark above!
+		// Show exclamation mark above NPC
+		GameObject alertIcon = Instantiate(alertIconPrefab, (Vector2)transform.position + ALERT_ICON_OFFSET, Quaternion.identity);
+		alertIcon.transform.SetParent(transform);
 		if (!isServer || isInfected) { return; }
 		// Only uninfected NPCs should flee, and the calculations
 		// 	should only be done on the server
