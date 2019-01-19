@@ -196,13 +196,18 @@ public class PlayerObject : NetworkBehaviour {
 		RpcDestroyGameOverScreen();
 		// Destroying any previous roundManager means this function can be used to restart games as well
 		if (roundManager != null) {
+			roundManager.EndRound();
 			NetworkServer.Destroy(roundManager.gameObject);
 		}
 		// Create new RoundManager game object on the server
 		GameObject roundManagerGameObject = Instantiate(RoundManagerPrefab);
 		// Spawn it on clients as well
 		NetworkServer.Spawn(roundManagerGameObject);
-		roundManager = roundManagerGameObject.GetComponentInChildren<RoundManager>();
+		PlayerObject[] serverPlayerObjects = FindObjectsOfType<PlayerObject>();
+		// TODO: clean this up
+		foreach (PlayerObject serverPlayerObject in serverPlayerObjects) {
+			serverPlayerObject.roundManager = roundManagerGameObject.GetComponentInChildren<RoundManager>();
+		}
 	}
 
 	[Command]
