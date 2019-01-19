@@ -94,6 +94,35 @@ public class NonPlayerCharacter : Character {
 		return target;
 	}
 
+	void FleeOrbInDirection(Utility.Directions direction) {
+		// Target a location that is the maximum movement unit away from the current position
+		float offset = direction == Utility.Directions.Right ? maxTargetDistance : -maxTargetDistance;
+		// Without running into obstacles (walls/beams)
+		targetX = FindTargetBeforeObstacle(transform.position.x + offset);
+		hasTarget = true;
+	}
+
+	float FindTargetBeforeObstacle(float target) {
+		// Size of box that will be cast to look for obstacles
+		Vector2 size = new Vector2(spriteRenderer.transform.localScale.x, spriteRenderer.transform.localScale.y);
+		// TODO: the below can cause npcs to walk into beams at head height,
+		//  but also stops the hitbox from being triggered by the floor
+		size.y -= 0.1f;
+		// If we're pressed against a wall, don't let that count as an obstacle
+		// NOTE: this value must be lower than the valid distance from target, otherwise we might set an unreachable target
+		size.x -= 0.1f;
+		// The direction we're attempting to move in
+		Vector2 direction = target > transform.position.x ? Vector2.right : Vector2.left;
+		RaycastHit2D hit = Physics2D.BoxCast(transform.position, size, 0, direction, Mathf.Abs(target - transform.position.x), Utility.GetLayerMask("npcPathObstacle"));
+		if (hit) {
+			// Set target for half of the npc's width from actual point of contact
+			float padding = size.x / 2;
+			return hit.point.x + (direction == Vector2.left ? padding : -padding);
+		}
+		// Otherwise no obstacle
+		return target;
+	}
+
 	public IEnumerator Idle() {
 		yield return new WaitForSeconds(Random.Range(minTimeUntilNewPath, maxTimeUntilNewPath));
 		// Check that we are still uninfected and still exist
@@ -125,5 +154,18 @@ public class NonPlayerCharacter : Character {
 			// Only update sprite if on the Parasite player's client
 			spriteRenderer.color = Color.magenta;
 		}
+	}
+
+	[ClientRpc]
+	public void RpcNearbyOrbAlert(Vector2 atPosition) {
+		// TODO: show exclamation mark above!
+		if (!isServer || isInfected) { return; }
+		// Only uninfected NPCs should flee, and the calculations
+		// 	should only be done on the server
+		Utility.Directions fleeDirection = atPosition.x < transform.position.x ?
+			Utility.Directions.Right :
+			Utility.Directions.Left;
+		FleeOrbInDirection(fleeDirection);
+		
 	}
 }

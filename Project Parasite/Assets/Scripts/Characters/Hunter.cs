@@ -10,6 +10,10 @@ public class Hunter : Character {
 	// The maximum number of orbs that this hunter can have spawned at any given time 
 	const int MAX_ORB_COUNT = 4;
 
+	// The size of the box around newly-placed orbs, inside of which
+	// 	NPCs will be alerted to run away
+	Vector2 NPC_ALERT_RANGE = new Vector2(6, 4);
+
 	// Used when getting user input to determine if key was down last frame
 	private bool oldUp = false;
 
@@ -115,6 +119,8 @@ public class Hunter : Character {
 		GameObject orbGameObject = Instantiate(orbPrefab, atPosition, Quaternion.identity);
 		Orb orb = orbGameObject.GetComponent<Orb>();
 
+		CmdAlertNpcsInRange(atPosition);
+
 		if (orbBeamRangeManager.isInRange(atPosition)) {
 			// Spawn beam halfway between orbs
 			beamSpawnPosition = Vector2.Lerp(orbBeamRangeManager.mostRecentOrb.transform.position, atPosition, 0.5f);
@@ -139,6 +145,18 @@ public class Hunter : Character {
 		if (orbs.Count <= 0) { return; }
 		NetworkServer.Destroy(orbs.Dequeue().gameObject);
 		RpcOnOrbRecalled(orbs.Count);
+	}
+
+	[Command]
+	void CmdAlertNpcsInRange(Vector2 ofPosition) {
+		// Find all NPCs in range
+		Collider2D[] npcs = Physics2D.OverlapBoxAll(ofPosition, NPC_ALERT_RANGE, 0, Utility.GetLayerMask(CharacterType.NPC));
+		NonPlayerCharacter npc;
+		// Alert each NPC
+		foreach (Collider2D npcCollider in npcs) {
+			npc = npcCollider.transform.parent.gameObject.GetComponentInChildren<NonPlayerCharacter>();
+			npc.RpcNearbyOrbAlert(ofPosition);
+		}
 	}
 
 	// ClientRpc
