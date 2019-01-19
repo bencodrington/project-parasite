@@ -17,7 +17,8 @@ public class RoundManager : NetworkBehaviour {
 
 	public bool isGameOver = false;
 
-	bool huntersOnlyMode = false;
+	bool huntersOnlyMode = true;
+	bool DEBUG_MODE = true;
 
 	void Start () {
 		if (!isServer) { return; }
@@ -73,6 +74,11 @@ public class RoundManager : NetworkBehaviour {
 		}
 		parasiteSpawnPoint = spawnPoints[parasiteSpawnPointIndex];
 		hunterSpawnPoint = spawnPoints[hunterSpawnPointIndex];
+
+		if (DEBUG_MODE) {
+			parasiteSpawnPoint = Vector2.zero;
+			hunterSpawnPoint = Vector2.zero;
+		}
 	}
 
 	public void EndRound() {
