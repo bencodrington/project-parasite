@@ -33,7 +33,9 @@ public class PlayerList : MonoBehaviour {
 		GameObject playerListEntry;
 		for(int i = 0; i < playerNames.Count; i++) {
 			playerListEntry = Instantiate(PlayerListEntryPrefab);
-			playerListEntry.transform.SetParent(transform);
+			// NOTE: the false on the next line is important for not messing with scaling
+			// 	and is necessary because of the Canvas Scaler component
+			playerListEntry.transform.SetParent(transform, false);
 			playerListEntry.transform.position = (Vector2)transform.position + new Vector2(0, (i+1) * -30);
 			playerListEntry.GetComponent<Text>().text = playerNames[i];
 		}

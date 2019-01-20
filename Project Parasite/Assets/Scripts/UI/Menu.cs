@@ -37,7 +37,9 @@ public class Menu : MonoBehaviour {
 		// Instantiate item
 		GameObject item = Instantiate(itemPrefab);
 		// Set it as a child of the menu 
-		item.transform.SetParent(transform);
+		// NOTE: the false on the next line is important for not messing with scaling
+		// 	and is necessary because of the Canvas Scaler component
+		item.transform.SetParent(transform, false);
 		// Add it to the list of items to remove on transition
 		menuItems.Add(item);
 		return item;
