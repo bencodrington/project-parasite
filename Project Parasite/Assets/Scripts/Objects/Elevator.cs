@@ -8,7 +8,7 @@ public class Elevator : NetworkBehaviour {
 	
 	const float LAG_LERP_FACTOR = 0.4f;
 	const float MOVEMENT_SPEED = 8f;
-	const float BUTTON_OFFSET = 0.5f;
+	const float BUTTON_OFFSET = 0.6f;
 
 	public float[] stops;
 	public Vector2 SIZE = new Vector2(2, 3);
@@ -32,15 +32,18 @@ public class Elevator : NetworkBehaviour {
 		ElevatorButton button;
 		buttons = new ElevatorButton[stops.Length];
 
-		Vector2 spawnPos = new Vector2(transform.position.x, transform.position.y + (SIZE.y / 2));
+		Vector2 spawnPos = new Vector2(transform.position.x,
+								transform.position.y +	// Base vertical position of the center of the elevator
+								(SIZE.y / 2) +			// Get to the top of the elevator
+								BUTTON_OFFSET / 2 );	// Add some padding before start of first button
 		// Spawn button prefabs based on # of stops
 		for (int i = 0; i < stops.Length; i++) {
-			spawnPos.y += BUTTON_OFFSET;
 			button = Instantiate(buttonPrefab, spawnPos, Quaternion.identity, transform).GetComponentInChildren<ElevatorButton>();
 			button.gameObject.GetComponentInChildren<Text>().text = (i + 1).ToString();
 			button.stopIndex = i;
 			button.elevatorId = this.netId;
 			buttons[i] = button;
+			spawnPos.y += BUTTON_OFFSET;
 		}
 
 	}
