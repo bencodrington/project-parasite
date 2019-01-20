@@ -63,6 +63,9 @@ public class Elevator : NetworkBehaviour {
 				if (passengers.Length > 0) {
 					// Show buttons on client
 					RpcSetButtonEnabled(true);
+				} else {
+					// Hide buttons on client
+					RpcSetButtonEnabled(false);
 				}
 			}
 			RpcUpdateServerPosition(transform.position);
