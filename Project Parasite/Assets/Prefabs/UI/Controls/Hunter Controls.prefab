@@ -80,8 +80,8 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: '[W,A,D] Move and jump
 
-    [J] Place Power Orb
+    [Left Click] Place Power Orb
 
-    [K] Recall Power Orb
+    [Right Click] Recall Power Orb
 
     [Shift] Hold to deactivate suit'
