@@ -77,7 +77,11 @@ public class Hunter : Character {
 
 		// Place orb
 		if (Input.GetMouseButtonDown(0)) {
-			CmdSpawnOrb(Utility.GetMousePos());
+			// TODO: this can be cleaner, once InputManager is implemented
+			// Don't spawn orb if clicking elevator button
+			if (Physics2D.OverlapPoint(Utility.GetMousePos(), Utility.GetLayerMask("clickable")) == null) {
+				CmdSpawnOrb(Utility.GetMousePos());
+			}
 		}
 		// Recall orb
 		if (Input.GetMouseButtonDown(1)) {
