@@ -11,37 +11,16 @@ public class ElevatorButton : MonoBehaviour {
 	public int stopIndex;
 	// The elevator this button belongs to
 	public NetworkInstanceId elevatorId;
-
-	private SpriteRenderer spriteRenderer;
-	private bool _isEnabled;
-	public bool IsEnabled {
-		get {
-			return _isEnabled;
-		} set {
-			spriteRenderer.color = new Color(spriteRenderer.color.r,
-											spriteRenderer.color.g,
-											spriteRenderer.color.b,
-											value ? 1 : 0);
-			_isEnabled = value;
-		}
-	}
-
-	void Start() {
-		spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-		IsEnabled = false;
-	}
 	
 	void Update () {
-		if (!_isEnabled) { return; }
 		Vector2 mousePosition, bottomLeft, topRight;
 		Vector2 halfSize = size / 2;
 		// Upon mouse click
 		if (Input.GetMouseButtonDown(0)) {
 			bottomLeft = (Vector2)transform.position - halfSize;
 			topRight = (Vector2)transform.position + halfSize;
-			mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 			// Check if click is within bounds
-			if (WithinBounds(bottomLeft, mousePosition, topRight)) {
+			if (WithinBounds(bottomLeft, Utility.GetMousePos(), topRight)) {
 				PlayerGrid.Instance.GetLocalPlayerObject().CmdCallElevatorToStop(elevatorId, stopIndex);
 			}
 		}

@@ -22,7 +22,7 @@ TagManager:
   - Hunters
   - EnergyCenters
   - EnergyBeams
-  - 
+  - Clickable
   - 
   - 
   - 
@@ -58,4 +58,7 @@ TagManager:
     locked: 0
   - name: Effects
     uniqueID: 360024031
+    locked: 0
+  - name: WorldSpaceUI
+    uniqueID: 3300710943
     locked: 0

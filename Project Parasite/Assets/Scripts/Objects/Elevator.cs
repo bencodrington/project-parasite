@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class Elevator : NetworkBehaviour {
 	
@@ -36,6 +37,7 @@ public class Elevator : NetworkBehaviour {
 		for (int i = 0; i < stops.Length; i++) {
 			spawnPos.y += BUTTON_OFFSET;
 			button = Instantiate(buttonPrefab, spawnPos, Quaternion.identity, transform).GetComponentInChildren<ElevatorButton>();
+			button.gameObject.GetComponentInChildren<Text>().text = (i + 1).ToString();
 			button.stopIndex = i;
 			button.elevatorId = this.netId;
 			buttons[i] = button;
@@ -56,8 +58,6 @@ public class Elevator : NetworkBehaviour {
 												Utility.GetLayerMask("character"));
 				Debug.DrawLine((Vector2)transform.position - halfSize, (Vector2)transform.position + halfSize);
 				if (passengers.Length > 0) {
-					// Show buttons on server
-					SetButtonEnabled(true);
 					// Show buttons on client
 					RpcSetButtonEnabled(true);
 				}
@@ -88,7 +88,7 @@ public class Elevator : NetworkBehaviour {
 
 	void SetButtonEnabled(bool isEnabled) {
 		for (int i = 0; i < buttons.Length; i++) {
-			buttons[i].IsEnabled = isEnabled;
+			buttons[i].gameObject.SetActive(isEnabled);
 		}
 	}
 
@@ -113,9 +113,7 @@ public class Elevator : NetworkBehaviour {
 
 	[ClientRpc]
 	void RpcSetButtonEnabled(bool isEnabled) {
-		if (!isServer) {
-			SetButtonEnabled(isEnabled);
-		}
+		SetButtonEnabled(isEnabled);
 	}
 
 	[ClientRpc]

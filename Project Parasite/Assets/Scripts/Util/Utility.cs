@@ -27,6 +27,7 @@ public static class Utility {
 			case "npcPathObstacle": return	GetLayerMask("obstacle") +
 											GetLayerMask("energyCenter") +
 											GetLayerMask("energyBeam");
+			case "clickable": return 1 << LayerMask.NameToLayer("Clickable");
 			default: return -1;
 		}
 	}
