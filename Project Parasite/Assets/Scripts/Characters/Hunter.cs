@@ -113,7 +113,10 @@ public class Hunter : Character {
 
 	[Command]
 	void CmdSpawnOrb(Vector2 atPosition) {
-		if (orbs.Count >= MAX_ORB_COUNT) { return; }
+		if (orbs.Count >= MAX_ORB_COUNT) { 
+			RpcOrbSpawnFailed();
+			return; 
+		}
 		Vector2 beamSpawnPosition;
 		// Create orb game object on the server
 		GameObject orbGameObject = Instantiate(orbPrefab, atPosition, Quaternion.identity);
@@ -183,6 +186,13 @@ public class Hunter : Character {
 			orbUiManager.OnOrbCountChange(newOrbCount);
 			// User can definitely place at least one orb, so show markers
 			orbBeamRangeManager.shouldShowMarkers = true;
+		}
+	}
+
+	[ClientRpc]
+	void RpcOrbSpawnFailed() {
+		if (hasAuthority) {
+			orbUiManager.FlashPlaceholders();
 		}
 	}
 }
