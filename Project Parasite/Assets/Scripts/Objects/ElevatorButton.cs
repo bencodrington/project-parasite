@@ -17,6 +17,8 @@ public class ElevatorButton : MonoBehaviour {
 	SpriteRenderer spriteRenderer;
 	Color defaultColour;
 	Color hoverColour = new Color(0.4f, 0.7f, 0.9f, 1);
+	Color disabledColour = new Color(0.1f, 0.2f, 0.3f, .5f);
+	public bool isDisabled = false;
 
 	void Start() {
 		spriteRenderer = GetComponentInChildren<SpriteRenderer>();
@@ -29,7 +31,9 @@ public class ElevatorButton : MonoBehaviour {
 		bottomLeft = (Vector2)transform.position - halfSize;
 		topRight = (Vector2)transform.position + halfSize;
 		bool isMouseOver = Utility.MouseIsWithinBounds(bottomLeft, topRight);
-		if (isMouseOver) {
+		if (isDisabled) {
+			spriteRenderer.color = disabledColour;
+		} else if (isMouseOver) {
 			// Highlight
 			spriteRenderer.color = hoverColour;
 		} else {
@@ -37,8 +41,8 @@ public class ElevatorButton : MonoBehaviour {
 		}
 		// Upon mouse click
 		if (Input.GetMouseButtonDown(0)) {
-			// Check if click is within bounds
-			if (isMouseOver) {
+			// Check if click is within bounds and the button is enabled
+			if (!isDisabled && isMouseOver) {
 				PlayerGrid.Instance.GetLocalPlayerObject().CmdCallElevatorToStop(elevatorId, stopIndex);
 			}
 		}

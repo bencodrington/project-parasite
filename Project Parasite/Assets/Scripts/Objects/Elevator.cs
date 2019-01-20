@@ -62,10 +62,10 @@ public class Elevator : NetworkBehaviour {
 				Debug.DrawLine((Vector2)transform.position - halfSize, (Vector2)transform.position + halfSize);
 				if (passengers.Length > 0) {
 					// Show buttons on client
-					RpcSetButtonEnabled(true);
+					RpcSetButtonActive(true);
 				} else {
 					// Hide buttons on client
-					RpcSetButtonEnabled(false);
+					RpcSetButtonActive(false);
 				}
 			}
 			RpcUpdateServerPosition(transform.position);
@@ -81,20 +81,22 @@ public class Elevator : NetworkBehaviour {
 	void MoveToTargetStop() {
 			Vector2 targetPosition;
 			float potentialMovement = MOVEMENT_SPEED * Time.deltaTime;
-				targetPosition = new Vector2(transform.position.x, stops[targetStop]);
-				if (Vector3.Distance(transform.position, targetPosition) < potentialMovement) {
-					// Destination reached
-					transform.position = targetPosition;
-					isMoving = false;
-				} else {
-					transform.position = Vector3.MoveTowards(transform.position, targetPosition, potentialMovement);
-				}
+			targetPosition = new Vector2(transform.position.x, stops[targetStop]);
+			if (Vector3.Distance(transform.position, targetPosition) < potentialMovement) {
+				// Destination reached
+				transform.position = targetPosition;
+				isMoving = false;
+				// Disable this floor's button
+				RpcDisableButton(targetStop);
+			} else {
+				transform.position = Vector3.MoveTowards(transform.position, targetPosition, potentialMovement);
+			}
 
 	}
 
-	void SetButtonEnabled(bool isEnabled) {
+	void SetButtonActive(bool isActive) {
 		for (int i = 0; i < buttons.Length; i++) {
-			buttons[i].gameObject.SetActive(isEnabled);
+			buttons[i].gameObject.SetActive(isActive);
 		}
 	}
 
@@ -102,10 +104,11 @@ public class Elevator : NetworkBehaviour {
 
 	[Command]
 	public void CmdCallToStop(int indexOfStop) {
+		RpcEnableButton(targetStop);
 		targetStop = indexOfStop;
 		isMoving = true;
-		SetButtonEnabled(false);
-		RpcSetButtonEnabled(false);
+		SetButtonActive(false);
+		RpcSetButtonActive(false);
 	}
 
 	// ClientRpc
@@ -118,13 +121,23 @@ public class Elevator : NetworkBehaviour {
 	}
 
 	[ClientRpc]
-	void RpcSetButtonEnabled(bool isEnabled) {
-		SetButtonEnabled(isEnabled);
+	void RpcSetButtonActive(bool isEnabled) {
+		SetButtonActive(isEnabled);
 	}
 
 	[ClientRpc]
 	public void RpcSetStopCoordinates(float[] stops) {
 		this.stops = stops;
 		InitializeButtons();
+	}
+
+	[ClientRpc]
+	void RpcDisableButton(int index) {
+		buttons[index].isDisabled = true;
+	}
+
+	[ClientRpc]
+	void RpcEnableButton(int index) {
+		buttons[index].isDisabled = false;
 	}
 }
