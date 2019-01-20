@@ -11,23 +11,36 @@ public class ElevatorButton : MonoBehaviour {
 	public int stopIndex;
 	// The elevator this button belongs to
 	public NetworkInstanceId elevatorId;
+	// Bounds of the button in world space
+	Vector2 bottomLeft, topRight;
+
+	SpriteRenderer spriteRenderer;
+	Color defaultColour;
+	Color hoverColour = new Color(0.4f, 0.7f, 0.9f, 1);
+
+	void Start() {
+		spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+		defaultColour = spriteRenderer.color;
+	}
 	
-	void Update () {
-		Vector2 mousePosition, bottomLeft, topRight;
+	void Update() {
+		// TODO: can be optimized with proper inputManager
 		Vector2 halfSize = size / 2;
+		bottomLeft = (Vector2)transform.position - halfSize;
+		topRight = (Vector2)transform.position + halfSize;
+		bool isMouseOver = Utility.MouseIsWithinBounds(bottomLeft, topRight);
+		if (isMouseOver) {
+			// Highlight
+			spriteRenderer.color = hoverColour;
+		} else {
+			spriteRenderer.color = defaultColour;
+		}
 		// Upon mouse click
 		if (Input.GetMouseButtonDown(0)) {
-			bottomLeft = (Vector2)transform.position - halfSize;
-			topRight = (Vector2)transform.position + halfSize;
 			// Check if click is within bounds
-			if (WithinBounds(bottomLeft, Utility.GetMousePos(), topRight)) {
+			if (isMouseOver) {
 				PlayerGrid.Instance.GetLocalPlayerObject().CmdCallElevatorToStop(elevatorId, stopIndex);
 			}
 		}
-	}
-
-	bool WithinBounds(Vector2 bottomLeft, Vector2 point, Vector2 topRight) {
-		return (bottomLeft.x <= point.x && point.x <= topRight.x &&
-				bottomLeft.y <= point.y && point.y <= topRight.y);
 	}
 }

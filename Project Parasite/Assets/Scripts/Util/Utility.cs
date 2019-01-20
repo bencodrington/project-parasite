@@ -74,4 +74,13 @@ public static class Utility {
 		Right,
 		Null
 	}
+
+	public static bool MouseIsWithinBounds(Vector2 bottomLeft, Vector2 topRight) {
+		return WithinBounds(bottomLeft, GetMousePos(), topRight);
+	}
+
+	public static bool WithinBounds(Vector2 bottomLeft, Vector2 point, Vector2 topRight) {
+		return (bottomLeft.x <= point.x && point.x <= topRight.x &&
+				bottomLeft.y <= point.y && point.y <= topRight.y);
+	}
 }
