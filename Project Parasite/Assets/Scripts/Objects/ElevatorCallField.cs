@@ -6,9 +6,13 @@ using UnityEngine.Networking;
 public class ElevatorCallField : InteractableObject {
 
 	public Elevator elevator;
+	public GameObject platformCalledAlertPrefab;
 	public int stopIndex;
 
 	Vector2 SIZE = new Vector2(2, 4);
+	// How far from the origin (bottom left of this object)
+	// 	should the 'platform called' alert be spawned
+	Vector2 PLATFORM_CALLED_ALERT_OFFSET = new Vector2(1, 3);
 
 	private Collider2D[] callers = new Collider2D[0];
 	private Collider2D[] oldCallers = new Collider2D[0];
@@ -77,6 +81,12 @@ public class ElevatorCallField : InteractableObject {
 		elevator.CmdCallToStop(stopIndex);
 		// Play 'ding' sound
 		audioSource.Play();
+		// Show 'platform called!' alert
+		Instantiate(platformCalledAlertPrefab,
+					(Vector2)transform.position + PLATFORM_CALLED_ALERT_OFFSET,
+					Quaternion.identity)
+			// And set this call field as it's parent in the hierarchy
+			.transform.SetParent(transform);
 	}
 
 	public override void OnInteract() {

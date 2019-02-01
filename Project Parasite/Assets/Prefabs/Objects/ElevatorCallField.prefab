@@ -128,6 +128,8 @@ MonoBehaviour:
   controlKeyPrefab: {fileID: 1304689041146781611, guid: b68db04621bd0d5408b90e2944163fca,
     type: 3}
   elevator: {fileID: 0}
+  platformCalledAlertPrefab: {fileID: 296580648822321038, guid: 5b34039ecfeed844aadb625f77ffa998,
+    type: 3}
   stopIndex: 1
 --- !u!114 &114282729578793178
 MonoBehaviour:
