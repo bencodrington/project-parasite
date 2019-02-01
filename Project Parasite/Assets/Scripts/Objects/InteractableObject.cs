@@ -14,7 +14,7 @@ public abstract class InteractableObject : NetworkBehaviour {
     // How far from this root's transform the key icon should be displayed
     protected Vector2 controlKeyOffset = new Vector2(1, 2);
 
-    public void Start() {
+    public virtual void Start() {
         // Create and hide the key icon
         controlKey = Instantiate(controlKeyPrefab, transform.position + (Vector3)controlKeyOffset, Quaternion.identity);
         controlKey.transform.parent = transform;

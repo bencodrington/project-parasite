@@ -13,6 +13,13 @@ public class ElevatorCallField : InteractableObject {
 	private Collider2D[] callers = new Collider2D[0];
 	private Collider2D[] oldCallers = new Collider2D[0];
 
+	AudioSource audioSource;
+
+	public override void Start() {
+		base.Start();
+		audioSource = GetComponent<AudioSource>();
+	} 
+
 	public void PhysicsUpdate() {
 		if (!isServer) { return; }
 		// TODO: this probably doesn't need to run every single physics update
@@ -68,6 +75,8 @@ public class ElevatorCallField : InteractableObject {
 
 	void CallElevator() {
 		elevator.CmdCallToStop(stopIndex);
+		// Play 'ding' sound
+		audioSource.Play();
 	}
 
 	public override void OnInteract() {
