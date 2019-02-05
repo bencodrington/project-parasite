@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -38,7 +39,28 @@ public class OrbBeam : NetworkBehaviour {
 
 	void FixedUpdate() {
 		Repel();
-		Fry();
+		if (isServer) {
+			// See if this beam is overlapping any parasites
+			Parasite[] parasites = Array.ConvertAll<Character, Parasite>(
+				CheckOverlapping(CharacterType.Parasite),
+				delegate (Character character) {
+					return (Parasite)character;
+				}
+			);
+			if (parasites.Length > 0) {
+				// If so, turn red and notify the hunter that placed it
+				RpcOnOverlapParasite();
+				// Fry parasites
+				Fry(parasites);
+			}
+			NonPlayerCharacter[] npcs = Array.ConvertAll<Character, NonPlayerCharacter>(
+				CheckOverlapping(CharacterType.NPC),
+				delegate (Character character) {
+					return (NonPlayerCharacter)character;
+				}
+			);
+			Fry(npcs);
+		}
 	}
 
 	void Repel() {
@@ -63,30 +85,35 @@ public class OrbBeam : NetworkBehaviour {
 		}
 	}
 
-	void Fry() {
-		// Get the colliders of all NPCs that fall on the line
-		RaycastHit2D[] hits = Physics2D.LinecastAll(startPoint, endPoint, Utility.GetLayerMask(CharacterType.NPC));
-		NonPlayerCharacter npc;
-		Parasite parasite;
-		// Fry each uninfected NPC on the server
-		foreach (RaycastHit2D hit in hits) {
-			npc = hit.transform.parent.GetComponent<NonPlayerCharacter>();
-			if (isServer && !npc.isInfected) {
-				FindObjectOfType<NpcManager>().DespawnNpc(npc.netId);
-			} else if (npc.isInfected && PlayerGrid.Instance.GetLocalCharacter() == npc) {
-				npc.CmdDespawnSelf();
+	Character[] CheckOverlapping(CharacterType type) {
+		RaycastHit2D[] hits = Physics2D.LinecastAll(startPoint, endPoint, Utility.GetLayerMask(type));
+		return Array.ConvertAll<RaycastHit2D, Character>(
+			hits,
+			delegate (RaycastHit2D hit) {
+				return hit.transform.parent.GetComponent<Character>();
 			}
-		}
-		
-		// Deal damage to parasite if it falls on the line (currently 1 per physics update)
-		RaycastHit2D parasiteHit = Physics2D.Linecast(startPoint, endPoint, Utility.GetLayerMask(CharacterType.Parasite));
-		if (parasiteHit != false) {
-			parasite = parasiteHit.transform.parent.GetComponent<Parasite>();
-			if (PlayerGrid.Instance.GetLocalCharacter() == parasite) {
-				PlayerGrid.Instance.GetLocalPlayerObject().ParasiteTakeDamage(1);
-			}
-		}
+		);
 	}
+
+	void Fry(Character[] characters) {
+		// TODO:
+	}
+
+	// void Fry() {
+	// 	// Get the colliders of all NPCs that fall on the line
+	// 	RaycastHit2D[] hits = Physics2D.LinecastAll(startPoint, endPoint, Utility.GetLayerMask(CharacterType.NPC));
+	// 	NonPlayerCharacter npc;
+	// 	Parasite parasite;
+	// 	// Fry each uninfected NPC on the server
+	// 	foreach (RaycastHit2D hit in hits) {
+	// 		npc = hit.transform.parent.GetComponent<NonPlayerCharacter>();
+	// 		if (isServer && !npc.isInfected) {
+	// 			FindObjectOfType<NpcManager>().DespawnNpc(npc.netId);
+	// 		} else if (npc.isInfected && PlayerGrid.Instance.GetLocalCharacter() == npc) {
+	// 			npc.CmdDespawnSelf();
+	// 		}
+	// 	}
+	// }
 
 	Vector2 CalculateForceDirection(Vector2 hunterPosition, Vector2 projectedPosition) {
 		return hunterPosition - projectedPosition;
@@ -111,5 +138,11 @@ public class OrbBeam : NetworkBehaviour {
 	[ClientRpc]
 	public void RpcInitialize(Vector2 startPoint, Vector2 endPoint) {
 		Initialize(startPoint, endPoint);
+	}
+
+	[ClientRpc]
+	void RpcOnOverlapParasite() {
+		// TODO:
+		Debug.Log("OVERLAPPING PARASITE");
 	}
 }
