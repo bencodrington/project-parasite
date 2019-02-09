@@ -34,7 +34,6 @@ public class MatchManager : MonoBehaviourPunCallbacks {
 
     public void Connect() {
         // Entry point of all networking
-        Debug.Log("MatchManager:Connect()");
         if (PhotonNetwork.IsConnected) {
             PhotonNetwork.JoinRandomRoom();
         } else {

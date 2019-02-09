@@ -9,7 +9,6 @@ public class NetworkButton : MonoBehaviour {
 			Debug.LogError("NetworkButton: OnClick(): MatchManager not found.");
 			return;
 		}
-		Debug.Log("NetworkButton:OnClick()");
 		matchManager.Connect();
 	}
 }
