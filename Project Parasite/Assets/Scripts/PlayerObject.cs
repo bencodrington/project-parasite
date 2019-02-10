@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -68,11 +69,6 @@ public class PlayerObject : NetworkBehaviour {
 
 	public override void OnStartLocalPlayer() {
 		base.OnStartLocalPlayer();
-		ClientInformation cI = FindObjectOfType<ClientInformation>();
-		if (cI == null) {
-			Debug.LogError("PlayerObject:OnStartLocalPlayer: ClientInformation not found");
-			return;
-		}
 		// Request the server's PlayerGrid to distribute any info it had before we connected
 		CmdPullPlayerGrid();
 		// Update local copy of PlayerGrid so that we can set local player without waiting
@@ -84,7 +80,7 @@ public class PlayerObject : NetworkBehaviour {
 		// Update local copy with local player boolean
 		PlayerGrid.Instance.SetLocalPlayer(netId);
 		// Update all copies with the client name
-		CmdSetPlayerName(cI.clientName);
+		CmdSetPlayerName(PhotonNetwork.NickName);
 	}
 
 	void Start() {
