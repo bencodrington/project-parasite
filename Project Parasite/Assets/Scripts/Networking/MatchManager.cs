@@ -11,18 +11,12 @@ public class MatchManager : MonoBehaviourPunCallbacks {
 
     // The prefab for the object used to persist client names across menus
     public GameObject ClientInformationPrefab;
-    // The prefab for the button that's spawned for each available server when listing open matches
-    public GameObject OpenServerButtonPrefab;
 
-    // How often the list of servers should be refreshed (seconds between refreshes)
-    const float SERVER_LIST_REFRESH_RATE = 1f;
     // The current client's name, stored here for easy access when creating matches
     string clientName;
 
     // Prefabs for the various menu item sets this flow requires
-    public MenuItemSet searchingForMatchMenuItemSet;
     public MenuItemSet searchingForPlayersMenuItemSet;
-    public MenuItemSet searchingForPlayersClientMenuItemSet;
 
     #region Private Variables
     
@@ -33,6 +27,7 @@ public class MatchManager : MonoBehaviourPunCallbacks {
     #region Public Methods
 
     public void Connect() {
+        StoreClientName("Anonymous Player");
         // Entry point of all networking
         if (PhotonNetwork.IsConnected) {
             PhotonNetwork.JoinRandomRoom();
@@ -59,15 +54,25 @@ public class MatchManager : MonoBehaviourPunCallbacks {
     }
 
     public override void OnJoinedRoom() {
-        // TODO:
+        TransitionToMenuItemSet(searchingForPlayersMenuItemSet);
     }
 
     #endregion
 
+    #region Private Methods
+
+    void TransitionToMenuItemSet(MenuItemSet menuItemSet) {
+        Menu menu = FindObjectOfType<Menu>();
+        if (menu == null) {
+            Debug.LogError("MatchManager: TransitionToMenuItemSet: Menu not found");
+            return;
+        }
+        menu.TransitionToNewMenuItemSet(menuItemSet);
+    }
 
     void StoreClientName(string defaultName) {
         clientName = GetClientName(defaultName);
-        Instantiate(ClientInformationPrefab).GetComponent<ClientInformation>().clientName = clientName;
+        PhotonNetwork.LocalPlayer.NickName = clientName;
     }
 
     string GetClientName(string defaultName) {
@@ -83,13 +88,6 @@ public class MatchManager : MonoBehaviourPunCallbacks {
         return (clientName == "") ? "ERROR: DEFAULT NAME WAS EMPTY" : clientName;
     }
 
-    void TransitionToMenuItemSet(MenuItemSet menuItemSet) {
-        Menu menu = FindObjectOfType<Menu>();
-        if (menu == null) {
-            Debug.LogError("MatchManager: TransitionToMenuItemSet: Menu not found");
-            return;
-        }
-        menu.TransitionToNewMenuItemSet(menuItemSet);
-    }
+    #endregion
 
 }

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
+using Photon.Realtime;
 
 public class PlayerList : MonoBehaviour {
 
@@ -12,18 +14,36 @@ public class PlayerList : MonoBehaviour {
 
 	List<GameObject> children;
 
+	#region MonoBehaviour Callbacks
+
 	void Start() {
 		oldPlayerNames = "";
 	}
 	
 	void Update() {
 		// TODO: this almost certainly doesn't need to run every frame
-		if (PlayerGrid.Instance == null) { return; }
-		playerNames = PlayerGrid.Instance.GetPlayerNames();
+		// TODO: run Onplayerconnect and Onplayerdisconnect
+		// if (PlayerGrid.Instance == null) { return; }
+		playerNames = GetPlayerNames();
+		// TODO: then this can be removed
 		if (ListHasBeenModified()) {
 			UpdateChildren();
 			oldPlayerNames = SerializeList(playerNames);
 		}
+	}
+
+	#endregion
+
+	#region Private Methods
+
+	List<string> GetPlayerNames() {
+		// return PlayerGrid.Instance.GetPlayerNames(); TODO: remove
+		List<string> playerNamesList = new List<string>();
+
+		foreach (Player player in PhotonNetwork.PlayerList) {
+			playerNamesList.Add(player.NickName);
+		}
+		return playerNamesList;
 	}
 
 	void UpdateChildren() {
@@ -52,4 +72,6 @@ public class PlayerList : MonoBehaviour {
 		}
 		return stringVersion;
 	}
+
+	#endregion
 }
