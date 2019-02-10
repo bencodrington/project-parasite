@@ -9,9 +9,6 @@ using Photon.Realtime;
 
 public class MatchManager : MonoBehaviourPunCallbacks {
 
-    // The prefab for the object used to persist client names across menus
-    public GameObject ClientInformationPrefab;
-
     // The current client's name, stored here for easy access when creating matches
     string clientName;
 
