@@ -2,16 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
 
 public class ClientName : MonoBehaviour {
 	void Start () {
-		ClientInformation cI = FindObjectOfType<ClientInformation>();
-		if (cI == null) {
-			Debug.Log("ClientName:Start: cI is null");
-			return;
-		}
-		if (cI.clientName != null) {
-			GetComponent<Text>().text = "Name: " + cI.clientName;
+		if (PhotonNetwork.NickName != null) {
+			GetComponent<Text>().text = "Name: " + PhotonNetwork.NickName;
 		}
 	}
 }

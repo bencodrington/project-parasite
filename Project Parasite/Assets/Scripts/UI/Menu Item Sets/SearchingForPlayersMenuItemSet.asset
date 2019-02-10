@@ -15,3 +15,4 @@ MonoBehaviour:
   menuItemPrefabs:
   - {fileID: 1938243808907530, guid: 70284901a565c034eacf945e6aa1080d, type: 3}
   - {fileID: 48, guid: afe87da9e791d02458e382ec9de73ece, type: 3}
+  - {fileID: 3218563350222047090, guid: c351c75e0f744cc468b0912d746d5100, type: 3}
