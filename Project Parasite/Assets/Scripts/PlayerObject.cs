@@ -14,7 +14,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 	public GameObject ParasiteControlsPrefab;
 	public GameObject HunterPrefab;
 	public GameObject HunterControlsPrefab;
-	public GameObject RoundManagerPrefab;
 	public GameObject HealthPrefab;
 	public GameObject NpcCountPrefab;
 	public GameObject GameOverScreenPrefab;
@@ -73,7 +72,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 	void Start() {
 		// TODO: extract to UI manager
 		topRightUiText = GameObject.FindGameObjectWithTag("TopRightUI").GetComponent<Text>();
-		Debug.Log("PlayerObject: start");
 	}
 
 	void UpdateHealthObject(int newValue) {

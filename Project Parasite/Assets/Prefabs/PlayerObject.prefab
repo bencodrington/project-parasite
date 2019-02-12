@@ -1,25 +1,14 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &100100000
-Prefab:
-  m_ObjectHideFlags: 1
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications: []
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 1820297792491458}
-  m_IsPrefabAsset: 1
 --- !u!1 &1820297792491458
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4521235775713244}
-  - component: {fileID: 114293516511762958}
   - component: {fileID: 114743023985419180}
   m_Layer: 0
   m_Name: PlayerObject
@@ -30,9 +19,10 @@ GameObject:
   m_IsActive: 1
 --- !u!4 &4521235775713244
 Transform:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1820297792491458}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -41,64 +31,28 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114293516511762958
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1820297792491458}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SceneId:
-    m_Value: 0
-  m_AssetId:
-    i0: 195
-    i1: 209
-    i2: 43
-    i3: 88
-    i4: 125
-    i5: 9
-    i6: 117
-    i7: 180
-    i8: 120
-    i9: 123
-    i10: 244
-    i11: 115
-    i12: 53
-    i13: 200
-    i14: 145
-    i15: 63
-  m_ServerOnly: 0
-  m_LocalPlayerAuthority: 0
 --- !u!114 &114743023985419180
 MonoBehaviour:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1820297792491458}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 793f9fd0b3f34e94a859c7d3e4d611a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ParasitePrefab: {fileID: 1744548462298568, guid: 8c3e18920cf16344f9ab25cbd87907fc,
-    type: 2}
+  ParasitePrefab: {fileID: 32, guid: 8c3e18920cf16344f9ab25cbd87907fc, type: 3}
   ParasiteControlsPrefab: {fileID: 1781725809795122, guid: 1ee8585f1dcdfa549be3fe95eb5b09bd,
-    type: 2}
-  HunterPrefab: {fileID: 1404862278284056, guid: ffa472e8f9da3c84f800cbd41f67e177,
-    type: 2}
+    type: 3}
+  HunterPrefab: {fileID: 25, guid: ffa472e8f9da3c84f800cbd41f67e177, type: 3}
   HunterControlsPrefab: {fileID: 1837243442876654, guid: 40bb69824403fa544863cf21950d59b1,
-    type: 2}
-  RoundManagerPrefab: {fileID: 1463329413419142, guid: 64e476012ce7af140b598b86d5a34da9,
-    type: 2}
-  HealthPrefab: {fileID: 1893212046803936, guid: 97a745d3950348a4781f8b1d182954d5,
-    type: 2}
+    type: 3}
+  HealthPrefab: {fileID: 0}
   NpcCountPrefab: {fileID: 1257916060788230, guid: ca84bca96eea3ae479cd93d97fc24088,
-    type: 2}
+    type: 3}
   GameOverScreenPrefab: {fileID: 1314741506534428, guid: 63bd87d6da451bd4486687110e76e6a0,
-    type: 2}
+    type: 3}
   GameOverScreenServerPrefab: {fileID: 1702133244406784, guid: db2f2e4192753d845bb4d1784213f515,
-    type: 2}
+    type: 3}

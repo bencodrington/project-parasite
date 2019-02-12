@@ -18,7 +18,7 @@ public class RoundManager : MonoBehaviour {
 
 	public bool isGameOver = false;
 
-	bool huntersOnlyMode = false;
+	bool huntersOnlyMode = true;
 	bool DEBUG_MODE = true;
 
 	void Start () {

@@ -121,7 +121,7 @@ public abstract class Character : MonoBehaviourPun {
 			physicsEntity.Update();
 			// Update the server's position
 			// TODO: clump these updates to improve network usage?
-			RpcUpdatePosition(transform.position, false);
+			this.photonView.RPC("RpcUpdatePosition", RpcTarget.Others, transform.position, false);
 		}
 	}
 	
@@ -176,9 +176,10 @@ public abstract class Character : MonoBehaviourPun {
 
 	[PunRPC]
 	void RpcUpdatePosition(Vector3 newPosition, bool snapToNewPos) {
+		Debug.Log("Received position: " + newPosition + ", shouldSnap: " + shouldSnapToServerPosition);
 		// TODO:
-		serverPosition = newPosition;
-		shouldSnapToServerPosition = snapToNewPos;
+		// serverPosition = newPosition;
+		// shouldSnapToServerPosition = snapToNewPos;
 	}
 
 
