@@ -146,7 +146,8 @@ public class Parasite : Character {
 		}
 
 		if (Input.GetKeyDown(KeyCode.E)) {
-			CmdInteractWithObjectsInRange();
+			// TODO:
+			// CmdInteractWithObjectsInRange();
 		}
 	}
 
@@ -209,7 +210,6 @@ public class Parasite : Character {
 
 	// Commands
 
-	[Command]
 	void CmdDestroyParasite() {
 		NetworkServer.Destroy(gameObject);
 	}

@@ -26,10 +26,10 @@ public class NonPlayerCharacter : Character {
 	Vector2 ALERT_ICON_OFFSET = new Vector2(0, 1);
 	
 	public override void Update() {
-		if (isInfected && hasAuthority) {
+		if (isInfected && HasAuthority()) {
 			// NPC is infected and this client is the Parasite player's client
 			HandleInput();
-		} else if (!isInfected && isServer && physicsEntity != null) {
+		} else if (!isInfected && HasAuthority() && physicsEntity != null) {
 			// NPC still belongs to the server
 			TraversePath();
 		} else {
@@ -137,37 +137,33 @@ public class NonPlayerCharacter : Character {
 
 	// Commands
 
-	[Command]
 	public void CmdDespawnSelf() {
 		// Spawn new Parasite Object
 		// TODO:
 		// PlayerObject.CmdSpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY));
-		// Despawn this NPC object
-		FindObjectOfType<NpcManager>().DespawnNpc(netId);
+		// // Despawn this NPC object
+		// FindObjectOfType<NpcManager>().DespawnNpc(netId);
 	}
 
 	// ClientRpc
 
-	[ClientRpc]
 	public void RpcSetLocalPlayerAuthority(bool newValue) {
 		GetComponentInChildren<NetworkIdentity>().localPlayerAuthority = newValue;
 	}
 
-	[ClientRpc]
 	public void RpcInfect() {
 		isInfected = true;
-		if (hasAuthority) {
+		if (HasAuthority()) {
 			// Only update sprite if on the Parasite player's client
 			spriteRenderer.color = Color.magenta;
 		}
 	}
 
-	[ClientRpc]
 	public void RpcNearbyOrbAlert(Vector2 atPosition) {
 		// Show exclamation mark above NPC
 		GameObject alertIcon = Instantiate(alertIconPrefab, (Vector2)transform.position + ALERT_ICON_OFFSET, Quaternion.identity);
 		alertIcon.transform.SetParent(transform);
-		if (!isServer || isInfected) { return; }
+		if (!HasAuthority() || isInfected) { return; }
 		// Only uninfected NPCs should flee, and the calculations
 		// 	should only be done on the server
 		Utility.Directions fleeDirection = atPosition.x < transform.position.x ?

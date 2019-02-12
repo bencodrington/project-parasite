@@ -150,13 +150,11 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
     	// Get PlayerCharacter script
     	Character character = characterGameObject.GetComponentInChildren<Character>();
     	// Initialize each player's character on their own client
-    	// character.RpcGeneratePhysicsEntity(velocity);
-    	// character.PlayerObject = this;
+    	character.GeneratePhysicsEntity(velocity);
+    	character.PlayerObject = this;
+		// TODO:
     	// // Ensure character snaps to its starting position on all clients
     	// character.CmdUpdatePosition(atPosition, true);
-    	// //  Set character as new target of camera
-    	// character.RpcSetCameraFollow();
-    	// character.RpcSetRenderLayer();
 	}
 	
 	#endregion

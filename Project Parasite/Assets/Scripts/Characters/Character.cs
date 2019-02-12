@@ -1,14 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
-using UnityEngine.Networking;
 
-public abstract class Character : NetworkBehaviour {
+public abstract class Character : MonoBehaviourPun {
 
 	protected SpriteRenderer spriteRenderer;
 	protected PhysicsEntity physicsEntity;
 
-	protected List<NetworkInstanceId> objectsInRange = new List<NetworkInstanceId>();
+	// TODO:
+	// protected List<NetworkInstanceId> objectsInRange = new List<NetworkInstanceId>();
 
 	protected Vector3 serverPosition;
 	protected bool shouldSnapToServerPosition = false;
@@ -42,20 +43,22 @@ public abstract class Character : NetworkBehaviour {
 
 	public CharacterStats stats;
 
-	protected abstract void HandleInput();
+
+	#region [MonoBehaviour Callbacks]
 
 	void Start() {
 		spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-
 		OnStart();
-	}
 
-	// Overridden by child classes to be called by the base Start() method
-	protected virtual void OnStart() {}
+		if (!HasAuthority()) { return; }
+    	//  Set character as new target of camera
+    	SetCameraFollow();
+    	SetRenderLayer();
+	}
 	
 	public virtual void Update () {
 		// Called once per frame for each Character
-		if (hasAuthority) {
+		if (HasAuthority()) {
 			// This character belongs to this client
 			HandleInput();
 		} else {
@@ -68,9 +71,20 @@ public abstract class Character : NetworkBehaviour {
 			}
 		}
 	}
+	
+	#endregion
+
+	#region [Public Methods]
+	
+	public void GeneratePhysicsEntity(Vector2 velocity) {
+		// Add physics entity
+		physicsEntity = new PhysicsEntity(transform, stats.height, stats.width);
+		// With starting velocity
+		physicsEntity.AddVelocity(velocity.x, velocity.y);
+	}
 
 	public void PhysicsUpdate() {
-		if (hasAuthority && physicsEntity != null) {
+		if (HasAuthority() && physicsEntity != null) {
 			// Based on input, accelerate in direction that's being pressed
 			// Horizontal
 			if (isMovingLeft) {
@@ -107,9 +121,18 @@ public abstract class Character : NetworkBehaviour {
 			physicsEntity.Update();
 			// Update the server's position
 			// TODO: clump these updates to improve network usage?
-			CmdUpdatePosition(transform.position, false);
+			RpcUpdatePosition(transform.position, false);
 		}
 	}
+	
+	#endregion
+
+	#region [Protected Methods]
+
+	protected abstract void HandleInput();
+
+	// Overridden by child classes to be called by the base Start() method
+	protected virtual void OnStart() {}
 
 	protected void HandleHorizontalMovement() {
 		isMovingLeft = false;
@@ -119,106 +142,71 @@ public abstract class Character : NetworkBehaviour {
 		if (right && !left) {
 			isMovingRight = true;
 			SetSpriteFlip(false);
-			CmdSetSpriteFlip(false);
+			// TODO: detect on all clients
 		} else if (left && !right) {
 			isMovingLeft = true;
 			SetSpriteFlip(true);
-			CmdSetSpriteFlip(true);
+			// TODO: detect on all clients
 		}
 	}
 
 	protected virtual void OnCharacterDestroy() {}
+	
+	protected bool HasAuthority() {
+		return (photonView.IsMine || !PhotonNetwork.IsConnected);
+	}
 
+	#endregion
+
+	#region [Private Methods]
+	
 	void SetSpriteFlip(bool isFacingLeft) {
 		spriteRenderer.flipX = isFacingLeft;
 	}
 
-	// COMMANDS
-
-	[Command]
-	public void CmdUpdatePosition(Vector3 newPosition, bool snapToNewPos) {
-		// TODO: verify new position is legal
-		// Only change serverPosition if newPosition is different, to reduce unnecessary Rpc calls
-		if (serverPosition != newPosition) {
-			serverPosition = newPosition;
-			RpcUpdateServerPosition(serverPosition, snapToNewPos);
-		}
+	void SetCameraFollow() {
+		FindObjectOfType<CameraFollow>().SetTarget(transform);
 	}
 
-	[Command]
-	public void CmdDeletePhysicsEntity() {
-		physicsEntity = null;
+	void SetRenderLayer() {
+		spriteRenderer.sortingLayerName = "ClientCharacter";
 	}
 
-	[Command]
-	void CmdSetSpriteFlip(bool isFacingLeft) {
-		RpcSetSpriteFlip(isFacingLeft);
-	}
+	#endregion
 
-	[Command]
-	protected void CmdInteractWithObjectsInRange() {
-		foreach (NetworkInstanceId netId in objectsInRange) {
-			GameObject gameObject = Utility.GetLocalObject(netId, isServer);
-			gameObject.GetComponentInChildren<InteractableObject>().OnInteract();
-		}
-	}
-
-	// CLIENTRPC
-
-	[ClientRpc]
-	void RpcUpdateServerPosition(Vector3 newPosition, bool snapToNewPos) {
+	[PunRPC]
+	void RpcUpdatePosition(Vector3 newPosition, bool snapToNewPos) {
+		// TODO:
 		serverPosition = newPosition;
 		shouldSnapToServerPosition = snapToNewPos;
 	}
 
-	[ClientRpc]
-	public void RpcGeneratePhysicsEntity(Vector2 velocity) {
-		if (hasAuthority) {
-			// Add physics entity
-			physicsEntity = new PhysicsEntity(transform, stats.height, stats.width);
-			// With starting velocity
-			physicsEntity.AddVelocity(velocity.x, velocity.y);
-		}
-	}
 
-	[ClientRpc]
-	public void RpcSetCameraFollow() {
-		if (hasAuthority) {
-			FindObjectOfType<CameraFollow>().SetTarget(transform);
-		}
-	}
+	// [Command]
+	// protected void CmdInteractWithObjectsInRange() {
+	// 	foreach (NetworkInstanceId netId in objectsInRange) {
+	// 		GameObject gameObject = Utility.GetLocalObject(netId, isServer);
+	// 		gameObject.GetComponentInChildren<InteractableObject>().OnInteract();
+	// 	}
+	// }
 
-	[ClientRpc]
-	public void RpcSetRenderLayer() {
-		if (hasAuthority) {
-			GetComponentInChildren<SpriteRenderer>().sortingLayerName = "ClientCharacter";
-		}
-	}
+	// [ClientRpc]
+	// public void RpcRegisterObject(NetworkInstanceId netId) {
+	// 	objectsInRange.Add(netId);
+	// 	// TODO: just get the InteractableObject and store that
+	// 	if (HasAuthority()) {
+	// 		// Show 'E' help key
+	// 		Utility.GetLocalObject(netId, isServer).GetComponentInChildren<InteractableObject>().SetIsInRange(true);
+	// 	}
+	// }
 
-	[ClientRpc]
-	void RpcSetSpriteFlip(bool isFacingLeft) {
-		if (!hasAuthority) {
-			SetSpriteFlip(isFacingLeft);
-		}
-	}
-
-	[ClientRpc]
-	public void RpcRegisterObject(NetworkInstanceId netId) {
-		objectsInRange.Add(netId);
-		// TODO: just get the InteractableObject and store that
-		if (hasAuthority) {
-			// Show 'E' help key
-			Utility.GetLocalObject(netId, isServer).GetComponentInChildren<InteractableObject>().SetIsInRange(true);
-		}
-	}
-
-	[ClientRpc]
-	public void RpcUnregisterObject(NetworkInstanceId netId) {
-		objectsInRange.Remove(netId);
-		if (hasAuthority) {
-			// Hide 'E' help key
-			Utility.GetLocalObject(netId, isServer).GetComponentInChildren<InteractableObject>().SetIsInRange(false);
-		}
-	}
+	// [ClientRpc]
+	// public void RpcUnregisterObject(NetworkInstanceId netId) {
+	// 	objectsInRange.Remove(netId);
+	// 	if (HasAuthority()) {
+	// 		// Hide 'E' help key
+	// 		Utility.GetLocalObject(netId, isServer).GetComponentInChildren<InteractableObject>().SetIsInRange(false);
+	// 	}
+	// }
 
 }

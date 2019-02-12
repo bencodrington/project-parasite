@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using System;
+using Photon.Pun;
 
 public class Hunter : Character {
 
@@ -31,11 +32,9 @@ public class Hunter : Character {
 	Queue<Orb> orbs;
 
 	protected override void OnStart() {
-		if (isServer) {
+		if (HasAuthority()) {
 			orbs = new Queue<Orb>();
 			PlayerObject.RegisterOnCharacterDestroyCallback(DestroyAllOrbs);
-		}
-		if (hasAuthority) {
 			// Spawn orb UI manager to display how many orbs are remaining
 			orbUiManager = Instantiate(orbUiManagerPrefab).GetComponent<OrbUiManager>();
 			// Anchor it to the bottom right corner
@@ -44,10 +43,6 @@ public class Hunter : Character {
 			orbUiManager.setMaxOrbCount(MAX_ORB_COUNT);
 			// Cache reference to orb beam range manager
 			orbBeamRangeManager = GetComponentInChildren<OrbBeamRangeManager>();
-		} else if (isServer) {
-			// The server still needs a reference to orb beam range manager
-			orbBeamRangeManager = GetComponentInChildren<OrbBeamRangeManager>();
-			orbBeamRangeManager.shouldShowMarkers = false;
 		} else {
 			Destroy(GetComponentInChildren<OrbBeamRangeManager>().gameObject);
 		}
@@ -72,7 +67,8 @@ public class Hunter : Character {
 		oldUp = up;
 
 		if (Input.GetKeyDown(KeyCode.E)) {
-			CmdInteractWithObjectsInRange();
+			// TODO:
+			// CmdInteractWithObjectsInRange();
 		}
 
 		// Place orb
@@ -108,14 +104,13 @@ public class Hunter : Character {
 	}
 
 	protected override void OnCharacterDestroy() {
-		if (hasAuthority) {
+		if (HasAuthority()) {
 			Destroy(orbUiManager.gameObject);
 		}
 	}
 
 	// Commands
 
-	[Command]
 	void CmdSpawnOrb(Vector2 atPosition) {
 		if (orbs.Count >= MAX_ORB_COUNT) { 
 			RpcOrbSpawnFailed();
@@ -147,14 +142,12 @@ public class Hunter : Character {
 		orbBeamRangeManager.mostRecentOrb = orb;
 	}
 
-	[Command]
 	void CmdRecallOrb() {
 		if (orbs.Count <= 0) { return; }
 		NetworkServer.Destroy(orbs.Dequeue().gameObject);
 		RpcOnOrbRecalled(orbs.Count);
 	}
 
-	[Command]
 	void CmdAlertNpcsInRange(Vector2 ofPosition) {
 		// Find all NPCs in range
 		Collider2D[] npcs = Physics2D.OverlapBoxAll(ofPosition, NPC_ALERT_RANGE, 0, Utility.GetLayerMask(CharacterType.NPC));
@@ -168,9 +161,8 @@ public class Hunter : Character {
 
 	// ClientRpc
 
-	[ClientRpc]
 	void RpcOnOrbSpawned(NetworkInstanceId orbNetId, int newOrbCount) {
-		if (hasAuthority) {
+		if (HasAuthority()) {
 			// This client spawned the orb
 			// Update reference to most recent orb for displaying distance limit to player
 			orbBeamRangeManager.mostRecentOrb = ClientScene.FindLocalObject(orbNetId).GetComponent<Orb>();
@@ -183,9 +175,8 @@ public class Hunter : Character {
 		}
 	}
 
-	[ClientRpc]
 	void RpcOnOrbRecalled(int newOrbCount) {
-		if (hasAuthority) {
+		if (HasAuthority()) {
 			// Update the number of remaining orbs currently displayed onscreen
 			orbUiManager.OnOrbCountChange(newOrbCount);
 			// User can definitely place at least one orb, so show markers
@@ -193,9 +184,8 @@ public class Hunter : Character {
 		}
 	}
 
-	[ClientRpc]
 	void RpcOrbSpawnFailed() {
-		if (hasAuthority) {
+		if (HasAuthority()) {
 			orbUiManager.FlashPlaceholders();
 		}
 	}

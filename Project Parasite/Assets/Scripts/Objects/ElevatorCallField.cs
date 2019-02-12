@@ -62,13 +62,15 @@ public class ElevatorCallField : InteractableObject {
 		foreach (Collider2D oldCaller in oldCallers) {
 			if (oldCaller != null) {
 				// Character is leaving the field
-				GetCharacterFromCollider(oldCaller).RpcUnregisterObject(netId);
+				// TODO:
+				// GetCharacterFromCollider(oldCaller).RpcUnregisterObject(netId);
 			}
 		}
 		foreach (Collider2D caller in callers) {
 			if (caller != null) {
 				// Character is entering the field
-				GetCharacterFromCollider(caller).RpcRegisterObject(netId);
+				// TODO:
+				// GetCharacterFromCollider(caller).RpcRegisterObject(netId);
 			}
 		}
 	}

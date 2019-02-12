@@ -72,7 +72,8 @@ public class OrbBeam : NetworkBehaviour {
 		foreach (RaycastHit2D hit in hits) {
 			npc = hit.transform.parent.GetComponent<NonPlayerCharacter>();
 			if (isServer && !npc.isInfected) {
-				FindObjectOfType<NpcManager>().DespawnNpc(npc.netId);
+				// TODO:
+				// FindObjectOfType<NpcManager>().DespawnNpc(npc.netId);
 			} else if (npc.isInfected && PlayerGrid.Instance.GetLocalCharacter() == npc) {
 				npc.CmdDespawnSelf();
 			}

@@ -220,7 +220,8 @@ public class PlayerGrid : NetworkBehaviour {
                 RpcSetCharacterType(pD.playerNetId, pD.characterType);
             }
             if (pD.character != e.character) {
-                RpcSetCharacter(pD.playerNetId, pD.character.netId);
+                // TODO:
+                // RpcSetCharacter(pD.playerNetId, pD.character.netId);
             }
         }
     }

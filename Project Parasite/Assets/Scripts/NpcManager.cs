@@ -42,7 +42,11 @@ public class NpcManager : NetworkBehaviour {
 	}
 
 	public void DespawnNpc(NetworkInstanceId npcNetId) {
-		NonPlayerCharacter npc = NpcList.Find((value) => {return value.netId == npcNetId;});
+		NonPlayerCharacter npc = NpcList.Find((value) => {
+			return true;
+			// TODO:
+			// return value.netId == npcNetId;
+			});
 		int index = NpcList.IndexOf(npc);
 		NpcList.RemoveAt(index);
 		NetworkServer.Destroy(npc.gameObject);
@@ -81,9 +85,10 @@ public class NpcManager : NetworkBehaviour {
 
 			// Propogate to all clients
 			NetworkServer.Spawn(npc.gameObject);
-			npc.RpcGeneratePhysicsEntity(Vector2.zero);
+			npc.GeneratePhysicsEntity(Vector2.zero);
 			// Ensure npc snaps to its starting position on all clients
-			npc.CmdUpdatePosition(spawnPosition, true);
+			// TODO:
+			// npc.CmdUpdatePosition(spawnPosition, true);
 			StartCoroutine(npc.Idle());
 		}
 	}
