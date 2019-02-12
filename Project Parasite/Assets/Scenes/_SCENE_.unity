@@ -1010,10 +1010,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 737581ac7914eb4448de2dcabc640efb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ClientInformationPrefab: {fileID: 1688660268600780, guid: a66ab832ed462b244b3b8512c591559b,
-    type: 3}
   searchingForPlayersMenuItemSet: {fileID: 11400000, guid: 1ceb17c6dcc3a7c4d8ef7712f3d15953,
     type: 2}
+  roundManagerPrefab: {fileID: 1463329413419142, guid: 64e476012ce7af140b598b86d5a34da9,
+    type: 3}
+  playerObjectPrefab: {fileID: 1820297792491458, guid: c3d12b587d0975b4787bf47335c8913f,
+    type: 3}
 --- !u!1 &1123706892
 GameObject:
   m_ObjectHideFlags: 0

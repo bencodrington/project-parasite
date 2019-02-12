@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class RoundManager : NetworkBehaviour {
+public class RoundManager : MonoBehaviour {
 
 	PlayerObject[] connectedPlayers;
 
@@ -17,16 +18,15 @@ public class RoundManager : NetworkBehaviour {
 
 	public bool isGameOver = false;
 
-	bool huntersOnlyMode = true;
+	bool huntersOnlyMode = false;
 	bool DEBUG_MODE = true;
 
 	void Start () {
-		if (!isServer) { return; }
-		// Cache Player Objects
-		// TODO: uncache on leave
-		connectedPlayers = FindObjectsOfType<PlayerObject>();
-		CmdSpawnObjectManager();
-		SelectSpawnPoints();
+		if (!PhotonNetwork.IsMasterClient) { return; }
+		// TODO:
+		// SpawnObjectManager();
+		// TODO:
+		// SelectSpawnPoints();
 		SelectParasite();
 	}
 
@@ -43,7 +43,7 @@ public class RoundManager : NetworkBehaviour {
 	}
 
 	void SelectParasite() {
-		int n = connectedPlayers.Length;
+		int n = PhotonNetwork.PlayerList.Length;
 		Vector2 spawnPoint;
 		// Randomly select one of the players to be parasite, the rest are hunters
 		int indexOfParasite = Random.Range(0, n);
@@ -57,7 +57,12 @@ public class RoundManager : NetworkBehaviour {
 				characterType = CharacterType.Hunter;
 				spawnPoint = hunterSpawnPoint;
 			}
-			connectedPlayers[i].CmdAssignCharacterTypeAndSpawnPoint(characterType, spawnPoint);
+			// TODO: extract to method
+			byte eventCode = EventCodes.AssignPlayerType;
+			object[] content = { PhotonNetwork.PlayerList[i].ActorNumber, characterType };
+			EventCodes.RaiseEventAll(eventCode, content);
+			// TODO: remove
+			// connectedPlayers[i].CmdAssignCharacterTypeAndSpawnPoint(characterType, spawnPoint);
 		}
 	}
 	
@@ -83,26 +88,23 @@ public class RoundManager : NetworkBehaviour {
 
 	public void EndRound() {
 		foreach (PlayerObject player in connectedPlayers) {
-			player.CmdEndRound();
+			// TODO:
+			// player.CmdEndRound();
 		}
 		transform.GetComponentInChildren<NpcManager>().DespawnNPCs();
 		objectManager.OnRoundEnd();
 	}
 
-	// Commands
-	[Command]
-	void CmdSpawnObjectManager() {
-		// Create new ObjectManager game object on the server
-		GameObject objectManagerGameObject = Instantiate(objectManagerPrefab);
-		NetworkServer.Spawn(objectManagerGameObject);
-		RpcSetObjectManager(objectManagerGameObject.GetComponent<NetworkIdentity>().netId);
+	void SpawnObjectManager() {
+		PhotonNetwork.Instantiate(objectManagerPrefab.name, Vector3.zero, Quaternion.identity, 0);
+		// RpcSetObjectManager(objectManagerGameObject.GetComponent<NetworkIdentity>().netId);
 	}
 
-	// ClientRpc
-	[ClientRpc]
-	void RpcSetObjectManager(NetworkInstanceId objectManagerNetId) {
-		objectManager = Utility.GetLocalObject(objectManagerNetId, isServer).GetComponentInChildren<ObjectManager>();
-		objectManager.OnRoundStart();
-	}
+	// // ClientRpc
+	// [ClientRpc]
+	// void RpcSetObjectManager(NetworkInstanceId objectManagerNetId) {
+	// 	objectManager = Utility.GetLocalObject(objectManagerNetId, isServer).GetComponentInChildren<ObjectManager>();
+	// 	objectManager.OnRoundStart();
+	// }
 
 }

@@ -115,6 +115,7 @@ GameObject:
   - component: {fileID: 4793340472743614}
   - component: {fileID: 114154550554042726}
   - component: {fileID: 114689640991166998}
+  - component: {fileID: 3839365685084351285}
   m_Layer: 11
   m_Name: Hunter
   m_TagString: Untagged
@@ -190,6 +191,28 @@ MonoBehaviour:
     type: 3}
   orbUiManagerPrefab: {fileID: 1009069422560828, guid: 6e19b3cf438c2fe4baa425b29810bea5,
     type: 3}
+--- !u!114 &3839365685084351285
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1404862278284056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 0
+  OwnershipTransfer: 0
+  ObservedComponents:
+  - {fileID: 0}
+  viewIdField: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &1917850558164872
 GameObject:
   m_ObjectHideFlags: 0

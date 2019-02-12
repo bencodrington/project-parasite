@@ -43,7 +43,8 @@ public class ElevatorButton : MonoBehaviour {
 		if (Input.GetMouseButtonDown(0)) {
 			// Check if click is within bounds and the button is enabled
 			if (!isDisabled && isMouseOver) {
-				PlayerGrid.Instance.GetLocalPlayerObject().CmdCallElevatorToStop(elevatorId, stopIndex);
+				// TODO:
+				// PlayerGrid.Instance.GetLocalPlayerObject().CmdCallElevatorToStop(elevatorId, stopIndex);
 			}
 		}
 	}

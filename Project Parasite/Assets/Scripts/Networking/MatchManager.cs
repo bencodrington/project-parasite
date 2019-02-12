@@ -10,8 +10,14 @@ using ExitGames.Client.Photon;
 
 public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
+    #region [Public Variables]
+    
     // Prefabs for the various menu item sets this flow requires
     public MenuItemSet searchingForPlayersMenuItemSet;
+    public GameObject roundManagerPrefab;
+    public GameObject playerObjectPrefab;
+    
+    #endregion
 
     #region [Private Variables]
     
@@ -35,6 +41,8 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
     public void StartGame() {
         Debug.Log("master client: starting game");
+        byte eventCode = EventCodes.StartGame;
+        EventCodes.RaiseEventAll(eventCode, null);
     }
     
     #endregion
@@ -64,6 +72,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
     public override void OnJoinedRoom() {
         TransitionToMenuItemSet(searchingForPlayersMenuItemSet);
+        InstantiatePlayerObject();
     }
 
     #endregion
@@ -76,6 +85,29 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
             bool isReady = (bool)content[1];
             // Update playersReady dictionary
             SetActorReady(actorNumber, isReady);
+        } else if (photonEvent.Code == EventCodes.StartGame) {
+            // Hide menu
+            // TODO: extract to UI manager
+            Destroy(GameObject.FindWithTag("TitleScreen"));
+            // Hide Menu
+            Menu menu = FindObjectOfType<Menu>();
+            if (menu == null) {
+                Debug.LogError("MatchManager: OnEvent: Menu not found");
+                return;
+            }
+            menu.DeleteMenuItems();
+
+            if (PhotonNetwork.IsMasterClient) {
+                // If roundmanager exists, end round and destroy it
+                // TODO:
+                // Create new roundmanager
+                if (roundManagerPrefab == null) {
+                    Debug.LogError("MatchManager: OnEvent: roundManagerPrefab not set.");
+                    return;
+                }
+                PhotonNetwork.Instantiate(roundManagerPrefab.name, Vector3.zero, Quaternion.identity, 0);
+
+            }
         }
     }
 
@@ -128,6 +160,10 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         if (PhotonNetwork.IsMasterClient) {
             StartGame();
         }
+    }
+
+    void InstantiatePlayerObject() {
+        Instantiate(playerObjectPrefab, Vector3.zero, Quaternion.identity);
     }
 
     #endregion

@@ -48,11 +48,13 @@ public class NpcManager : NetworkBehaviour {
 		NetworkServer.Destroy(npc.gameObject);
 		// TODO: there has to be a more efficient way of updating this
 		foreach (PlayerObject playerObject in FindObjectsOfType<PlayerObject>()) {
-			playerObject.RpcUpdateRemainingNpcCount(NpcList.Count);
+			// TODO:
+			// playerObject.RpcUpdateRemainingNpcCount(NpcList.Count);
 		}
 		if (NpcList.Count == 0) {
 			// Game Over
-			PlayerGrid.Instance.GetLocalPlayerObject().CmdShowGameOverScreen(CharacterType.Parasite);
+			// TODO:
+			// PlayerGrid.Instance.GetLocalPlayerObject().CmdShowGameOverScreen(CharacterType.Parasite);
 		}
 	}
 
@@ -63,7 +65,8 @@ public class NpcManager : NetworkBehaviour {
 		}
 		// TODO: there has to be a more efficient way of updating this
 		foreach (PlayerObject playerObject in FindObjectsOfType<PlayerObject>()) {
-			playerObject.RpcUpdateRemainingNpcCount(NpcList.Count);
+			// TODO:
+			// playerObject.RpcUpdateRemainingNpcCount(NpcList.Count);
 		}
 	}
 

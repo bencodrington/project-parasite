@@ -33,10 +33,7 @@ public class ReadyButton : MonoBehaviour
         bool isReady = toggle.isOn;
         byte eventCode = EventCodes.SetReady;
         object[] content = new object[] { PhotonNetwork.LocalPlayer.ActorNumber, isReady };
-        RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
-        SendOptions sendOptions = new SendOptions { Reliability = true };
-        // Send to all players
-        PhotonNetwork.RaiseEvent(eventCode, content, raiseEventOptions, sendOptions);
+        EventCodes.RaiseEventAll(eventCode, content);
     }
 
     #endregion

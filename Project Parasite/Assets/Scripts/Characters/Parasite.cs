@@ -137,7 +137,8 @@ public class Parasite : Character {
 			IsAttemptingInfection = true;
 			Collider2D npc = Physics2D.OverlapCircle(transform.position, INFECT_RADIUS, Utility.GetLayerMask(CharacterType.NPC));
 			if (npc != null) {
-				CmdInfectNpc(npc.transform.parent.GetComponent<NetworkIdentity>().netId);
+				// TODO:
+				// CmdInfectNpc(npc.transform.parent.GetComponent<NetworkIdentity>().netId);
 				CmdDestroyParasite();
 			}
 		} else {
@@ -213,29 +214,29 @@ public class Parasite : Character {
 		NetworkServer.Destroy(gameObject);
 	}
 
-	[Command]
-	void CmdInfectNpc(NetworkInstanceId npcNetId) {
-		// Find NPC GameObject with matching NetId
-		GameObject npcGameObject = NetworkServer.FindLocalObject(npcNetId);
-		// Get NonPlayerCharacter script and NetworkIdentity component off of it
-		NonPlayerCharacter npc = npcGameObject.GetComponentInChildren<NonPlayerCharacter>();
-		NetworkIdentity networkIdentity = npcGameObject.GetComponentInChildren<NetworkIdentity>();
-		// Let it know it will be player controlled from now on
-		networkIdentity.localPlayerAuthority = true;
-		npc.RpcSetLocalPlayerAuthority(true);
-		// Store playerObject for eventual transfer back to parasite
-		npc.PlayerObject = PlayerObject;
-		// Give Parasite player authority over the NPC
-		networkIdentity.AssignClientAuthority(PlayerObject.connectionToClient);
-		// Delete current physics entity off the server for performance
-		npc.CmdDeletePhysicsEntity();
-		// TODO: transfer velocity from current physics entity?
-		npc.RpcGeneratePhysicsEntity(Vector2.zero);
-		// Set isInfected to true/update sprite on new authority's client
-		npc.RpcInfect();
-		// Update client's camera and render settings to reflect new character
-		npc.RpcSetCameraFollow();
-		npc.RpcSetRenderLayer();
-		PlayerGrid.Instance.CmdSetCharacter(PlayerObject.netId, npc.netId);
-	}
+	// [Command]
+	// void CmdInfectNpc(NetworkInstanceId npcNetId) {
+	// 	// Find NPC GameObject with matching NetId
+	// 	GameObject npcGameObject = NetworkServer.FindLocalObject(npcNetId);
+	// 	// Get NonPlayerCharacter script and NetworkIdentity component off of it
+	// 	NonPlayerCharacter npc = npcGameObject.GetComponentInChildren<NonPlayerCharacter>();
+	// 	NetworkIdentity networkIdentity = npcGameObject.GetComponentInChildren<NetworkIdentity>();
+	// 	// Let it know it will be player controlled from now on
+	// 	networkIdentity.localPlayerAuthority = true;
+	// 	npc.RpcSetLocalPlayerAuthority(true);
+	// 	// Store playerObject for eventual transfer back to parasite
+	// 	npc.PlayerObject = PlayerObject;
+	// 	// Give Parasite player authority over the NPC
+	// 	networkIdentity.AssignClientAuthority(PlayerObject.connectionToClient);
+	// 	// Delete current physics entity off the server for performance
+	// 	npc.CmdDeletePhysicsEntity();
+	// 	// TODO: transfer velocity from current physics entity?
+	// 	npc.RpcGeneratePhysicsEntity(Vector2.zero);
+	// 	// Set isInfected to true/update sprite on new authority's client
+	// 	npc.RpcInfect();
+	// 	// Update client's camera and render settings to reflect new character
+	// 	npc.RpcSetCameraFollow();
+	// 	npc.RpcSetRenderLayer();
+	// 	PlayerGrid.Instance.CmdSetCharacter(PlayerObject.netId, npc.netId);
+	// }
 }
