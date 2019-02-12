@@ -46,6 +46,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     #region MonoBehaviour PunCallbacks
     
     public virtual void OnEnable() {
+        base.OnEnable();
         PhotonNetwork.AddCallbackTarget(this);
     }
 
@@ -67,6 +68,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     }
 
     public virtual void OnDisable() {
+        base.OnDisable();
         PhotonNetwork.RemoveCallbackTarget(this);
     }
 
