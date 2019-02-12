@@ -32,6 +32,10 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
             PhotonNetwork.ConnectUsingSettings();
         }
     }
+
+    public void StartGame() {
+        Debug.Log("master client: starting game");
+    }
     
     #endregion
 
@@ -44,11 +48,6 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     #endregion
 
     #region MonoBehaviour PunCallbacks
-    
-    public virtual void OnEnable() {
-        base.OnEnable();
-        PhotonNetwork.AddCallbackTarget(this);
-    }
 
     public override void OnConnectedToMaster() {
         PhotonNetwork.JoinRandomRoom();
@@ -65,11 +64,6 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
     public override void OnJoinedRoom() {
         TransitionToMenuItemSet(searchingForPlayersMenuItemSet);
-    }
-
-    public virtual void OnDisable() {
-        base.OnDisable();
-        PhotonNetwork.RemoveCallbackTarget(this);
     }
 
     #endregion
@@ -131,6 +125,9 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         }
         // If we got here, all connected players are ready
         Debug.Log("Everyone's ready!");
+        if (PhotonNetwork.IsMasterClient) {
+            StartGame();
+        }
     }
 
     #endregion
