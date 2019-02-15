@@ -36,25 +36,26 @@ public class Elevator : MonoBehaviourPun {
 	
 	#endregion
 
-	void InitializeButtons() {
-		// ElevatorButton button;
-		// buttons = new ElevatorButton[stops.Length];
+	void InitializeButtons(int buttonCount) {
+		ElevatorButton button;
+		buttons = new ElevatorButton[buttonCount];
 
-		// Vector2 spawnPos = new Vector2(transform.position.x,
-		// 						transform.position.y +	// Base vertical position of the center of the elevator
-		// 						(SIZE.y / 2) +			// Get to the top of the elevator
-		// 						BUTTON_OFFSET / 2 );	// Add some padding before start of first button
-		// // Spawn button prefabs based on # of stops
-		// for (int i = 0; i < stops.Length; i++) {
-		// 	button = Instantiate(buttonPrefab, spawnPos, Quaternion.identity, transform).GetComponentInChildren<ElevatorButton>();
-		// 	button.gameObject.GetComponentInChildren<Text>().text = (i + 1).ToString();
-		// 	button.stopIndex = i;
-		// 	// TODO:
-		// 	// button.elevatorId = this.netId;
-		// 	buttons[i] = button;
-		// 	spawnPos.y += BUTTON_OFFSET;
-		// }
+		Vector2 spawnPos = new Vector2(transform.position.x,
+								transform.position.y +	// Base vertical position of the center of the elevator
+								(SIZE.y / 2) +			// Get to the top of the elevator
+								BUTTON_OFFSET / 2 );	// Add some padding before start of first button
+		// Spawn button prefabs based on # of stops
+		for (int i = 0; i < buttonCount; i++) {
+			button = Instantiate(buttonPrefab, spawnPos, Quaternion.identity, transform).GetComponentInChildren<ElevatorButton>();
+			button.gameObject.GetComponentInChildren<Text>().text = (i + 1).ToString();
+			button.stopIndex = i;
+			button.elevator = this;
+			buttons[i] = button;
+			spawnPos.y += BUTTON_OFFSET;
+		}
 	}
+
+	#region [Public Methods]
 	
 	public void PhysicsUpdate() {
 		// if (PhotonNetwork.IsMasterClient) {
@@ -90,6 +91,14 @@ public class Elevator : MonoBehaviourPun {
 		}
 	}
 
+	public void CallToStop(int stopIndex) {
+		photonView.RPC("RpcCallToStop", RpcTarget.All, stopIndex);
+	}
+	
+	#endregion
+	
+	
+
 	void MoveToTargetStop() {
 		// Vector2 targetPosition;
 		// float potentialMovement = MOVEMENT_SPEED * Time.deltaTime;
@@ -105,7 +114,7 @@ public class Elevator : MonoBehaviourPun {
 		// }
 	}
 
-	void SetButtonActive(bool isActive) {
+	void SetAllButtonsActive(bool isActive) {
 		for (int i = 0; i < buttons.Length; i++) {
 			buttons[i].gameObject.SetActive(isActive);
 		}
@@ -138,42 +147,36 @@ public class Elevator : MonoBehaviourPun {
 		// TODO: replace magic number, half of elevator height
 		return new Vector2(xCoordinate, yCoordinate - 1.5f);
 	}
+
+	void DisableButton(int index) {
+		buttons[index].isDisabled = true;
+	}
+
+	void EnableButton(int index) {
+		buttons[index].isDisabled = false;
+	}
 	
 	#endregion
 
 	[PunRPC]
 	public void RpcSetStopData(float[] yCoordinates, bool[] isOnRightSideValues) {
 		SpawnStops(yCoordinates, isOnRightSideValues);
-		// TODO:
-		// InitializeButtons();
+		InitializeButtons(yCoordinates.Length);
 	}
 
 	[PunRPC]
 	public void RpcCallToStop(int indexOfStop) {
 		Debug.Log("Called to stop: " + indexOfStop);
-		// RpcEnableButton(targetStop);
-		// targetStop = indexOfStop;
-		// isMoving = true;
-		// SetButtonActive(false);
-		// RpcSetButtonActive(false);
+		EnableButton(targetStop);
+		targetStop = indexOfStop;
+		isMoving = true;
+		SetAllButtonsActive(false);
 	}
 
-	// ClientRpc
 	void RpcUpdateServerPosition(Vector3 newPosition) {
-		if (PhotonNetwork.IsMasterClient) { return; }
-		// Else, on a client machine, so update our record of the elevator's true position
-		serverPosition = newPosition;
-	}
-
-	void RpcSetButtonActive(bool isEnabled) {
-		SetButtonActive(isEnabled);
-	}
-
-	void RpcDisableButton(int index) {
-		buttons[index].isDisabled = true;
-	}
-
-	void RpcEnableButton(int index) {
-		buttons[index].isDisabled = false;
+		// TODO:
+		// if (PhotonNetwork.IsMasterClient) { return; }
+		// // Else, on a client machine, so update our record of the elevator's true position
+		// serverPosition = newPosition;
 	}
 }

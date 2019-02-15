@@ -21,7 +21,7 @@ public class ElevatorCallField : InteractableObject {
 	} 
 
 	void CallElevator() {
-		elevator.photonView.RPC("RpcCallToStop", RpcTarget.All, stopIndex);
+		elevator.CallToStop(stopIndex);
 		// Play 'ding' sound
 		audioSource.Play();
 		// Show 'platform called!' alert
