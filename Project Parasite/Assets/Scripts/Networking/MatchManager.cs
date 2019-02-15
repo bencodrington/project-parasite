@@ -14,7 +14,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     
     // Prefabs for the various menu item sets this flow requires
     public MenuItemSet searchingForPlayersMenuItemSet;
-    public GameObject roundManagerPrefab;
+    GameObject roundManagerPrefab;
     public GameObject playerObjectPrefab;
     
     #endregion
@@ -51,6 +51,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
     public void Start() {
         playersReady = new Dictionary<int, bool>();
+        roundManagerPrefab = Resources.Load("RoundManager") as GameObject;
     }
     
     #endregion

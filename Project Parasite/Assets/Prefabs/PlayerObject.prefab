@@ -46,7 +46,7 @@ MonoBehaviour:
   ParasitePrefab: {fileID: 32, guid: 8c3e18920cf16344f9ab25cbd87907fc, type: 3}
   ParasiteControlsPrefab: {fileID: 1781725809795122, guid: 1ee8585f1dcdfa549be3fe95eb5b09bd,
     type: 3}
-  HunterPrefab: {fileID: 23, guid: ffa472e8f9da3c84f800cbd41f67e177, type: 3}
+  HunterPrefab: {fileID: 25, guid: ffa472e8f9da3c84f800cbd41f67e177, type: 3}
   HunterControlsPrefab: {fileID: 1837243442876654, guid: 40bb69824403fa544863cf21950d59b1,
     type: 3}
   HealthPrefab: {fileID: 0}

@@ -10,9 +10,9 @@ using UnityEngine.UI;
 
 public class PlayerObject : MonoBehaviour, IOnEventCallback {
 
-	public GameObject ParasitePrefab;
+	GameObject ParasitePrefab;
 	public GameObject ParasiteControlsPrefab;
-	public GameObject HunterPrefab;
+	GameObject HunterPrefab;
 	public GameObject HunterControlsPrefab;
 	public GameObject HealthPrefab;
 	public GameObject NpcCountPrefab;
@@ -70,6 +70,8 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 	}
 
 	void Start() {
+		ParasitePrefab = Resources.Load("Parasite") as GameObject;
+		HunterPrefab = Resources.Load("Hunter") as GameObject;
 		// TODO: extract to UI manager
 		topRightUiText = GameObject.FindGameObjectWithTag("TopRightUI").GetComponent<Text>();
 	}
