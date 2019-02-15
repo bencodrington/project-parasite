@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class Elevator : NetworkBehaviour {
+public class Elevator : MonoBehaviourPun {
 	
 	const float LAG_LERP_FACTOR = 0.4f;
 	const float MOVEMENT_SPEED = 8f;
@@ -41,7 +41,8 @@ public class Elevator : NetworkBehaviour {
 			button = Instantiate(buttonPrefab, spawnPos, Quaternion.identity, transform).GetComponentInChildren<ElevatorButton>();
 			button.gameObject.GetComponentInChildren<Text>().text = (i + 1).ToString();
 			button.stopIndex = i;
-			button.elevatorId = this.netId;
+			// TODO:
+			// button.elevatorId = this.netId;
 			buttons[i] = button;
 			spawnPos.y += BUTTON_OFFSET;
 		}
@@ -49,7 +50,7 @@ public class Elevator : NetworkBehaviour {
 	}
 	
 	public void PhysicsUpdate() {
-		if (isServer) {
+		if (PhotonNetwork.IsMasterClient) {
 			if (isMoving) {
 				MoveToTargetStop();
 			} else {
@@ -101,8 +102,6 @@ public class Elevator : NetworkBehaviour {
 	}
 
 	// Commands
-
-	[Command]
 	public void CmdCallToStop(int indexOfStop) {
 		RpcEnableButton(targetStop);
 		targetStop = indexOfStop;
@@ -112,31 +111,26 @@ public class Elevator : NetworkBehaviour {
 	}
 
 	// ClientRpc
-
-	[ClientRpc]
 	void RpcUpdateServerPosition(Vector3 newPosition) {
-		if (isServer) { return; }
+		if (PhotonNetwork.IsMasterClient) { return; }
 		// Else, on a client machine, so update our record of the elevator's true position
 		serverPosition = newPosition;
 	}
 
-	[ClientRpc]
 	void RpcSetButtonActive(bool isEnabled) {
 		SetButtonActive(isEnabled);
 	}
 
-	[ClientRpc]
 	public void RpcSetStopCoordinates(float[] stops) {
 		this.stops = stops;
-		InitializeButtons();
+		// TODO:
+		// InitializeButtons();
 	}
 
-	[ClientRpc]
 	void RpcDisableButton(int index) {
 		buttons[index].isDisabled = true;
 	}
 
-	[ClientRpc]
 	void RpcEnableButton(int index) {
 		buttons[index].isDisabled = false;
 	}

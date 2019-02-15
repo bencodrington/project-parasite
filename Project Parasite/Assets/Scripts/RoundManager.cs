@@ -2,13 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
-using UnityEngine.Networking;
 
 public class RoundManager : MonoBehaviour {
 
 	PlayerObject[] connectedPlayers;
 
-	public GameObject objectManagerPrefab;
+	GameObject objectManagerPrefab;
 	ObjectManager objectManager;
 
 	public Vector2[] spawnPoints;
@@ -23,8 +22,9 @@ public class RoundManager : MonoBehaviour {
 
 	void Start () {
 		if (!PhotonNetwork.IsMasterClient) { return; }
-		// TODO:
-		// SpawnObjectManager();
+		objectManagerPrefab = Resources.Load("ObjectManager") as GameObject;
+		SpawnObjectManager();
+		objectManager.OnRoundStart();
 		// TODO:
 		// SelectSpawnPoints();
 		SelectParasite();
@@ -96,7 +96,9 @@ public class RoundManager : MonoBehaviour {
 	}
 
 	void SpawnObjectManager() {
-		PhotonNetwork.Instantiate(objectManagerPrefab.name, Vector3.zero, Quaternion.identity, 0);
+		GameObject oMGameObject = PhotonNetwork.Instantiate(objectManagerPrefab.name, Vector3.zero, Quaternion.identity, 0);
+		objectManager = oMGameObject.GetComponent<ObjectManager>();
+		// TODO:
 		// RpcSetObjectManager(objectManagerGameObject.GetComponent<NetworkIdentity>().netId);
 	}
 

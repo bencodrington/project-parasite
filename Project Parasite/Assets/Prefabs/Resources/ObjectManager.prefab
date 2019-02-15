@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1567054513807339570}
   - component: {fileID: 3352440500454858238}
   - component: {fileID: 7471505100910594985}
+  - component: {fileID: 1834820785548947604}
   m_Layer: 0
   m_Name: ObjectManager
   m_TagString: Untagged
@@ -81,3 +82,25 @@ MonoBehaviour:
     type: 3}
   elevatorCallFieldPrefab: {fileID: 1071992796203306, guid: 25d1080c17a5fad428d3d1dec9ffdab9,
     type: 3}
+--- !u!114 &1834820785548947604
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6443559730030799925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 0
+  OwnershipTransfer: 0
+  ObservedComponents:
+  - {fileID: 0}
+  viewIdField: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
