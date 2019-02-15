@@ -32,5 +32,9 @@ MonoBehaviour:
   - RpcUpdatePosition
   - RpcSpawnOrb
   - RpcRecallOrb
+  - RpcSetStopData
+  - RpcCallToStop
+  - RpcStoreElevator
+  - RpcSetObjectManager
   DisableAutoOpenWizard: 1
   ShowSettings: 1

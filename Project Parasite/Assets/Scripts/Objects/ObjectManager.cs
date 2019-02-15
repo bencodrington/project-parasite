@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class ObjectManager : MonoBehaviourPun {
 
-	GameObject elevatorPrefab;
-
 	class StopData {
 		public float yCoordinate;
 		public bool isOnRightSide;
@@ -57,7 +55,13 @@ public class ObjectManager : MonoBehaviourPun {
 		})
 	};
 
+	#region [Private Variables]
+
+	GameObject elevatorPrefab;
+	
 	List<Elevator> elevators;
+	
+	#endregion
 
 	#region [Public Methods]
 	
@@ -75,18 +79,12 @@ public class ObjectManager : MonoBehaviourPun {
 	}
 
 	public void PhysicsUpdate() {
-	// 	// Note: each object that needs to be updated every physics update needs to be
-	// 	// 	added (via Rpc) to the client ObjectManager's list of objects to update
-	// 	if (elevators == null) { return; }
-	// 	foreach (Elevator elevator in elevators) {
-	// 		elevator.PhysicsUpdate();
-	// 	}
-	// 	// Call fields are only updated every physics update on the server, and are
-	// 	// 	not stored on the client ObjectManager
-	// 	if (!isServer) { return; }
-	// 	foreach (ElevatorCallField callField in callFields) {
-	// 		callField.PhysicsUpdate();
-	// 	}
+		// Note: each object that needs to be updated every physics update needs to be
+		// 	added (via Rpc) to the client ObjectManager's list of objects to update
+		if (elevators == null) { return; }
+		foreach (Elevator elevator in elevators) {
+			elevator.PhysicsUpdate();
+		}
 	}
 	
 	#endregion
@@ -103,14 +101,15 @@ public class ObjectManager : MonoBehaviourPun {
 	#region [Private Methods]
 
 	void SpawnElevators() {
+		int elevatorViewId;
+		// This should only ever be called on the Master Client
 		foreach (ElevatorData elevatorData in elevatorDataArray) {
-			SpawnElevator(elevatorData);
-			// TODO:
-			// RpcStoreElevator(elevatorNetId);
+			elevatorViewId = SpawnElevator(elevatorData);
+			photonView.RPC("RpcStoreElevator", RpcTarget.All, elevatorViewId);
 		}
 	}
 
-	void SpawnElevator(ElevatorData elevatorData) {
+	int SpawnElevator(ElevatorData elevatorData) {
 		// Instantiate GameObject
 		GameObject elevatorGameObject = PhotonNetwork.Instantiate(
 											elevatorPrefab.name,
@@ -125,11 +124,7 @@ public class ObjectManager : MonoBehaviourPun {
 		}
 		// Let all copies of the elevator know what their stops are
 		elevator.photonView.RPC("RpcSetStopData", RpcTarget.All, yCoordinates, isOnRightSideValues);
-		// TODO:
-	// 	// Add to server master list of elevators
-	// 	elevators.Add(elevator);
-	// 	// Spawn the stops that belong to it
-	// 	SpawnStops(elevatorData, elevator);
+		return elevator.photonView.ViewID;
 	}
 
 	Vector2 GetElevatorSpawnCoordinates(ElevatorData elevator) {
@@ -140,7 +135,19 @@ public class ObjectManager : MonoBehaviourPun {
 
 	#endregion
 
-
+	[PunRPC]
+	void RpcStoreElevator(int elevatorViewId) {
+		Debug.Log("STORING ELEVATOR w ID: " + elevatorViewId);
+		// This function is used to cache references to elevators that have been spawned
+		// 	on the server. Otherwise the client ObjectManager will not know which elevators to update
+		// 	each PhysicsUpdate.
+		Elevator elevator = PhotonView.Find(elevatorViewId).GetComponentInChildren<Elevator>();
+		// TODO: cleanup: ensure that elevators list has been instantiated before adding to it
+		if (elevators == null) {
+			elevators = new List<Elevator>();
+		}
+		elevators.Add(elevator);
+	}
 	
 
 	
@@ -155,20 +162,5 @@ public class ObjectManager : MonoBehaviourPun {
 	// 	foreach(ElevatorCallField callField in callFields) {
 	// 		NetworkServer.Destroy(callField.gameObject);
 	// 	}
-	// }
-
-	// // ClientRpc
-	// [ClientRpc]
-	// void RpcStoreElevator(NetworkInstanceId elevatorNetId) {
-	// 	// This function is used to cache references (on the client) to elevators that have been spawned
-	// 	// 	on the server. Otherwise the client ObjectManager will not know which elevators to update
-	// 	// 	each PhysicsUpdate.
-	// 	if (isServer) { return; }
-	// 	Elevator elevator = Utility.GetLocalObject(elevatorNetId, isServer).GetComponentInChildren<Elevator>();
-	// 	// TODO: cleanup: ensure that elevators list has been instantiated before adding to it
-	// 	if (elevators == null) {
-	// 		elevators = new List<Elevator>();
-	// 	}
-	// 	elevators.Add(elevator);
 	// }
 }

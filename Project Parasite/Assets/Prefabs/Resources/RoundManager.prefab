@@ -44,8 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f82651a65d980144e9fff0278f28ae79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectManagerPrefab: {fileID: 6443559730030799925, guid: 12e852027c4ce8f41b7c7ec0c714e361,
-    type: 3}
   spawnPoints:
   - {x: -35, y: 35}
   - {x: -35, y: -9}

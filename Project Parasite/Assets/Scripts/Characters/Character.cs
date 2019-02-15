@@ -8,8 +8,7 @@ public abstract class Character : MonoBehaviourPun {
 	protected SpriteRenderer spriteRenderer;
 	protected PhysicsEntity physicsEntity;
 
-	// TODO:
-	// protected List<NetworkInstanceId> objectsInRange = new List<NetworkInstanceId>();
+	protected List<InteractableObject> objectsInRange = new List<InteractableObject>();
 
 	protected Vector3 serverPosition;
 	protected bool shouldSnapToServerPosition = false;
@@ -124,6 +123,13 @@ public abstract class Character : MonoBehaviourPun {
 			photonView.RPC("RpcUpdatePosition", RpcTarget.Others, transform.position, false);
 		}
 	}
+
+	public void RegisterInteractableObject(InteractableObject netId) {
+		objectsInRange.Add(netId);
+	}
+	public void UnregisterInteractableObject(InteractableObject netId) {
+		objectsInRange.Remove(netId);
+	}
 	
 	#endregion
 
@@ -180,32 +186,10 @@ public abstract class Character : MonoBehaviourPun {
 		shouldSnapToServerPosition = snapToNewPos;
 	}
 
-
-	// [Command]
-	// protected void CmdInteractWithObjectsInRange() {
-	// 	foreach (NetworkInstanceId netId in objectsInRange) {
-	// 		GameObject gameObject = Utility.GetLocalObject(netId, isServer);
-	// 		gameObject.GetComponentInChildren<InteractableObject>().OnInteract();
-	// 	}
-	// }
-
-	// [ClientRpc]
-	// public void RpcRegisterObject(NetworkInstanceId netId) {
-	// 	objectsInRange.Add(netId);
-	// 	// TODO: just get the InteractableObject and store that
-	// 	if (HasAuthority()) {
-	// 		// Show 'E' help key
-	// 		Utility.GetLocalObject(netId, isServer).GetComponentInChildren<InteractableObject>().SetIsInRange(true);
-	// 	}
-	// }
-
-	// [ClientRpc]
-	// public void RpcUnregisterObject(NetworkInstanceId netId) {
-	// 	objectsInRange.Remove(netId);
-	// 	if (HasAuthority()) {
-	// 		// Hide 'E' help key
-	// 		Utility.GetLocalObject(netId, isServer).GetComponentInChildren<InteractableObject>().SetIsInRange(false);
-	// 	}
-	// }
+	protected void InteractWithObjectsInRange() {
+		foreach (InteractableObject interactableObject in objectsInRange) {
+			interactableObject.OnInteract();
+		}
+	}
 
 }

@@ -57,32 +57,36 @@ public class Elevator : MonoBehaviourPun {
 	}
 	
 	public void PhysicsUpdate() {
-		if (PhotonNetwork.IsMasterClient) {
-			if (isMoving) {
-				MoveToTargetStop();
-			} else {
-				// TODO: this probably doesn't need to run every single physics update
-				// Check for entity within borders
-				Vector2 halfSize = SIZE / 2;
-				passengers = Physics2D.OverlapAreaAll((Vector2)transform.position - halfSize,
-												(Vector2)transform.position + halfSize,
-												Utility.GetLayerMask("character"));
-				Debug.DrawLine((Vector2)transform.position - halfSize, (Vector2)transform.position + halfSize);
-				if (passengers.Length > 0) {
-					// Show buttons on client
-					RpcSetButtonActive(true);
-				} else {
-					// Hide buttons on client
-					RpcSetButtonActive(false);
-				}
-			}
-			RpcUpdateServerPosition(transform.position);
-		} else {
-			transform.position = Vector3.Lerp(transform.position, serverPosition, LAG_LERP_FACTOR);
-		}
+		// if (PhotonNetwork.IsMasterClient) {
+		// 	if (isMoving) {
+		// 		MoveToTargetStop();
+		// 	} else {
+		// 		// TODO: this probably doesn't need to run every single physics update
+		// 		// Check for entity within borders
+		// 		Vector2 halfSize = SIZE / 2;
+		// 		passengers = Physics2D.OverlapAreaAll((Vector2)transform.position - halfSize,
+		// 										(Vector2)transform.position + halfSize,
+		// 										Utility.GetLayerMask("character"));
+		// 		Debug.DrawLine((Vector2)transform.position - halfSize, (Vector2)transform.position + halfSize);
+		// 		if (passengers.Length > 0) {
+		// 			// Show buttons on client
+		// 			RpcSetButtonActive(true);
+		// 		} else {
+		// 			// Hide buttons on client
+		// 			RpcSetButtonActive(false);
+		// 		}
+		// 	}
+		// 	RpcUpdateServerPosition(transform.position);
+		// } else {
+		// 	transform.position = Vector3.Lerp(transform.position, serverPosition, LAG_LERP_FACTOR);
+		// }
 		// Update each kinematicPhysicsEntity in this component's children (floor/ceiling)
 		foreach(KinematicPhysicsEntity entity in kinematicPhysicsEntities) {
 			entity.PhysicsUpdate();
+		}
+		// Update each callfield (a.k.a. stop) that belongs to this elevator
+		foreach(ElevatorCallField callField in callFields) {
+			callField.PhysicsUpdate();
 		}
 	}
 
@@ -144,17 +148,14 @@ public class Elevator : MonoBehaviourPun {
 		// InitializeButtons();
 	}
 
-
-
-
-
-	// Commands
-	public void CmdCallToStop(int indexOfStop) {
-		RpcEnableButton(targetStop);
-		targetStop = indexOfStop;
-		isMoving = true;
-		SetButtonActive(false);
-		RpcSetButtonActive(false);
+	[PunRPC]
+	public void RpcCallToStop(int indexOfStop) {
+		Debug.Log("Called to stop: " + indexOfStop);
+		// RpcEnableButton(targetStop);
+		// targetStop = indexOfStop;
+		// isMoving = true;
+		// SetButtonActive(false);
+		// RpcSetButtonActive(false);
 	}
 
 	// ClientRpc

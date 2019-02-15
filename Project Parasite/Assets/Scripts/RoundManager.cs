@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
 
-public class RoundManager : MonoBehaviour {
+public class RoundManager : MonoBehaviourPun {
 
 	PlayerObject[] connectedPlayers;
 
@@ -20,11 +20,12 @@ public class RoundManager : MonoBehaviour {
 	bool huntersOnlyMode = true;
 	bool DEBUG_MODE = true;
 
+	#region [MonoBehaviour Callbacks]
+	
 	void Start () {
 		if (!PhotonNetwork.IsMasterClient) { return; }
 		objectManagerPrefab = Resources.Load("ObjectManager") as GameObject;
 		SpawnObjectManager();
-		objectManager.OnRoundStart();
 		// TODO:
 		// SelectSpawnPoints();
 		SelectParasite();
@@ -41,7 +42,19 @@ public class RoundManager : MonoBehaviour {
 			character.PhysicsUpdate();
 		}
 	}
+	
+	#endregion
 
+	public void EndRound() {
+		foreach (PlayerObject player in connectedPlayers) {
+			// TODO:
+			// player.CmdEndRound();
+		}
+		transform.GetComponentInChildren<NpcManager>().DespawnNPCs();
+		objectManager.OnRoundEnd();
+	}
+
+	#region [Private Methods]
 	void SelectParasite() {
 		int n = PhotonNetwork.PlayerList.Length;
 		Vector2 spawnPoint;
@@ -65,7 +78,7 @@ public class RoundManager : MonoBehaviour {
 			// connectedPlayers[i].CmdAssignCharacterTypeAndSpawnPoint(characterType, spawnPoint);
 		}
 	}
-	
+
 	void SelectSpawnPoints() {
 		int n = spawnPoints.Length;
 		int parasiteSpawnPointIndex, hunterSpawnPointIndex;
@@ -86,27 +99,18 @@ public class RoundManager : MonoBehaviour {
 		}
 	}
 
-	public void EndRound() {
-		foreach (PlayerObject player in connectedPlayers) {
-			// TODO:
-			// player.CmdEndRound();
-		}
-		transform.GetComponentInChildren<NpcManager>().DespawnNPCs();
-		objectManager.OnRoundEnd();
-	}
-
 	void SpawnObjectManager() {
 		GameObject oMGameObject = PhotonNetwork.Instantiate(objectManagerPrefab.name, Vector3.zero, Quaternion.identity, 0);
 		objectManager = oMGameObject.GetComponent<ObjectManager>();
-		// TODO:
-		// RpcSetObjectManager(objectManagerGameObject.GetComponent<NetworkIdentity>().netId);
+		photonView.RPC("RpcSetObjectManager", RpcTarget.All, objectManager.photonView.ViewID);
 	}
+	
+	#endregion
 
-	// // ClientRpc
-	// [ClientRpc]
-	// void RpcSetObjectManager(NetworkInstanceId objectManagerNetId) {
-	// 	objectManager = Utility.GetLocalObject(objectManagerNetId, isServer).GetComponentInChildren<ObjectManager>();
-	// 	objectManager.OnRoundStart();
-	// }
+	[PunRPC]
+	void RpcSetObjectManager(int objectManagerViewId) {
+		objectManager = PhotonView.Find(objectManagerViewId).GetComponentInChildren<ObjectManager>();
+		objectManager.OnRoundStart();
+	}
 
 }
