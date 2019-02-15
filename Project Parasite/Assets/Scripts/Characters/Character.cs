@@ -176,10 +176,8 @@ public abstract class Character : MonoBehaviourPun {
 
 	[PunRPC]
 	protected void RpcUpdatePosition(Vector3 newPosition, bool snapToNewPos) {
-		Debug.Log("Received position: " + newPosition + ", shouldSnap: " + shouldSnapToServerPosition);
-		// TODO:
-		// serverPosition = newPosition;
-		// shouldSnapToServerPosition = snapToNewPos;
+		serverPosition = newPosition;
+		shouldSnapToServerPosition = snapToNewPos;
 	}
 
 
