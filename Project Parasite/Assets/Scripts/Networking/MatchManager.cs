@@ -40,7 +40,6 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     }
 
     public void StartGame() {
-        Debug.Log("master client: starting game");
         byte eventCode = EventCodes.StartGame;
         EventCodes.RaiseEventAll(eventCode, null);
     }
