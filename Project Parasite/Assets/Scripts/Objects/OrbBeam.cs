@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
-public class OrbBeam : NetworkBehaviour {
+public class OrbBeam : MonoBehaviour {
 
 	float energyRadius = 2f;
 	float energyForce = 10f;
@@ -18,7 +17,7 @@ public class OrbBeam : NetworkBehaviour {
 
 	SpriteRenderer spriteRenderer;
 
-	void Initialize(Vector2 startPoint, Vector2 endPoint) {
+	public void Initialize(Vector2 startPoint, Vector2 endPoint) {
 		this.startPoint = startPoint;
 		this.endPoint = endPoint;
 		normal = Vector2.Perpendicular(endPoint - startPoint).normalized;
@@ -37,7 +36,8 @@ public class OrbBeam : NetworkBehaviour {
 	}
 
 	void FixedUpdate() {
-		Repel();
+		// TODO:
+		// Repel();
 		Fry();
 	}
 
@@ -71,7 +71,8 @@ public class OrbBeam : NetworkBehaviour {
 		// Fry each uninfected NPC on the server
 		foreach (RaycastHit2D hit in hits) {
 			npc = hit.transform.parent.GetComponent<NonPlayerCharacter>();
-			if (isServer && !npc.isInfected) {
+			if (!npc.isInfected) {
+			// if (isServer && !npc.isInfected) {
 				// TODO:
 				// FindObjectOfType<NpcManager>().DespawnNpc(npc.netId);
 			} else if (npc.isInfected && PlayerGrid.Instance.GetLocalCharacter() == npc) {
@@ -105,12 +106,5 @@ public class OrbBeam : NetworkBehaviour {
 		// FORCE OUTPUT:	   ^--FULL FORCE--^			       0
 		float t = (distance - fullForceCutoff) / (energyRadius - fullForceCutoff);
 		return Mathf.Lerp(energyForce, 0, t);
-	}
-
-	// ClientRpc
-
-	[ClientRpc]
-	public void RpcInitialize(Vector2 startPoint, Vector2 endPoint) {
-		Initialize(startPoint, endPoint);
 	}
 }

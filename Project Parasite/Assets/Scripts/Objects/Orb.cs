@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
-public class Orb : NetworkBehaviour {
+public class Orb : MonoBehaviour {
 
 	float energyRadius = 2f;
 	float energyForce = 1f;
@@ -11,15 +10,16 @@ public class Orb : NetworkBehaviour {
 	OrbBeam beam;
 
 	void FixedUpdate() {
-		Collider2D[] hunterColliders = Physics2D.OverlapCircleAll(transform.position, energyRadius, Utility.GetLayerMask("energyCenter"));
-		Vector2 forceDirection;
-		foreach (Collider2D hunterCollider in hunterColliders) {
-			Hunter hunter = hunterCollider.transform.parent.GetComponent<Hunter>();
-			if ((Character)hunter == PlayerGrid.Instance.GetLocalCharacter()) {
-				forceDirection = hunterCollider.transform.position - transform.position;
-				hunter.Repel(forceDirection, CalculateForce(hunterCollider.transform.position));
-			}
-		}
+		// TODO:
+		// Collider2D[] hunterColliders = Physics2D.OverlapCircleAll(transform.position, energyRadius, Utility.GetLayerMask("energyCenter"));
+		// Vector2 forceDirection;
+		// foreach (Collider2D hunterCollider in hunterColliders) {
+		// 	Hunter hunter = hunterCollider.transform.parent.GetComponent<Hunter>();
+		// 	if ((Character)hunter == PlayerGrid.Instance.GetLocalCharacter()) {
+		// 		forceDirection = hunterCollider.transform.position - transform.position;
+		// 		hunter.Repel(forceDirection, CalculateForce(hunterCollider.transform.position));
+		// 	}
+		// }
 	}
 
 	float CalculateForce(Vector2 hunterPosition) {
