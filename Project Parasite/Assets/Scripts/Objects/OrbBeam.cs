@@ -36,8 +36,7 @@ public class OrbBeam : MonoBehaviour {
 	}
 
 	void FixedUpdate() {
-		// TODO:
-		// Repel();
+		Repel();
 		Fry();
 	}
 
@@ -48,7 +47,7 @@ public class OrbBeam : MonoBehaviour {
 		Collider2D[] energyCenterColliders = Physics2D.OverlapBoxAll(transform.position, hitboxSize, hitboxAngle, Utility.GetLayerMask("energyCenter"));
 		foreach (Collider2D energyCenterCollider in energyCenterColliders) {
 			Hunter hunter = energyCenterCollider.transform.parent.GetComponent<Hunter>();
-			if ((Character)hunter == PlayerGrid.Instance.GetLocalCharacter()) {
+			if (hunter.photonView.IsMine) {
 				hunterPosition = energyCenterCollider.transform.position;
 				// Find the point on the orb beam line that is nearest to the hunter
 				projectionOntoOrbBeam = Utility.ProjectOntoRay2D(hunterPosition, hitboxRay);

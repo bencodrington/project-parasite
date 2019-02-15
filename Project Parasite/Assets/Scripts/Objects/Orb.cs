@@ -10,16 +10,15 @@ public class Orb : MonoBehaviour {
 	OrbBeam beam;
 
 	void FixedUpdate() {
-		// TODO:
-		// Collider2D[] hunterColliders = Physics2D.OverlapCircleAll(transform.position, energyRadius, Utility.GetLayerMask("energyCenter"));
-		// Vector2 forceDirection;
-		// foreach (Collider2D hunterCollider in hunterColliders) {
-		// 	Hunter hunter = hunterCollider.transform.parent.GetComponent<Hunter>();
-		// 	if ((Character)hunter == PlayerGrid.Instance.GetLocalCharacter()) {
-		// 		forceDirection = hunterCollider.transform.position - transform.position;
-		// 		hunter.Repel(forceDirection, CalculateForce(hunterCollider.transform.position));
-		// 	}
-		// }
+		Collider2D[] hunterColliders = Physics2D.OverlapCircleAll(transform.position, energyRadius, Utility.GetLayerMask("energyCenter"));
+		Vector2 forceDirection;
+		foreach (Collider2D hunterCollider in hunterColliders) {
+			Hunter hunter = hunterCollider.transform.parent.GetComponent<Hunter>();
+			if (hunter.photonView.IsMine) {
+				forceDirection = hunterCollider.transform.position - transform.position;
+				hunter.Repel(forceDirection, CalculateForce(hunterCollider.transform.position));
+			}
+		}
 	}
 
 	float CalculateForce(Vector2 hunterPosition) {
