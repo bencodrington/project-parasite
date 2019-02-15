@@ -142,7 +142,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 	#region [Private Methods]
 	
 	void SpawnPlayerCharacter(CharacterType characterType, Vector3 atPosition, Vector2 velocity) {
-		Debug.Log("Spawning character of type " + characterType);
 		GameObject characterPrefab = characterType == CharacterType.Parasite ? ParasitePrefab : HunterPrefab;
     	// Create PlayerCharacter game object on the server
     	characterGameObject = PhotonNetwork.Instantiate(characterPrefab.name, atPosition, Quaternion.identity);

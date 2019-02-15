@@ -157,7 +157,6 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
             }
         }
         // If we got here, all connected players are ready
-        Debug.Log("Everyone's ready!");
         if (PhotonNetwork.IsMasterClient) {
             StartGame();
         }
