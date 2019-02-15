@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
-using UnityEngine.Networking;
 
 public class ElevatorCallField : InteractableObject {
 
@@ -25,7 +25,6 @@ public class ElevatorCallField : InteractableObject {
 	} 
 
 	public void PhysicsUpdate() {
-		if (!isServer) { return; }
 		// TODO: this probably doesn't need to run every single physics update
 		// Check for entity within borders
 		callers = Physics2D.OverlapAreaAll(transform.position,
@@ -96,7 +95,6 @@ public class ElevatorCallField : InteractableObject {
 	}
 
 	// Commands
-	[Command]
 	void CmdCallElevator() {
 		CallElevator();
 	}

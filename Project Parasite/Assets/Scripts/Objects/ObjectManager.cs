@@ -6,10 +6,6 @@ using UnityEngine;
 public class ObjectManager : MonoBehaviourPun {
 
 	GameObject elevatorPrefab;
-	public GameObject elevatorCallFieldPrefab;
-
-	// How far from the elevator's center should the callfield center be
-	const float STOP_X_OFFSET = 2f;
 
 	class StopData {
 		public float yCoordinate;
@@ -62,7 +58,6 @@ public class ObjectManager : MonoBehaviourPun {
 	};
 
 	List<Elevator> elevators;
-	List<ElevatorCallField> callFields;
 
 	#region [Public Methods]
 	
@@ -99,9 +94,8 @@ public class ObjectManager : MonoBehaviourPun {
 	#region [MonoBehaviour Callbacks]
 	
 	void Awake() {
-		// Initialize lists of elevators & callfields(a.k.a. stops)
+		// Initialize lists of elevators
 		elevators = new List<Elevator>();
-		callFields = new List<ElevatorCallField>();
 	}
 	
 	#endregion
@@ -124,11 +118,13 @@ public class ObjectManager : MonoBehaviourPun {
 											Quaternion.identity);
 		Elevator elevator = elevatorGameObject.GetComponent<Elevator>();
 		float[] yCoordinates = new float[elevatorData.stops.Length];
+		bool[] isOnRightSideValues = new bool[yCoordinates.Length];
 		for (int i = 0; i < yCoordinates.Length; i++) {
 			yCoordinates[i] = elevatorData.stops[i].yCoordinate;
+			isOnRightSideValues[i] = elevatorData.stops[i].isOnRightSide;
 		}
 		// Let all copies of the elevator know what their stops are
-		elevator.RpcSetStopCoordinates(yCoordinates);
+		elevator.photonView.RPC("RpcSetStopData", RpcTarget.All, yCoordinates, isOnRightSideValues);
 		// TODO:
 	// 	// Add to server master list of elevators
 	// 	elevators.Add(elevator);
@@ -147,35 +143,7 @@ public class ObjectManager : MonoBehaviourPun {
 
 	
 
-	// void SpawnStops(ElevatorData elevatorData, Elevator elevator) {
-	// 	for (int i = 0; i < elevatorData.stops.Length; i++) {
-	// 		SpawnStop(elevatorData.stops[i], i, elevatorData.xCoordinate, elevator);
-	// 	}
-	// }
-
-	// void SpawnStop(StopData stop, int index, float xCoordinate, Elevator elevator) {
-	// 	// Instantiate GameObject
-	// 	GameObject callFieldGameObject = GameObject.Instantiate(
-	// 							elevatorCallFieldPrefab,
-	// 							GetStopSpawnCoordinates(stop, xCoordinate),
-	// 							Quaternion.identity);
-	// 	// Share with clients
-	// 	NetworkServer.Spawn(callFieldGameObject);
-	// 	ElevatorCallField callField = callFieldGameObject.GetComponent<ElevatorCallField>();
-	// 	// Client callfields don't need to know their elevator nor stopIndex
-	// 	// 	because all checking for callers and calling is done server-side
-	// 	callField.elevator = elevator;
-	// 	callField.stopIndex = index;
-	// 	callFields.Add(callField);
-	// }
-
-	// Vector2 GetStopSpawnCoordinates(StopData stop, float xCoordinate) {
-	// 	// -1f is because call fields are positioned by their bottom left corner, not the middle
-	// 	// TODO: that can be cleaner
-	// 	xCoordinate += stop.isOnRightSide ? STOP_X_OFFSET - 1f : -STOP_X_OFFSET - 1f;
-	// 	// TODO: replace magic number, half of elevator height
-	// 	return new Vector2(xCoordinate, stop.yCoordinate - 1.5f);
-	// }
+	
 
 	// void DestroyElevators() {
 	// 	foreach(Elevator elevator in elevators) {

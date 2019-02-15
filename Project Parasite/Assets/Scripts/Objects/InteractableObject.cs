@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
-public abstract class InteractableObject : NetworkBehaviour {
+public abstract class InteractableObject : MonoBehaviour {
     // Whether the object is in range of being interacted with
     bool _isInRange = false;
 
