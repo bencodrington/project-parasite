@@ -119,7 +119,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 			int actorNumber = (int)content[0];
 			CharacterType characterType = (CharacterType)content[1];
 			Vector3 spawnPoint = Vector3.zero;
-			Debug.Log("aN: " + actorNumber + ", local aN: " + PhotonNetwork.LocalPlayer.ActorNumber);
 			if (actorNumber == PhotonNetwork.LocalPlayer.ActorNumber) {
 				// Spawn Character of type `characterType` across clients
 				SpawnPlayerCharacter(characterType, spawnPoint, Vector2.zero);
