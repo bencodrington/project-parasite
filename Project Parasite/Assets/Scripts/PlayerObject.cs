@@ -54,6 +54,8 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 			_parasiteHealth = value;
 			UpdateHealthObject(value);
 			if (value <= 0) {
+				// No need to keep sending this event
+				if (gameOverScreen != null) { return; }
 				Debug.Log("Hunters Win!");
                 EventCodes.RaiseGameOverEvent(CharacterType.Hunter);
 			}
@@ -83,34 +85,35 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 		topRightUiText.text = newValue.ToString();
 	}
 
-	void DestroyGameOverScreen() {
-		// gameOverScreen should be null when starting the game from the main menu
-		// 	as opposed to when restarting after a round has been completed
-		if (gameOverScreen == null) { return; }
-		Destroy(gameOverScreen.gameObject);
-	}
-
 	public void ParasiteTakeDamage(int damage) {
 		ParasiteHealth -= damage;
 	}
 
     public void OnEvent(EventData photonEvent)
     {
-        if (photonEvent.Code == EventCodes.AssignPlayerType) {
-			// Deconstruct event
-			int actorNumber = (int)EventCodes.GetEventContentAtPosition(photonEvent, 0);
-			CharacterType assignedCharacterType = (CharacterType)EventCodes.GetEventContentAtPosition(photonEvent, 1);
-			Vector3 spawnPoint = Vector3.zero;
-			if (actorNumber == PhotonNetwork.LocalPlayer.ActorNumber) {
-				// Spawn Character of type `assignedCharacterType` across clients
-				SpawnPlayerCharacter(assignedCharacterType, spawnPoint, Vector2.zero);
-				// TODO: update hud
-			}
-		} else if (photonEvent.Code == EventCodes.GameOver) {
-			// Deconstruct event
-			CharacterType victorType = (CharacterType)EventCodes.GetFirstEventContent(photonEvent);
-			// TODO: if gameOver already called, don't do this again
-			ShowGameOverScreen(victorType);
+		switch (photonEvent.Code) {
+			case EventCodes.StartGame:
+				// TODO: extract to UI Manager
+				DestroyGameOverScreen();
+				DestroyCharacter();
+				// TODO: destroy hud
+				break;
+			case EventCodes.AssignPlayerType:
+				// Deconstruct event
+				int actorNumber = (int)EventCodes.GetEventContentAtPosition(photonEvent, 0);
+				CharacterType assignedCharacterType = (CharacterType)EventCodes.GetEventContentAtPosition(photonEvent, 1);
+				Vector3 spawnPoint = Vector3.zero;
+				if (actorNumber == PhotonNetwork.LocalPlayer.ActorNumber) {
+					// Spawn Character of type `assignedCharacterType` across clients
+					SpawnPlayerCharacter(assignedCharacterType, spawnPoint, Vector2.zero);
+					// TODO: update hud
+				}
+				break;
+			case EventCodes.GameOver: 
+				// Deconstruct event
+				CharacterType victorType = (CharacterType)EventCodes.GetFirstEventContent(photonEvent);
+				ShowGameOverScreen(victorType);
+				break;
 		}
     }
 
@@ -153,6 +156,8 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 
 	// TODO: extract to UI manager
 	void ShowGameOverScreen(CharacterType victorType) {
+		// Don't spawn another gameover screen if one already exists
+		if (gameOverScreen != null) { return; }
 		gameOverScreen = PhotonNetwork.IsMasterClient ? Instantiate(GameOverScreenServerPrefab) : Instantiate(GameOverScreenPrefab);
 		gameOverScreen.transform.SetParent(FindObjectOfType<Canvas>().transform);
 		RectTransform rect = gameOverScreen.GetComponent<RectTransform>();
@@ -170,12 +175,25 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 		txt.text = victorType == CharacterType.Hunter ? HUNTERS_WIN : PARASITE_WINS;
 		txt.color = victorType == characterType ? WIN_COLOUR : LOSS_COLOUR;
 	}
+
+	void DestroyGameOverScreen() {
+		// gameOverScreen should be null when starting the game from the main menu
+		// 	as opposed to when restarting after a round has been completed
+		if (gameOverScreen == null) { return; }
+		Destroy(gameOverScreen.gameObject);
+	}
+
+	void DestroyCharacter() {
+    	if (characterGameObject != null) {
+    		OnCharacterDestroy();
+    		PhotonNetwork.Destroy(characterGameObject);
+    	}
+    }
 	
 	#endregion
 
     // // Commands
 
-    // [Command]
     // public void CmdAssignCharacterTypeAndSpawnPoint(CharacterType characterType, Vector2 spawnPoint) {
     // 	// Spawn Character across clients
     // 	CmdSpawnPlayerCharacter(characterType, spawnPoint, Vector2.zero);
@@ -185,33 +203,12 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
     // 	RpcUpdateHud();
     // }
 
-    // [Command]
-    // public void CmdDestroyGameOverScreen() {
-    // 	RpcDestroyGameOverScreen();
-    // }
-
-    // [Command]
-    // public void CmdDestroyCharacter() {
-    // 	if (characterGameObject != null) {
-    // 		OnCharacterDestroy();
-    // 		NetworkServer.Destroy(characterGameObject);
-    // 	}
-    // }
-
-    // [Command]
-    // public void CmdEndRound() {
-    // 	CmdDestroyCharacter();
-    // 	RpcRemoveHud();
-    // }
-
-    // [Command]
     // public void CmdCallElevatorToStop(NetworkInstanceId elevatorId, int stopIndex) {
     // 	NetworkServer.FindLocalObject(elevatorId).GetComponentInChildren<Elevator>().CmdCallToStop(stopIndex);
     // }
 
     // // ClientRpc
 
-    // [ClientRpc]
     // void RpcUpdateHud() {
     // 	if (!isLocalPlayer) { return; }
     // 	CharacterType characterType = PlayerGrid.Instance.GetLocalCharacterType();
@@ -236,7 +233,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
     // 	npcCountObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(UI_PADDING_DISTANCE, -UI_PADDING_DISTANCE);
     // }
 
-    // [ClientRpc]
     // void RpcRemoveHud() {
     // 	if (!isLocalPlayer) { return; }
     // 	if (topRightUiText != null) {
@@ -250,14 +246,8 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
     // 	}
     // }
 
-    // [ClientRpc]
     // public void RpcUpdateRemainingNpcCount(int updatedCount) {
     // 	if (!isLocalPlayer) { return; }
     // 	RemainingNpcCount = updatedCount;
-    // }
-
-    // [ClientRpc]
-    // void RpcDestroyGameOverScreen() {
-    // 	PlayerGrid.Instance.GetLocalPlayerObject().DestroyGameOverScreen();
     // }
 }

@@ -21,6 +21,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     #region [Private Variables]
     
     GameObject roundManagerPrefab;
+    RoundManager roundManager;
     const int MAX_PLAYERS_PER_ROOM = 4;
     Dictionary<int, bool> playersReady;
 
@@ -77,6 +78,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     #endregion
 
     public void OnEvent(EventData photonEvent) {
+        GameObject roundManagerGameObject;
         if (photonEvent.Code == EventCodes.SetReady) {
             // Deconstruct event
             object[] content = (object[])photonEvent.CustomData;
@@ -97,14 +99,17 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
             menu.DeleteMenuItems();
 
             if (PhotonNetwork.IsMasterClient) {
-                // If roundmanager exists, end round and destroy it
-                // TODO:
+                // If roundmanager exists, end round
+                if (roundManager != null) {
+                    roundManager.EndRound();
+                }
                 // Create new roundmanager
                 if (roundManagerPrefab == null) {
                     Debug.LogError("MatchManager: OnEvent: roundManagerPrefab not set.");
                     return;
                 }
-                PhotonNetwork.Instantiate(roundManagerPrefab.name, Vector3.zero, Quaternion.identity, 0);
+                roundManagerGameObject = PhotonNetwork.Instantiate(roundManagerPrefab.name, Vector3.zero, Quaternion.identity, 0);
+                roundManager = roundManagerGameObject.GetComponent<RoundManager>();
 
             }
         }
