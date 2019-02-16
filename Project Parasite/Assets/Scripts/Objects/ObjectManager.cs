@@ -74,8 +74,7 @@ public class ObjectManager : MonoBehaviourPun {
 
 	public void OnRoundEnd() {
 		if (!PhotonNetwork.IsMasterClient) { return; }
-		// DestroyElevators();
-		// DestroyCallFields();
+		DestroyElevators();
 	}
 
 	public void PhysicsUpdate() {
@@ -133,6 +132,12 @@ public class ObjectManager : MonoBehaviourPun {
 		return new Vector2(elevator.xCoordinate, yCoordinate);
 	}
 
+	void DestroyElevators() {
+		foreach(Elevator elevator in elevators) {
+			PhotonNetwork.Destroy(elevator.gameObject);
+		}
+	}
+
 	#endregion
 
 	[PunRPC]
@@ -147,19 +152,4 @@ public class ObjectManager : MonoBehaviourPun {
 		}
 		elevators.Add(elevator);
 	}
-	
-
-	
-
-	// void DestroyElevators() {
-	// 	foreach(Elevator elevator in elevators) {
-	// 		NetworkServer.Destroy(elevator.gameObject);
-	// 	}
-	// }
-
-	// void DestroyCallFields() {
-	// 	foreach(ElevatorCallField callField in callFields) {
-	// 		NetworkServer.Destroy(callField.gameObject);
-	// 	}
-	// }
 }

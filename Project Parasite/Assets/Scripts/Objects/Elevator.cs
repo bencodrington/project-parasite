@@ -36,15 +36,6 @@ public class Elevator : MonoBehaviourPun {
 	
 	#endregion
 
-	#region [MonoBehaviour Callbacks]
-	
-	void Awake() {
-		kinematicPhysicsEntities = GetComponentsInChildren<KinematicPhysicsEntity>();
-		callFields = new List<ElevatorCallField>();
-	}
-	
-	#endregion
-
 
 	#region [Public Methods]
 	
@@ -73,29 +64,22 @@ public class Elevator : MonoBehaviourPun {
 	}
 	
 	#endregion
-	
-	
 
-	void MoveToTargetStop() {
-		Vector2 targetPosition;
-		float potentialMovement = MOVEMENT_SPEED * Time.deltaTime;
-		targetPosition = new Vector2(transform.position.x, stopYCoordinates[targetStop]);
-		if (Vector3.Distance(transform.position, targetPosition) < potentialMovement) {
-			// Destination reached
-			transform.position = targetPosition;
-			isMoving = false;
-			// Disable this floor's button
-			DisableButton(targetStop);
-		} else {
-			transform.position = Vector3.MoveTowards(transform.position, targetPosition, potentialMovement);
-		}
+	#region [MonoBehaviour Callbacks]
+	
+	void Awake() {
+		kinematicPhysicsEntities = GetComponentsInChildren<KinematicPhysicsEntity>();
+		callFields = new List<ElevatorCallField>();
 	}
 
-	void SetAllButtonsActive(bool isActive) {
-		for (int i = 0; i < buttons.Length; i++) {
-			buttons[i].gameObject.SetActive(isActive);
+	void OnDestroy() {
+		Debug.Log("Destroying elevator and its callFields");
+		foreach (ElevatorCallField callField in callFields) {
+			Destroy(callField);
 		}
 	}
+	
+	#endregion
 
 	#region [Private Methods]
 	
@@ -167,6 +151,27 @@ public class Elevator : MonoBehaviourPun {
 		} else {
 			// Hide buttons on client
 			SetAllButtonsActive(false);
+		}
+	}
+
+	void MoveToTargetStop() {
+		Vector2 targetPosition;
+		float potentialMovement = MOVEMENT_SPEED * Time.deltaTime;
+		targetPosition = new Vector2(transform.position.x, stopYCoordinates[targetStop]);
+		if (Vector3.Distance(transform.position, targetPosition) < potentialMovement) {
+			// Destination reached
+			transform.position = targetPosition;
+			isMoving = false;
+			// Disable this floor's button
+			DisableButton(targetStop);
+		} else {
+			transform.position = Vector3.MoveTowards(transform.position, targetPosition, potentialMovement);
+		}
+	}
+
+	void SetAllButtonsActive(bool isActive) {
+		for (int i = 0; i < buttons.Length; i++) {
+			buttons[i].gameObject.SetActive(isActive);
 		}
 	}
 	
