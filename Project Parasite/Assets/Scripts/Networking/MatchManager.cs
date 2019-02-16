@@ -14,15 +14,14 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     
     // Prefabs for the various menu item sets this flow requires
     public MenuItemSet searchingForPlayersMenuItemSet;
-    GameObject roundManagerPrefab;
     public GameObject playerObjectPrefab;
     
     #endregion
 
     #region [Private Variables]
     
+    GameObject roundManagerPrefab;
     const int MAX_PLAYERS_PER_ROOM = 4;
-
     Dictionary<int, bool> playersReady;
 
     #endregion

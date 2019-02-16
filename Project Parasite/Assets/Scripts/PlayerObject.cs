@@ -53,8 +53,8 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 			_parasiteHealth = value;
 			UpdateHealthObject(value);
 			if (value <= 0) {
-				// TODO:
-				// CmdShowGameOverScreen(CharacterType.Hunter);
+				Debug.Log("Parasite Wins!");
+                EventCodes.RaiseGameOverEvent(CharacterType.Hunter);
 			}
 		}
 	}

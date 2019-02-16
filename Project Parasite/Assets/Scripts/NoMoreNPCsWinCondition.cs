@@ -24,8 +24,9 @@ public class NoMoreNPCsWinCondition : IOnEventCallback
     }
 
     public void OnEvent(EventData photonEvent) {
+        object[] content;
         if (photonEvent.Code == EventCodes.SetNpcCount) {
-            object[] content = (object[])photonEvent.CustomData;
+            content = (object[])photonEvent.CustomData;
             npcCount = (int)content[0];
         } else if (photonEvent.Code == EventCodes.NpcDespawned) {
             npcCount--;
@@ -33,6 +34,7 @@ public class NoMoreNPCsWinCondition : IOnEventCallback
                 // TODO:
                 // Hunters Win
                 Debug.Log("HUNTERS WIN");
+                EventCodes.RaiseGameOverEvent(CharacterType.Hunter);
 		        PhotonNetwork.RemoveCallbackTarget(this);
             }
         }

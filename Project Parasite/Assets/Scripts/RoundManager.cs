@@ -7,8 +7,6 @@ using UnityEngine;
 
 public class RoundManager : MonoBehaviourPun {
 
-	PlayerObject[] connectedPlayers;
-
 	GameObject objectManagerPrefab;
 	ObjectManager objectManager;
 
@@ -51,10 +49,6 @@ public class RoundManager : MonoBehaviourPun {
 	#endregion
 
 	public void EndRound() {
-		foreach (PlayerObject player in connectedPlayers) {
-			// TODO:
-			// player.CmdEndRound();
-		}
 		transform.GetComponentInChildren<NpcManager>().DespawnNPCs();
 		objectManager.OnRoundEnd();
 	}
