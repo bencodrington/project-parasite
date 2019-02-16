@@ -10,36 +10,45 @@ using UnityEngine.UI;
 
 public class PlayerObject : MonoBehaviour, IOnEventCallback {
 
-	GameObject ParasitePrefab;
+	#region [Public Variables]
+	
 	public GameObject ParasiteControlsPrefab;
-	GameObject HunterPrefab;
 	public GameObject HunterControlsPrefab;
 	public GameObject HealthPrefab;
 	public GameObject NpcCountPrefab;
 	public GameObject GameOverScreenPrefab;
 	public GameObject GameOverScreenServerPrefab;
+	
+	#endregion
 
-	private GameObject characterGameObject;
-	private Text topRightUiText;
-	private GameObject npcCountObject;
-	private GameObject controlsObject;
-	private GameObject gameOverScreen;
-	private RoundManager roundManager;
+	#region [Private Variables]
+	
+	GameObject HunterPrefab;
+	GameObject ParasitePrefab;
+
+	GameObject characterGameObject;
+	Text topRightUiText;
+	GameObject npcCountObject;
+	GameObject controlsObject;
+	GameObject gameOverScreen;
+	RoundManager roundManager;
 
 	// The text shown on the game over screen
-	private const string HUNTERS_WIN = "HUNTERS WIN!";
-	private const string PARASITE_WINS = "PARASITE WINS!";
+	const string HUNTERS_WIN = "HUNTERS WIN!";
+	const string PARASITE_WINS = "PARASITE WINS!";
 	// The colour of the text shown on the game over screen
-	private Color WIN_COLOUR = Color.green;
-	private Color LOSS_COLOUR = Color.red;
+	Color WIN_COLOUR = Color.green;
+	Color LOSS_COLOUR = Color.red;
+	
+	#endregion
 
-	private int _parasiteHealth;
-	private int ParasiteHealth {
+	int _parasiteHealth;
+	int ParasiteHealth {
 		get { return _parasiteHealth; }
 		set {
 			if (value < _parasiteHealth) {
 				// Notify parasite that it is taking damage
-				((Parasite)PlayerGrid.Instance.GetLocalCharacter()).OnTakingDamage();
+				characterGameObject.GetComponent<Parasite>().OnTakingDamage();
 			}
 			_parasiteHealth = value;
 			UpdateHealthObject(value);

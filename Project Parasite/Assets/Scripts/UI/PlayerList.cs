@@ -23,7 +23,6 @@ public class PlayerList : MonoBehaviour {
 	void Update() {
 		// TODO: this almost certainly doesn't need to run every frame
 		// TODO: run Onplayerconnect and Onplayerdisconnect
-		// if (PlayerGrid.Instance == null) { return; }
 		playerNames = GetPlayerNames();
 		// TODO: then this can be removed
 		if (ListHasBeenModified()) {
@@ -37,7 +36,6 @@ public class PlayerList : MonoBehaviour {
 	#region Private Methods
 
 	List<string> GetPlayerNames() {
-		// return PlayerGrid.Instance.GetPlayerNames(); TODO: remove
 		List<string> playerNamesList = new List<string>();
 
 		foreach (Player player in PhotonNetwork.PlayerList) {
