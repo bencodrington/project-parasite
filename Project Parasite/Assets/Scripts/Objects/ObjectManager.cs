@@ -137,7 +137,6 @@ public class ObjectManager : MonoBehaviourPun {
 
 	[PunRPC]
 	void RpcStoreElevator(int elevatorViewId) {
-		Debug.Log("STORING ELEVATOR w ID: " + elevatorViewId);
 		// This function is used to cache references to elevators that have been spawned
 		// 	on the server. Otherwise the client ObjectManager will not know which elevators to update
 		// 	each PhysicsUpdate.
