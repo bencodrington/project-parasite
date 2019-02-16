@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using ExitGames.Client.Photon;
 using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 
-public class RoundManager : MonoBehaviourPun {
+public class RoundManager : MonoBehaviourPun, IOnEventCallback {
 
 	PlayerObject[] connectedPlayers;
 
@@ -20,6 +22,8 @@ public class RoundManager : MonoBehaviourPun {
 	bool huntersOnlyMode = false;
 	bool DEBUG_MODE = true;
 
+	NoMoreNPCsWinCondition noMoreNPCs;
+
 	#region [MonoBehaviour Callbacks]
 	
 	void Start () {
@@ -29,6 +33,7 @@ public class RoundManager : MonoBehaviourPun {
 		// TODO:
 		// SelectSpawnPoints();
 		SelectParasite();
+		noMoreNPCs = new NoMoreNPCsWinCondition();
 	}
 
 	void FixedUpdate() {
@@ -112,5 +117,4 @@ public class RoundManager : MonoBehaviourPun {
 		objectManager = PhotonView.Find(objectManagerViewId).GetComponentInChildren<ObjectManager>();
 		objectManager.OnRoundStart();
 	}
-
 }

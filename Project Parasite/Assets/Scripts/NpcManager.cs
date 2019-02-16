@@ -32,31 +32,6 @@ public class NpcManager : MonoBehaviour {
 	
 	#endregion
 
-	#region [Public Methods]
-
-	// public void DespawnNpc(NetworkInstanceId npcNetId) {
-	// // 	NonPlayerCharacter npc = NpcList.Find((value) => {
-	// // 		return true;
-	// // 		// TODO:
-	// // 		// return value.netId == npcNetId;
-	// // 		});
-	// // 	int index = NpcList.IndexOf(npc);
-	// // 	NpcList.RemoveAt(index);
-	// // 	NetworkServer.Destroy(npc.gameObject);
-	// // 	// TODO: there has to be a more efficient way of updating this
-	// // 	foreach (PlayerObject playerObject in FindObjectsOfType<PlayerObject>()) {
-	// // 		// TODO:
-	// // 		// playerObject.RpcUpdateRemainingNpcCount(NpcList.Count);
-	// // 	}
-	// // 	if (NpcList.Count == 0) {
-	// // 		// Game Over
-	// // 		// TODO:
-	// // 		// PlayerGrid.Instance.GetLocalPlayerObject().CmdShowGameOverScreen(CharacterType.Parasite);
-	// // 	}
-	// }
-	
-	#endregion
-
 	#region [MonoBehaviour Callbacks]
 	
 	void Start () {
@@ -112,15 +87,15 @@ public class NpcManager : MonoBehaviour {
 	#endregion
 
 	public void DespawnNPCs() {
-		// // Remove NPCs
-		// foreach (NonPlayerCharacter npc in NpcList) {
-		// 	if (npc == null) {
-		// 		Debug.LogError("NpcManager: Attempting to destroy an NPC that is null");
-		// 	} else {
-		// 		NetworkServer.Destroy(npc.gameObject);
-		// 	}
-		// }
-		// NpcList.Clear();
+		// Remove NPCs
+		foreach (NonPlayerCharacter npc in NpcList) {
+			if (npc == null) {
+				Debug.LogError("NpcManager: Attempting to destroy an NPC that is null");
+			} else {
+				PhotonNetwork.Destroy(npc.gameObject);
+			}
+		}
+		NpcList.Clear();
 	}
 
 }

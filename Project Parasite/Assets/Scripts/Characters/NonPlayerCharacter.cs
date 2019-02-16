@@ -172,9 +172,9 @@ public class NonPlayerCharacter : Character {
 	}
 
 	void DespawnSelf() {
+		// Send out an event to decrement counter
+		EventCodes.RaiseEventAll(EventCodes.NpcDespawned, null);
 		PhotonNetwork.Destroy(photonView);
-		// TODO: go through npcmanager,
-		// TODO:	or just make npcmanager npcSpawner and send out a DECREMENT_COUNTER event
 	}
 
 	void SpawnParasite() {

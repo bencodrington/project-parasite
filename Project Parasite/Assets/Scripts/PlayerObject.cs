@@ -78,13 +78,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 		OnCharacterDestroy -= cb;
 	}
 
-	void Start() {
-		ParasitePrefab = Resources.Load("Parasite") as GameObject;
-		HunterPrefab = Resources.Load("Hunter") as GameObject;
-		// TODO: extract to UI manager
-		topRightUiText = GameObject.FindGameObjectWithTag("TopRightUI").GetComponent<Text>();
-	}
-
 	void UpdateHealthObject(int newValue) {
 		topRightUiText.text = newValue.ToString();
 	}
@@ -137,6 +130,13 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
     }
 
 	#region [MonoBehaviour Callbacks]
+
+	void Start() {
+		ParasitePrefab = Resources.Load("Parasite") as GameObject;
+		HunterPrefab = Resources.Load("Hunter") as GameObject;
+		// TODO: extract to UI manager
+		topRightUiText = GameObject.FindGameObjectWithTag("TopRightUI").GetComponent<Text>();
+	}
 	
 	public void OnEnable() {
 		PhotonNetwork.AddCallbackTarget(this);
