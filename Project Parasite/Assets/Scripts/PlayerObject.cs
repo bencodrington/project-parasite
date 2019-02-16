@@ -32,6 +32,7 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 	GameObject controlsObject;
 	GameObject gameOverScreen;
 	RoundManager roundManager;
+	CharacterType characterType;
 
 	// The text shown on the game over screen
 	const string HUNTERS_WIN = "HUNTERS WIN!";
@@ -53,7 +54,7 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 			_parasiteHealth = value;
 			UpdateHealthObject(value);
 			if (value <= 0) {
-				Debug.Log("Parasite Wins!");
+				Debug.Log("Hunters Win!");
                 EventCodes.RaiseGameOverEvent(CharacterType.Hunter);
 			}
 		}
@@ -82,26 +83,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 		topRightUiText.text = newValue.ToString();
 	}
 
-	// TODO: extrat to UI manager
-	// void ShowGameOverScreen(CharacterType victorType) {
-	// 	gameOverScreen = isServer ? Instantiate(GameOverScreenServerPrefab) : Instantiate(GameOverScreenPrefab);
-	// 	gameOverScreen.transform.SetParent(FindObjectOfType<Canvas>().transform);
-	// 	RectTransform rect = gameOverScreen.GetComponent<RectTransform>();
-	// 	// Position gameOverScreen;
-	// 	rect.anchoredPosition = new Vector2(0.5f, 0.5f);
-	// 	rect.offsetMax = Vector2.zero;
-	// 	rect.offsetMin = Vector2.zero;
-
-	// 	Transform VictorText = gameOverScreen.transform.Find("Victor");
-	// 	if (VictorText == null) {
-	// 		Debug.LogError("PlayerObject:ShowGameOverScreen: Victor Text not found");
-	// 		return;
-	// 	}
-	// 	Text txt = VictorText.GetComponent<Text>();
-	// 	txt.text = victorType == CharacterType.Hunter ? HUNTERS_WIN : PARASITE_WINS;
-	// 	txt.color = victorType == PlayerGrid.Instance.GetLocalCharacterType() ? WIN_COLOUR : LOSS_COLOUR;
-	// }
-
 	void DestroyGameOverScreen() {
 		// gameOverScreen should be null when starting the game from the main menu
 		// 	as opposed to when restarting after a round has been completed
@@ -117,17 +98,37 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
     {
         if (photonEvent.Code == EventCodes.AssignPlayerType) {
 			// Deconstruct event
-			object[] content = (object[])photonEvent.CustomData;
-			int actorNumber = (int)content[0];
-			CharacterType characterType = (CharacterType)content[1];
+			int actorNumber = (int)EventCodes.GetEventContentAtPosition(photonEvent, 0);
+			CharacterType assignedCharacterType = (CharacterType)EventCodes.GetEventContentAtPosition(photonEvent, 1);
 			Vector3 spawnPoint = Vector3.zero;
 			if (actorNumber == PhotonNetwork.LocalPlayer.ActorNumber) {
-				// Spawn Character of type `characterType` across clients
-				SpawnPlayerCharacter(characterType, spawnPoint, Vector2.zero);
+				// Spawn Character of type `assignedCharacterType` across clients
+				SpawnPlayerCharacter(assignedCharacterType, spawnPoint, Vector2.zero);
 				// TODO: update hud
 			}
+		} else if (photonEvent.Code == EventCodes.GameOver) {
+			// Deconstruct event
+			CharacterType victorType = (CharacterType)EventCodes.GetFirstEventContent(photonEvent);
+			// TODO: if gameOver already called, don't do this again
+			ShowGameOverScreen(victorType);
 		}
     }
+
+	#region [Public Methods]
+	
+	public void SpawnPlayerCharacter(CharacterType assignedCharacterType, Vector3 atPosition, Vector2 velocity) {
+		GameObject characterPrefab = assignedCharacterType == CharacterType.Parasite ? ParasitePrefab : HunterPrefab;
+    	// Create PlayerCharacter game object on the server
+    	characterGameObject = PhotonNetwork.Instantiate(characterPrefab.name, atPosition, Quaternion.identity);
+    	// Get PlayerCharacter script
+    	Character character = characterGameObject.GetComponentInChildren<Character>();
+    	// Initialize each player's character on their own client
+    	character.GeneratePhysicsEntity(velocity);
+    	character.PlayerObject = this;
+		characterType = assignedCharacterType;
+	}
+	
+	#endregion
 
 	#region [MonoBehaviour Callbacks]
 
@@ -149,16 +150,25 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 	#endregion
 
 	#region [Private Methods]
-	
-	public void SpawnPlayerCharacter(CharacterType characterType, Vector3 atPosition, Vector2 velocity) {
-		GameObject characterPrefab = characterType == CharacterType.Parasite ? ParasitePrefab : HunterPrefab;
-    	// Create PlayerCharacter game object on the server
-    	characterGameObject = PhotonNetwork.Instantiate(characterPrefab.name, atPosition, Quaternion.identity);
-    	// Get PlayerCharacter script
-    	Character character = characterGameObject.GetComponentInChildren<Character>();
-    	// Initialize each player's character on their own client
-    	character.GeneratePhysicsEntity(velocity);
-    	character.PlayerObject = this;
+
+	// TODO: extract to UI manager
+	void ShowGameOverScreen(CharacterType victorType) {
+		gameOverScreen = PhotonNetwork.IsMasterClient ? Instantiate(GameOverScreenServerPrefab) : Instantiate(GameOverScreenPrefab);
+		gameOverScreen.transform.SetParent(FindObjectOfType<Canvas>().transform);
+		RectTransform rect = gameOverScreen.GetComponent<RectTransform>();
+		// Position gameOverScreen;
+		rect.anchoredPosition = new Vector2(0.5f, 0.5f);
+		rect.offsetMax = Vector2.zero;
+		rect.offsetMin = Vector2.zero;
+
+		Transform VictorText = gameOverScreen.transform.Find("Victor");
+		if (VictorText == null) {
+			Debug.LogError("PlayerObject:ShowGameOverScreen: Victor Text not found");
+			return;
+		}
+		Text txt = VictorText.GetComponent<Text>();
+		txt.text = victorType == CharacterType.Hunter ? HUNTERS_WIN : PARASITE_WINS;
+		txt.color = victorType == characterType ? WIN_COLOUR : LOSS_COLOUR;
 	}
 	
 	#endregion
@@ -173,16 +183,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
     // 	PlayerGrid.Instance.CmdSetCharacterType(netId, characterType);
     // 	// Update HUD to show necessary information for this character type
     // 	RpcUpdateHud();
-    // }
-
-    // [Command]
-    // public void CmdShowGameOverScreen(CharacterType victorType) {
-    // 	if (roundManager == null) {
-    // 		return;
-    // 	}
-    // 	if (roundManager.isGameOver) { return; }
-    // 	roundManager.isGameOver = true;
-    // 	RpcShowGameOverScreen(victorType);
     // }
 
     // [Command]
@@ -210,18 +210,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
     // }
 
     // // ClientRpc
-
-    // [ClientRpc]
-    // public void RpcDestroyTitleScreen() {
-    // 	Destroy(GameObject.FindWithTag("TitleScreen"));
-    // 	// Hide Menu
-    //     Menu menu = FindObjectOfType<Menu>();
-    //     if (menu == null) {
-    //         Debug.LogError("NetworkDiscoveryClient: onReceivedBroadcast: Menu not found");
-    //         return;
-    //     }
-    //     menu.DeleteMenuItems();
-    // }
 
     // [ClientRpc]
     // void RpcUpdateHud() {
@@ -266,11 +254,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
     // public void RpcUpdateRemainingNpcCount(int updatedCount) {
     // 	if (!isLocalPlayer) { return; }
     // 	RemainingNpcCount = updatedCount;
-    // }
-
-    // [ClientRpc]
-    // void RpcShowGameOverScreen(CharacterType victorType) {
-    // 	PlayerGrid.Instance.GetLocalPlayerObject().ShowGameOverScreen(victorType);
     // }
 
     // [ClientRpc]

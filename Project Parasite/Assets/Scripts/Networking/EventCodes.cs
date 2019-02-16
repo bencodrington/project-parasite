@@ -22,4 +22,13 @@ public class EventCodes
         object[] content = new object[] { victorType };
         RaiseEventAll(GameOver, content);
     }
+
+    public static object GetEventContentAtPosition(EventData photonEvent, int pos) {
+        object[] content = (object[])photonEvent.CustomData;
+        return content[pos];
+    }
+
+    public static object GetFirstEventContent(EventData photonEvent) {
+        return GetEventContentAtPosition(photonEvent, 0);
+    }
 }

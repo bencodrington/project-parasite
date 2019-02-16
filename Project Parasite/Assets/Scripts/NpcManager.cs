@@ -28,7 +28,7 @@ public class NpcManager : MonoBehaviour {
 	const float SPAWN_RANGE_X = 6;
 	const float SPAWN_RANGE_Y = 2;
 
-	bool DEBUG_MODE = false;
+	bool DEBUG_MODE = true;
 	
 	#endregion
 
@@ -46,9 +46,12 @@ public class NpcManager : MonoBehaviour {
 	#region [Private Methods]
 	
 	void SpawnNPCs() {
-		if (DEBUG_MODE) { return; }
-		foreach(Vector2 spawnCenter in spawnCenters) {
-			SpawnNpcGroup(spawnCenter);
+		if (DEBUG_MODE) { 
+			SpawnNpcAtPosition(Vector2.zero);
+		} else {
+			foreach (Vector2 spawnCenter in spawnCenters) {
+				SpawnNpcGroup(spawnCenter);
+			}
 		}
 		object[] content = { NpcList.Count };
 		EventCodes.RaiseEventAll(EventCodes.SetNpcCount, content);
@@ -58,15 +61,19 @@ public class NpcManager : MonoBehaviour {
 		// This should only ever run on the Master Client
 		int npcCount = SelectNpcGroupSize();
 		Vector2 spawnPosition;
-		NonPlayerCharacter npc;
 		for (int i = 0; i < npcCount; i++) {
 			spawnPosition = SelectSpawnPosition(spawnCenter);
-			npc = PhotonNetwork.Instantiate(NpcPrefab.name, spawnPosition, Quaternion.identity).GetComponentInChildren<NonPlayerCharacter>();
-			
-			npc.GeneratePhysicsEntity(Vector2.zero);
-			StartCoroutine(npc.Idle());
-			NpcList.Add(npc);
+			SpawnNpcAtPosition(spawnPosition);
 		}
+	}
+
+	void SpawnNpcAtPosition(Vector2 position) {
+		NonPlayerCharacter npc;
+		npc = PhotonNetwork.Instantiate(NpcPrefab.name, position, Quaternion.identity)
+				.GetComponentInChildren<NonPlayerCharacter>();
+		npc.GeneratePhysicsEntity(Vector2.zero);
+		StartCoroutine(npc.Idle());
+		NpcList.Add(npc);
 	}
 
 	int SelectNpcGroupSize() {

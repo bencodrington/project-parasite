@@ -32,9 +32,9 @@ public class NoMoreNPCsWinCondition : IOnEventCallback
             npcCount--;
             if (npcCount == 0) {
                 // TODO:
-                // Hunters Win
-                Debug.Log("HUNTERS WIN");
-                EventCodes.RaiseGameOverEvent(CharacterType.Hunter);
+                // Parasites Win
+                Debug.Log("Parasite Wins!");
+                EventCodes.RaiseGameOverEvent(CharacterType.Parasite);
 		        PhotonNetwork.RemoveCallbackTarget(this);
             }
         }
