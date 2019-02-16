@@ -141,7 +141,7 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 
 	#region [Private Methods]
 	
-	void SpawnPlayerCharacter(CharacterType characterType, Vector3 atPosition, Vector2 velocity) {
+	public void SpawnPlayerCharacter(CharacterType characterType, Vector3 atPosition, Vector2 velocity) {
 		GameObject characterPrefab = characterType == CharacterType.Parasite ? ParasitePrefab : HunterPrefab;
     	// Create PlayerCharacter game object on the server
     	characterGameObject = PhotonNetwork.Instantiate(characterPrefab.name, atPosition, Quaternion.identity);
@@ -150,9 +150,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
     	// Initialize each player's character on their own client
     	character.GeneratePhysicsEntity(velocity);
     	character.PlayerObject = this;
-		// TODO:
-    	// // Ensure character snaps to its starting position on all clients
-    	// character.CmdUpdatePosition(atPosition, true);
 	}
 	
 	#endregion

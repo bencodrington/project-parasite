@@ -17,7 +17,7 @@ public class RoundManager : MonoBehaviourPun {
 
 	public bool isGameOver = false;
 
-	bool huntersOnlyMode = true;
+	bool huntersOnlyMode = false;
 	bool DEBUG_MODE = true;
 
 	#region [MonoBehaviour Callbacks]

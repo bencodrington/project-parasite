@@ -8,10 +8,10 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 48}
-  - component: {fileID: 107}
-  - component: {fileID: 108}
-  - component: {fileID: 8203352948643630802}
+  - component: {fileID: 53}
+  - component: {fileID: 124}
+  - component: {fileID: 125}
+  - component: {fileID: 152}
   m_Layer: 0
   m_Name: RoundManager
   m_TagString: Untagged
@@ -19,7 +19,7 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &48
+--- !u!4 &53
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -33,7 +33,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &107
+--- !u!114 &124
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -51,7 +51,7 @@ MonoBehaviour:
   - {x: 35, y: 35}
   - {x: 35, y: -9}
   isGameOver: 0
---- !u!114 &108
+--- !u!114 &125
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -73,7 +73,7 @@ MonoBehaviour:
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &8203352948643630802
+--- !u!114 &152
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

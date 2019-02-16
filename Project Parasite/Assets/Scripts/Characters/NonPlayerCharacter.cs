@@ -1,11 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
 public class NonPlayerCharacter : Character {
 
+	#region [Public Variables]
+	
 	public bool isInfected = false;
+	
+	// The exclamation mark that is shown when orbs are placed nearby
+	public GameObject alertIconPrefab;
 
+	#endregion
+
+	#region [Private Variables]
+	
 	private const float PARASITE_LAUNCH_VELOCITY = 30f;
 
 	// Pathfinding
@@ -19,10 +29,48 @@ public class NonPlayerCharacter : Character {
 	private float maxTargetDistance = 5f;
 	private float minTargetDistance = 2f;
 
-	// The exclamation mark that is shown when orbs are placed nearby
-	public GameObject alertIconPrefab;
 	// How far from the npc's center to display the icon
 	Vector2 ALERT_ICON_OFFSET = new Vector2(0, 1);
+	
+	#endregion
+
+	protected override void HandleInput() {
+		// This function is only called when this NPC is infected,
+		// 	and is only called on the Parasite player's client
+		// Movement
+		HandleHorizontalMovement();
+		// Self Destruct
+		if (Input.GetMouseButtonDown(1)) {
+			BurstMeatSuit();
+		}
+	}
+
+	#region [Public Methods]
+
+	public IEnumerator Idle() {
+		yield return new WaitForSeconds(Random.Range(minTimeUntilNewPath, maxTimeUntilNewPath));
+		// Check that we are still uninfected and still exist
+		if (this != null && !isInfected) { FindNewPath(); }
+		
+	}
+
+	public void OnGotFried() {
+		if (isInfected) {
+			BurstMeatSuit();
+		} else {
+			DespawnSelf();
+		}
+	}
+
+	public void Infect() {
+		isInfected = true;
+		// Only update sprite if on the Parasite player's client
+		spriteRenderer.color = Color.magenta;
+	}
+	
+	#endregion
+
+	#region [MonoBehaviour Callbacks]
 	
 	public override void Update() {
 		if (isInfected && HasAuthority()) {
@@ -37,19 +85,10 @@ public class NonPlayerCharacter : Character {
 			transform.position = Vector3.Lerp(transform.position, serverPosition, 0.8f);
 		}
 	}
+	
+	#endregion
 
-    protected override void HandleInput()
-    {
-		// This function is only called when this NPC is infected,
-		// 	and is only called on the Parasite player's client
-		// Movement
-		HandleHorizontalMovement();
-		// Self Destruct
-		if (Input.GetMouseButtonDown(1)) {
-			// Destroy this NPC
-			CmdDespawnSelf();
-		}
-    }
+	#region [Private Methods]
 
 	void TraversePath() {
 		isMovingLeft = false;
@@ -127,37 +166,24 @@ public class NonPlayerCharacter : Character {
 		return target;
 	}
 
-	public IEnumerator Idle() {
-		yield return new WaitForSeconds(Random.Range(minTimeUntilNewPath, maxTimeUntilNewPath));
-		// Check that we are still uninfected and still exist
-		if (this != null && !isInfected) { FindNewPath(); }
-		
+	void BurstMeatSuit() {
+		DespawnSelf();
+		SpawnParasite();
 	}
 
-	// Commands
-
-	public void CmdDespawnSelf() {
-		// Spawn new Parasite Object
-		// TODO:
-		// PlayerObject.CmdSpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY));
-		// // Despawn this NPC object
-		// FindObjectOfType<NpcManager>().DespawnNpc(netId);
+	void DespawnSelf() {
+		PhotonNetwork.Destroy(photonView);
+		// TODO: go through npcmanager,
+		// TODO:	or just make npcmanager npcSpawner and send out a DECREMENT_COUNTER event
 	}
 
-	// ClientRpc
-
-	// public void RpcSetLocalPlayerAuthority(bool newValue) {
-	// 	GetComponentInChildren<NetworkIdentity>().localPlayerAuthority = newValue;
-	// }
-
-	public void RpcInfect() {
-		isInfected = true;
-		if (HasAuthority()) {
-			// Only update sprite if on the Parasite player's client
-			spriteRenderer.color = Color.magenta;
-		}
+	void SpawnParasite() {
+		PlayerObject.SpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY));
 	}
+	
+	#endregion
 
+	// TODO:
 	public void RpcNearbyOrbAlert(Vector2 atPosition) {
 		// Show exclamation mark above NPC
 		GameObject alertIcon = Instantiate(alertIconPrefab, (Vector2)transform.position + ALERT_ICON_OFFSET, Quaternion.identity);
@@ -169,6 +195,5 @@ public class NonPlayerCharacter : Character {
 			Utility.Directions.Right :
 			Utility.Directions.Left;
 		FleeOrbInDirection(fleeDirection);
-		
 	}
 }

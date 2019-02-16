@@ -70,12 +70,8 @@ public class OrbBeam : MonoBehaviour {
 		// Fry each uninfected NPC on the server
 		foreach (RaycastHit2D hit in hits) {
 			npc = hit.transform.parent.GetComponent<NonPlayerCharacter>();
-			if (!npc.isInfected) {
-			// if (isServer && !npc.isInfected) {
-				// TODO:
-				// FindObjectOfType<NpcManager>().DespawnNpc(npc.netId);
-			} else if (npc.isInfected && PlayerGrid.Instance.GetLocalCharacter() == npc) {
-				npc.CmdDespawnSelf();
+			if (npc.photonView.IsMine) {
+				npc.OnGotFried();
 			}
 		}
 		

@@ -32,6 +32,31 @@ public class NpcManager : MonoBehaviour {
 	
 	#endregion
 
+	#region [Public Methods]
+
+	// public void DespawnNpc(NetworkInstanceId npcNetId) {
+	// // 	NonPlayerCharacter npc = NpcList.Find((value) => {
+	// // 		return true;
+	// // 		// TODO:
+	// // 		// return value.netId == npcNetId;
+	// // 		});
+	// // 	int index = NpcList.IndexOf(npc);
+	// // 	NpcList.RemoveAt(index);
+	// // 	NetworkServer.Destroy(npc.gameObject);
+	// // 	// TODO: there has to be a more efficient way of updating this
+	// // 	foreach (PlayerObject playerObject in FindObjectsOfType<PlayerObject>()) {
+	// // 		// TODO:
+	// // 		// playerObject.RpcUpdateRemainingNpcCount(NpcList.Count);
+	// // 	}
+	// // 	if (NpcList.Count == 0) {
+	// // 		// Game Over
+	// // 		// TODO:
+	// // 		// PlayerGrid.Instance.GetLocalPlayerObject().CmdShowGameOverScreen(CharacterType.Parasite);
+	// // 	}
+	// }
+	
+	#endregion
+
 	#region [MonoBehaviour Callbacks]
 	
 	void Start () {
@@ -97,26 +122,5 @@ public class NpcManager : MonoBehaviour {
 		// }
 		// NpcList.Clear();
 	}
-
-	// public void DespawnNpc(NetworkInstanceId npcNetId) {
-	// 	NonPlayerCharacter npc = NpcList.Find((value) => {
-	// 		return true;
-	// 		// TODO:
-	// 		// return value.netId == npcNetId;
-	// 		});
-	// 	int index = NpcList.IndexOf(npc);
-	// 	NpcList.RemoveAt(index);
-	// 	NetworkServer.Destroy(npc.gameObject);
-	// 	// TODO: there has to be a more efficient way of updating this
-	// 	foreach (PlayerObject playerObject in FindObjectsOfType<PlayerObject>()) {
-	// 		// TODO:
-	// 		// playerObject.RpcUpdateRemainingNpcCount(NpcList.Count);
-	// 	}
-	// 	if (NpcList.Count == 0) {
-	// 		// Game Over
-	// 		// TODO:
-	// 		// PlayerGrid.Instance.GetLocalPlayerObject().CmdShowGameOverScreen(CharacterType.Parasite);
-	// 	}
-	// }
 
 }

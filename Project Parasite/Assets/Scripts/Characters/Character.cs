@@ -124,11 +124,19 @@ public abstract class Character : MonoBehaviourPun {
 		}
 	}
 
+	public void SetCameraFollow() {
+		FindObjectOfType<CameraFollow>().SetTarget(transform);
+	}
+
 	public void RegisterInteractableObject(InteractableObject netId) {
 		objectsInRange.Add(netId);
 	}
 	public void UnregisterInteractableObject(InteractableObject netId) {
 		objectsInRange.Remove(netId);
+	}
+
+	public void SetRenderLayer() {
+		spriteRenderer.sortingLayerName = "ClientCharacter";
 	}
 	
 	#endregion
@@ -156,18 +164,6 @@ public abstract class Character : MonoBehaviourPun {
 	
 	protected bool HasAuthority() {
 		return (photonView.IsMine || !PhotonNetwork.IsConnected);
-	}
-
-	#endregion
-
-	#region [Private Methods]
-
-	void SetCameraFollow() {
-		FindObjectOfType<CameraFollow>().SetTarget(transform);
-	}
-
-	void SetRenderLayer() {
-		spriteRenderer.sortingLayerName = "ClientCharacter";
 	}
 
 	#endregion
