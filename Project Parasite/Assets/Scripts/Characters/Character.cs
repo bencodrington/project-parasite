@@ -147,12 +147,8 @@ public abstract class Character : MonoBehaviourPun {
 		bool left = Input.GetKey(KeyCode.A);
 		if (right && !left) {
 			isMovingRight = true;
-			SetSpriteFlip(false);
-			// TODO: detect on all clients
 		} else if (left && !right) {
 			isMovingLeft = true;
-			SetSpriteFlip(true);
-			// TODO: detect on all clients
 		}
 	}
 
@@ -165,10 +161,6 @@ public abstract class Character : MonoBehaviourPun {
 	#endregion
 
 	#region [Private Methods]
-	
-	void SetSpriteFlip(bool isFacingLeft) {
-		spriteRenderer.flipX = isFacingLeft;
-	}
 
 	void SetCameraFollow() {
 		FindObjectOfType<CameraFollow>().SetTarget(transform);

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
 public class NonPlayerCharacter : Character {
 
@@ -147,9 +146,9 @@ public class NonPlayerCharacter : Character {
 
 	// ClientRpc
 
-	public void RpcSetLocalPlayerAuthority(bool newValue) {
-		GetComponentInChildren<NetworkIdentity>().localPlayerAuthority = newValue;
-	}
+	// public void RpcSetLocalPlayerAuthority(bool newValue) {
+	// 	GetComponentInChildren<NetworkIdentity>().localPlayerAuthority = newValue;
+	// }
 
 	public void RpcInfect() {
 		isInfected = true;
