@@ -36,5 +36,6 @@ MonoBehaviour:
   - RpcCallToStop
   - RpcStoreElevator
   - RpcSetObjectManager
+  - RpcUpdateServerPosition
   DisableAutoOpenWizard: 1
   ShowSettings: 1

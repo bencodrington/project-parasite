@@ -45,7 +45,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83694ecb3e4e0644fbb47ce8a31323ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SIZE: {x: 2, y: 3}
   buttonPrefab: {fileID: 1033965413891920, guid: f3dfc9ff2808eee409e1cd94896183e0,
     type: 3}
   elevatorCallFieldPrefab: {fileID: 1071992796203306, guid: 25d1080c17a5fad428d3d1dec9ffdab9,
