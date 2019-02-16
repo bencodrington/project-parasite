@@ -8,6 +8,7 @@ public class EventCodes
     public const byte StartGame         = 1;
     public const byte AssignPlayerType  = 2;
     public const byte NpcDespawned      = 3;
+    public const byte SetNpcCount       = 4;
 
     public static void RaiseEventAll(byte eventCode, object[] content) {
         RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };

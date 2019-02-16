@@ -5,7 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 
-public class RoundManager : MonoBehaviourPun, IOnEventCallback {
+public class RoundManager : MonoBehaviourPun {
 
 	PlayerObject[] connectedPlayers;
 

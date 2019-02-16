@@ -24,9 +24,12 @@ public class NoMoreNPCsWinCondition : IOnEventCallback
     }
 
     public void OnEvent(EventData photonEvent) {
-        if (photonEvent.Code == EventCodes.NpcDespawned) {
+        if (photonEvent.Code == EventCodes.SetNpcCount) {
+            object[] content = (object[])photonEvent.CustomData;
+            npcCount = (int)content[0];
+        } else if (photonEvent.Code == EventCodes.NpcDespawned) {
             npcCount--;
-            if (npcCount <= 0) {
+            if (npcCount == 0) {
                 // TODO:
                 // Hunters Win
                 Debug.Log("HUNTERS WIN");

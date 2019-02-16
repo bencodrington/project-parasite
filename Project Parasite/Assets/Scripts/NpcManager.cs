@@ -50,11 +50,8 @@ public class NpcManager : MonoBehaviour {
 		foreach(Vector2 spawnCenter in spawnCenters) {
 			SpawnNpcGroup(spawnCenter);
 		}
-		// TODO: there has to be a more efficient way of updating this
-		foreach (PlayerObject playerObject in FindObjectsOfType<PlayerObject>()) {
-			// TODO:
-			// playerObject.RpcUpdateRemainingNpcCount(NpcList.Count);
-		}
+		object[] content = { NpcList.Count };
+		EventCodes.RaiseEventAll(EventCodes.SetNpcCount, content);
 	}
 	
 	void SpawnNpcGroup(Vector2 spawnCenter) {
@@ -68,7 +65,6 @@ public class NpcManager : MonoBehaviour {
 			
 			npc.GeneratePhysicsEntity(Vector2.zero);
 			StartCoroutine(npc.Idle());
-			// TODO: run on all clients??
 			NpcList.Add(npc);
 		}
 	}
