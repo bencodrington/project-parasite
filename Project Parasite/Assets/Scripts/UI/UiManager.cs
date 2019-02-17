@@ -52,7 +52,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 				DestroyGameOverScreen();
 				RemoveHud();
                 break;
-			case EventCodes.AssignPlayerType:
+			case EventCodes.AssignPlayerTypeAndSpawnPoint:
                 UpdateHud();
                 break;
             case EventCodes.GameOver: 

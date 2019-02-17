@@ -18,7 +18,7 @@ public class RoundManager : MonoBehaviourPun {
 	public bool isGameOver = false;
 
 	bool huntersOnlyMode = false;
-	bool DEBUG_MODE = true;
+	bool DEBUG_MODE = false;
 
 	NoMoreNPCsWinCondition noMoreNPCs;
 
@@ -70,12 +70,7 @@ public class RoundManager : MonoBehaviourPun {
 				characterType = CharacterType.Hunter;
 				spawnPoint = hunterSpawnPoint;
 			}
-			// CLEANUP: extract to method
-			byte eventCode = EventCodes.AssignPlayerType;
-			object[] content = { PhotonNetwork.PlayerList[i].ActorNumber, characterType };
-			EventCodes.RaiseEventAll(eventCode, content);
-			// TODO: remove
-			// connectedPlayers[i].CmdAssignCharacterTypeAndSpawnPoint(characterType, spawnPoint);
+			RaiseSpawnEvent(i, characterType, spawnPoint);
 		}
 	}
 
@@ -103,6 +98,12 @@ public class RoundManager : MonoBehaviourPun {
 		GameObject oMGameObject = PhotonNetwork.Instantiate(objectManagerPrefab.name, Vector3.zero, Quaternion.identity, 0);
 		objectManager = oMGameObject.GetComponent<ObjectManager>();
 		photonView.RPC("RpcSetObjectManager", RpcTarget.All, objectManager.photonView.ViewID);
+	}
+
+	void RaiseSpawnEvent(int playerIndex, CharacterType characterType, Vector2 spawnPoint) {
+		byte eventCode = EventCodes.AssignPlayerTypeAndSpawnPoint;
+		object[] content = { PhotonNetwork.PlayerList[playerIndex].ActorNumber, characterType, spawnPoint };
+		EventCodes.RaiseEventAll(eventCode, content);
 	}
 	
 	#endregion

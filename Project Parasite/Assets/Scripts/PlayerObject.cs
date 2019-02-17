@@ -63,11 +63,11 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 			case EventCodes.StartGame:
 				DestroyCharacter();
 				break;
-			case EventCodes.AssignPlayerType:
+			case EventCodes.AssignPlayerTypeAndSpawnPoint:
 				// Deconstruct event
 				int actorNumber = (int)EventCodes.GetEventContentAtPosition(photonEvent, 0);
 				CharacterType assignedCharacterType = (CharacterType)EventCodes.GetEventContentAtPosition(photonEvent, 1);
-				Vector3 spawnPoint = Vector3.zero;
+				Vector3 spawnPoint = (Vector2)EventCodes.GetEventContentAtPosition(photonEvent, 2);
 				if (actorNumber == PhotonNetwork.LocalPlayer.ActorNumber) {
 					// Spawn Character of type `assignedCharacterType` across clients
 					SpawnPlayerCharacter(assignedCharacterType, spawnPoint, Vector2.zero);
