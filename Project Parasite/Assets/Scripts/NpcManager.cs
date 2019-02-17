@@ -92,9 +92,7 @@ public class NpcManager : MonoBehaviour {
 	public void DespawnNPCs() {
 		// Remove NPCs
 		foreach (NonPlayerCharacter npc in NpcList) {
-			if (npc == null) {
-				Debug.LogError("NpcManager: Attempting to destroy an NPC that is null");
-			} else {
+			if (npc != null) {
 				PhotonNetwork.Destroy(npc.gameObject);
 			}
 		}

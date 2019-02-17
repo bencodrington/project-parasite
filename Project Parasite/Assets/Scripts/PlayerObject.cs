@@ -23,7 +23,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 
 	GameObject characterGameObject;
 	RoundManager roundManager;
-	CharacterType characterType;
 
 	#endregion
 
@@ -88,7 +87,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
     	// Initialize each player's character on their own client
     	character.GeneratePhysicsEntity(velocity);
     	character.PlayerObject = this;
-		characterType = assignedCharacterType;
 		UiManager.Instance.characterType = assignedCharacterType;
 	}
 	
