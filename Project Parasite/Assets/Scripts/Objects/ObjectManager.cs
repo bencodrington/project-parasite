@@ -146,7 +146,7 @@ public class ObjectManager : MonoBehaviourPun {
 		// 	on the server. Otherwise the client ObjectManager will not know which elevators to update
 		// 	each PhysicsUpdate.
 		Elevator elevator = PhotonView.Find(elevatorViewId).GetComponentInChildren<Elevator>();
-		// TODO: cleanup: ensure that elevators list has been instantiated before adding to it
+		// CLEANUP: ensure that elevators list has been instantiated before adding to it
 		if (elevators == null) {
 			elevators = new List<Elevator>();
 		}

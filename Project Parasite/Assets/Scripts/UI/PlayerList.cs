@@ -21,10 +21,10 @@ public class PlayerList : MonoBehaviour {
 	}
 	
 	void Update() {
-		// TODO: this almost certainly doesn't need to run every frame
-		// TODO: run Onplayerconnect and Onplayerdisconnect
+		// OPTIMIZE: this almost certainly doesn't need to run every frame
+		// OPTIMIZE: run Onplayerconnect and Onplayerdisconnect
 		playerNames = GetPlayerNames();
-		// TODO: then this can be removed
+		// OPTIMIZE: then this can be removed
 		if (ListHasBeenModified()) {
 			UpdateChildren();
 			oldPlayerNames = SerializeList(playerNames);

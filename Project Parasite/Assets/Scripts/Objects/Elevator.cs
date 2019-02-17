@@ -103,9 +103,9 @@ public class Elevator : MonoBehaviourPun {
 
 	Vector2 GetStopSpawnCoordinates(float xCoordinate, float yCoordinate, bool isOnRightSide) {
 		// -1f is because call fields are positioned by their bottom left corner, not the middle
-		// TODO: this can be cleaner
+		// CLEANUP: this can be cleaner
 		xCoordinate += isOnRightSide ? STOP_X_OFFSET - 1f : -STOP_X_OFFSET - 1f;
-		// TODO: replace magic number, half of elevator height
+		// CLEANUP: replace magic number, half of elevator height
 		return new Vector2(xCoordinate, yCoordinate - 1.5f);
 	}
 

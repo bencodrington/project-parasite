@@ -70,7 +70,7 @@ public class Hunter : Character {
 
 		// Place orb
 		if (Input.GetMouseButtonDown(0)) {
-			// TODO: this can be cleaner, once InputManager is implemented
+			// CLEANUP: this can be cleaner, once InputManager is implemented
 			// Don't spawn orb if clicking elevator button
 			if (Physics2D.OverlapPoint(Utility.GetMousePos(), Utility.GetLayerMask("clickable")) == null) {
 				AttemptToSpawnOrb(Utility.GetMousePos());
@@ -176,7 +176,7 @@ public class Hunter : Character {
 		if (HasAuthority()) {
 			// Update the number of remaining orbs currently displayed onscreen
 			orbUiManager.OnOrbCountChange(orbs.Count);
-			// TODO: this should probably be extracted to the rangemanager itself
+			// CLEANUP: this should probably be extracted to the rangemanager itself
 			// Hide markers if the user can't place more orbs
 			if (orbs.Count == MAX_ORB_COUNT) {
 				orbBeamRangeManager.shouldShowMarkers = false;

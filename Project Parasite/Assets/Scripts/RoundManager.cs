@@ -40,7 +40,7 @@ public class RoundManager : MonoBehaviourPun {
 			objectManager.PhysicsUpdate();
 		}
 		// Update all characters in the scene
-		// TODO: optimize (maybe by going through the cached players and calling PhysicsUpdate for them?)
+		// OPTIMIZE: (maybe by going through the cached players and calling PhysicsUpdate for them?)
 		foreach(Character character in FindObjectsOfType<Character>()) {
 			character.PhysicsUpdate();
 		}
@@ -70,7 +70,7 @@ public class RoundManager : MonoBehaviourPun {
 				characterType = CharacterType.Hunter;
 				spawnPoint = hunterSpawnPoint;
 			}
-			// TODO: extract to method
+			// CLEANUP: extract to method
 			byte eventCode = EventCodes.AssignPlayerType;
 			object[] content = { PhotonNetwork.PlayerList[i].ActorNumber, characterType };
 			EventCodes.RaiseEventAll(eventCode, content);

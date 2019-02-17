@@ -37,7 +37,7 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 			_parasiteHealth = value;
 			UiManager.Instance.UpdateHealthObject(value);
 			if (value <= 0) {
-				// TODO: No need to keep sending this event
+				// OPTIMIZE: No need to keep sending this event
 				Debug.Log("Hunters Win!");
                 EventCodes.RaiseGameOverEvent(CharacterType.Hunter);
 			}
@@ -119,8 +119,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
     }
 	
 	#endregion
-
-    // // Commands
 
     // public void CmdAssignCharacterTypeAndSpawnPoint(CharacterType characterType, Vector2 spawnPoint) {
     // 	// Spawn Character across clients

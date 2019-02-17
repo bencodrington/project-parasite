@@ -26,7 +26,7 @@ public abstract class InteractableObject : MonoBehaviour {
     }
 
     public void PhysicsUpdate() {
-		// TODO: this probably doesn't need to run every single physics update
+		// OPTIMIZE: this probably doesn't need to run every single physics update
 		// Check for entity within borders
 		charactersInRange = Physics2D.OverlapAreaAll(transform.position,
 										transform.position + new Vector3(SIZE.x, SIZE.y, 0),
@@ -40,9 +40,9 @@ public abstract class InteractableObject : MonoBehaviour {
     
 	void ResolveCharacterListDiff(Collider2D[] oldCallers, Collider2D[] callers) {
         Character character;
-		// TODO: move this logic to the local character because they only need to maintain a list of overlapped objects
-		// TODO:		at one point rather than a whole area.
-		// TODO: then just verify calls on the server
+		// OPTIMIZE: move this logic to the local character because they only need to maintain a list of overlapped objects
+		// OPTIMIZE:		at one point rather than a whole area.
+		// OPTIMIZE: then just verify calls on the server
 		// It's okay to mess up the oldCallers array,
 		// 	but callers should be preserved outside this method
 		callers = (Collider2D[])callers.Clone();

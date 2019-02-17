@@ -37,7 +37,7 @@ public class ElevatorButton : MonoBehaviour {
 	}
 	
 	void Update() {
-		// TODO: can be optimized with proper inputManager
+		// OPTIMIZE: can be optimized with proper inputManager
 		Vector2 halfSize = size / 2;
 		bottomLeft = (Vector2)transform.position - halfSize;
 		topRight = (Vector2)transform.position + halfSize;

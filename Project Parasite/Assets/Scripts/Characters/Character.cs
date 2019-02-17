@@ -119,7 +119,7 @@ public abstract class Character : MonoBehaviourPun {
 
 			physicsEntity.Update();
 			// Update the server's position
-			// TODO: clump these updates to improve network usage?
+			// OPTIMIZE: clump these updates to improve network usage?
 			photonView.RPC("RpcUpdatePosition", RpcTarget.Others, transform.position, false);
 		}
 	}
