@@ -93,6 +93,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 
     void Start() {
 		topRightUiText = GameObject.FindGameObjectWithTag("TopRightUI").GetComponent<Text>();
+		// Find main canvas before other canvases are created
         canvas = FindObjectOfType<Canvas>().transform;
     }
 
@@ -153,20 +154,20 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     	switch (characterType) {
     		case CharacterType.Hunter:
     			topRightUiText.enabled = false;
-    			controlsObject = Instantiate(HunterControlsPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
+    			controlsObject = Instantiate(HunterControlsPrefab, Vector3.zero, Quaternion.identity, canvas);
     			break;
     		case CharacterType.Parasite:
     			topRightUiText.enabled = true;
     			UpdateHealthObject(PlayerObject.STARTING_PARASITE_HEALTH);
-    			controlsObject = Instantiate(ParasiteControlsPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
+    			controlsObject = Instantiate(ParasiteControlsPrefab, Vector3.zero, Quaternion.identity, canvas);
     			break;
     		default:
     			topRightUiText.enabled = false;
     			break;
     	}
     	controlsObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(UI_PADDING_DISTANCE, UI_PADDING_DISTANCE);
-    	// Display NPC count 
-    	GameObject npcCountObject = Instantiate(NpcCountPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
+    	// Display NPC count
+    	GameObject npcCountObject = Instantiate(NpcCountPrefab, Vector3.zero, Quaternion.identity, canvas);
     	npcCountObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(UI_PADDING_DISTANCE, -UI_PADDING_DISTANCE);
         npcCountText = npcCountObject.GetComponentInChildren<Text>();
     }

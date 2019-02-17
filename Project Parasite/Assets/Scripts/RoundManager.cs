@@ -35,12 +35,12 @@ public class RoundManager : MonoBehaviourPun {
 	#region [MonoBehaviour Callbacks]
 	
 	void Start () {
+		noMoreNPCs = new NoMoreNPCsWinCondition();
 		if (!PhotonNetwork.IsMasterClient) { return; }
 		objectManagerPrefab = Resources.Load("ObjectManager") as GameObject;
 		SpawnObjectManager();
 		SelectSpawnPoints();
 		SelectParasite();
-		noMoreNPCs = new NoMoreNPCsWinCondition();
 	}
 
 	void FixedUpdate() {
