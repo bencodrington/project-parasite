@@ -195,6 +195,9 @@ public class Elevator : MonoBehaviourPun {
 	[PunRPC]
 	void RpcUpdateServerPosition(Vector3 newPosition) {
 		if (PhotonNetwork.IsMasterClient) { return; }
+		if (serverPosition == newPosition) {
+			isMoving = false;
+		}
 		// Else, on a client machine, so update our record of the elevator's true position
 		serverPosition = newPosition;
 	}
