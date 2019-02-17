@@ -19,19 +19,17 @@ public class NoMoreNPCsWinCondition : IOnEventCallback
 		PhotonNetwork.AddCallbackTarget(this);
     }
     
-    public void SetNpcCount(int startingCount) {
-        npcCount = startingCount;
+    public void SetNpcCount(int newNpcCount) {
+        npcCount = newNpcCount;
+        UiManager.Instance.SetRemainingNpcCount(npcCount);
     }
 
     public void OnEvent(EventData photonEvent) {
-        object[] content;
         if (photonEvent.Code == EventCodes.SetNpcCount) {
-            content = (object[])photonEvent.CustomData;
-            npcCount = (int)content[0];
+            SetNpcCount((int)EventCodes.GetFirstEventContent(photonEvent));
         } else if (photonEvent.Code == EventCodes.NpcDespawned) {
-            npcCount--;
+            SetNpcCount(npcCount - 1);
             if (npcCount == 0) {
-                // TODO:
                 // Parasites Win
                 Debug.Log("Parasite Wins!");
                 EventCodes.RaiseGameOverEvent(CharacterType.Parasite);

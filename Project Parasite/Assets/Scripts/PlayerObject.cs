@@ -12,10 +12,7 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 
 	#region [Public Variables]
 	
-	public GameObject ParasiteControlsPrefab;
-	public GameObject HunterControlsPrefab;
-	public GameObject HealthPrefab;
-	public GameObject NpcCountPrefab;
+	public const int STARTING_PARASITE_HEALTH = 100;
 	
 	#endregion
 
@@ -25,11 +22,9 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 	GameObject ParasitePrefab;
 
 	GameObject characterGameObject;
-	GameObject npcCountObject;
-	GameObject controlsObject;
 	RoundManager roundManager;
 	CharacterType characterType;
-	
+
 	#endregion
 
 	int _parasiteHealth;
@@ -49,17 +44,7 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 			}
 		}
 	}
-	private int _remainingNpcCount;
-	private int RemainingNpcCount {
-		get { return _remainingNpcCount; }
-		set {
-			_remainingNpcCount = value;
-			if (npcCountObject != null) {npcCountObject.GetComponentInChildren<Text>().text = value.ToString();};
-		}
-	}
 
-	private const int STARTING_PARASITE_HEALTH = 100;
-	private const int UI_PADDING_DISTANCE = 9;
 
 	private Action OnCharacterDestroy;
 	public void RegisterOnCharacterDestroyCallback(Action cb) {
@@ -150,49 +135,5 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 
     // public void CmdCallElevatorToStop(NetworkInstanceId elevatorId, int stopIndex) {
     // 	NetworkServer.FindLocalObject(elevatorId).GetComponentInChildren<Elevator>().CmdCallToStop(stopIndex);
-    // }
-
-    // // ClientRpc
-
-    // void RpcUpdateHud() {
-    // 	if (!isLocalPlayer) { return; }
-    // 	CharacterType characterType = PlayerGrid.Instance.GetLocalCharacterType();
-    // 	switch (characterType) {
-    // 		case CharacterType.Hunter:
-    // 			topRightUiText.enabled = false;
-    // 			controlsObject = Instantiate(HunterControlsPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
-    // 			break;
-    // 		case CharacterType.Parasite:
-    // 			topRightUiText.enabled = true;
-    // 			ParasiteHealth = STARTING_PARASITE_HEALTH;
-    // 			controlsObject = Instantiate(ParasiteControlsPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
-    // 			break;
-    // 		default:
-    // 			// TODO: deactivate all UI
-    // 			topRightUiText.enabled = false;
-    // 			break;
-    // 	}
-    // 	controlsObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(UI_PADDING_DISTANCE, UI_PADDING_DISTANCE);
-    // 	// Display NPC count 
-    // 	npcCountObject = Instantiate(NpcCountPrefab, Vector3.zero, Quaternion.identity, FindObjectOfType<Canvas>().transform);
-    // 	npcCountObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(UI_PADDING_DISTANCE, -UI_PADDING_DISTANCE);
-    // }
-
-    // void RpcRemoveHud() {
-    // 	if (!isLocalPlayer) { return; }
-    // 	if (topRightUiText != null) {
-    // 		topRightUiText.enabled = false;
-    // 	}
-    // 	if (npcCountObject != null) {
-    // 		Destroy(npcCountObject);
-    // 	}
-    // 	if (controlsObject != null) {
-    // 		Destroy(controlsObject);
-    // 	}
-    // }
-
-    // public void RpcUpdateRemainingNpcCount(int updatedCount) {
-    // 	if (!isLocalPlayer) { return; }
-    // 	RemainingNpcCount = updatedCount;
     // }
 }

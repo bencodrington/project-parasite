@@ -895,6 +895,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1092008076}
   - component: {fileID: 1092008078}
+  - component: {fileID: 1092008075}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -902,6 +903,29 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &1092008075
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1092008074}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bb95ee9ef6fec048a67f789541bf6be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GameOverScreenPrefab: {fileID: 1314741506534428, guid: 63bd87d6da451bd4486687110e76e6a0,
+    type: 3}
+  GameOverScreenServerPrefab: {fileID: 1702133244406784, guid: db2f2e4192753d845bb4d1784213f515,
+    type: 3}
+  characterType: 0
+  ParasiteControlsPrefab: {fileID: 1781725809795122, guid: 1ee8585f1dcdfa549be3fe95eb5b09bd,
+    type: 3}
+  HunterControlsPrefab: {fileID: 1837243442876654, guid: 40bb69824403fa544863cf21950d59b1,
+    type: 3}
+  NpcCountPrefab: {fileID: 1257916060788230, guid: ca84bca96eea3ae479cd93d97fc24088,
+    type: 3}
 --- !u!4 &1092008076
 Transform:
   m_ObjectHideFlags: 0

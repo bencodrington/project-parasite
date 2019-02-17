@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RestartGameButton
+public class RestartGameButton : MonoBehaviour
 {
 
     #region [Public Methods]
