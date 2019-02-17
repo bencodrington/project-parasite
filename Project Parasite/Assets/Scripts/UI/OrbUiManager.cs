@@ -16,9 +16,10 @@ public class OrbUiManager : MonoBehaviour {
 	Color PLACEHOLDER_FLASH_COLOUR = Color.red;
 
 	const float DISTANCE_BETWEEN_ORB_SPRITES = 10;
-	const float ORB_SPRITE_WIDTH = 50;
+	const float ORB_SPRITE_WIDTH = 100;
+	const float ORB_SPRITE_HEIGHT = 100;
 	// Space to the edge of the canvas
-	Vector2 CANVAS_PADDING = new Vector2(-420, 20);
+	Vector2 CANVAS_PADDING = new Vector2(-10, 10);
 
 	int maxOrbCount;
 	int numOrbSpritesEnabled;
@@ -97,8 +98,8 @@ public class OrbUiManager : MonoBehaviour {
 
 	Vector2 getNewOrbSpritePosition(int index) {
 		// index should be in the range [0..maxOrbCount - 1]
-		float x = (-(DISTANCE_BETWEEN_ORB_SPRITES + ORB_SPRITE_WIDTH) * index) - ORB_SPRITE_WIDTH;
-		return new Vector2(x, 0);
+		float x = (-(DISTANCE_BETWEEN_ORB_SPRITES + ORB_SPRITE_WIDTH) * index) - ORB_SPRITE_WIDTH / 2;
+		return new Vector2(x, ORB_SPRITE_HEIGHT / 2);
 	}
 
 	public void FlashPlaceholders() {

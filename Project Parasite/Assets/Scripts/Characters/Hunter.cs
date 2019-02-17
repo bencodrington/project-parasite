@@ -36,9 +36,12 @@ public class Hunter : Character {
 		orbBeamRangeManager = GetComponentInChildren<OrbBeamRangeManager>();
 		if (HasAuthority()) {
 			// Spawn orb UI manager to display how many orbs are remaining
-			orbUiManager = Instantiate(orbUiManagerPrefab).GetComponent<OrbUiManager>();
-			// Anchor it to the bottom right corner
-			orbUiManager.transform.SetParent(FindObjectOfType<Canvas>().transform);
+			orbUiManager = Instantiate(orbUiManagerPrefab,
+										Vector3.zero,
+										Quaternion.identity,
+										// Anchor it to the canvas
+										UiManager.Instance.GetCanvas()
+			).GetComponent<OrbUiManager>();
 			// Initialize it with the maximum orbs to spawn
 			orbUiManager.setMaxOrbCount(MAX_ORB_COUNT);
 		} else {

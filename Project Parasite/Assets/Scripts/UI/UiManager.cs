@@ -74,6 +74,10 @@ public class UiManager : MonoBehaviour, IOnEventCallback
             npcCountText.text = remainingNpcCount.ToString();
         };
     }
+
+	public Transform GetCanvas() {
+		return canvas;
+	}
     
     #endregion
 
