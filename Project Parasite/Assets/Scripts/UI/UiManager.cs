@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using ExitGames.Client.Photon;
 using Photon.Pun;
@@ -45,7 +46,9 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     public void OnEvent(EventData photonEvent)
     {
         switch (photonEvent.Code) {
-            case EventCodes.StartGame: 
+            case EventCodes.StartGame:
+                DestroyTitleScreen();
+                HideMenu();
 				DestroyGameOverScreen();
 				RemoveHud();
                 break;
@@ -61,7 +64,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     }
 
     #region [Public Methods]
-    
+
     public void SetRemainingNpcCount(int remainingNpcCount) {
         if (npcCountText != null) {
             npcCountText.text = remainingNpcCount.ToString();
@@ -100,6 +103,19 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	public void UpdateHealthObject(int newValue) {
 		topRightUiText.text = newValue.ToString();
 	}
+
+    void DestroyTitleScreen() {
+        Destroy(GameObject.FindWithTag("TitleScreen"));
+    }
+
+    void HideMenu() {
+        Menu menu = FindObjectOfType<Menu>();
+        if (menu == null) {
+            Debug.LogError("UiManager: HideMenu: Menu not found");
+            return;
+        }
+        menu.DeleteMenuItems();
+    }
 
     void ShowGameOverScreen(CharacterType victorType) {
 		// Don't spawn another gameover screen if one already exists

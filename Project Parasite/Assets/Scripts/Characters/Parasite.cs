@@ -223,7 +223,6 @@ public class Parasite : Character {
 		// Store playerObject for eventual transfer back to parasite
 		npc.PlayerObject = PlayerObject;
 		// Ensure the npc has a physics entity on this client
-		// TODO: transfer velocity from current physics entity?
 		npc.GeneratePhysicsEntity(Vector2.zero);
 		// Set isInfected to true/update sprite on new authority's client
 		npc.Infect();

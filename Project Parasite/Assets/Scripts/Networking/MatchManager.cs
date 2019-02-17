@@ -87,17 +87,6 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
             // Update playersReady dictionary
             SetActorReady(actorNumber, isReady);
         } else if (photonEvent.Code == EventCodes.StartGame) {
-            // Hide menu
-            // TODO: extract to UI manager
-            Destroy(GameObject.FindWithTag("TitleScreen"));
-            // Hide Menu
-            Menu menu = FindObjectOfType<Menu>();
-            if (menu == null) {
-                Debug.LogError("MatchManager: OnEvent: Menu not found");
-                return;
-            }
-            menu.DeleteMenuItems();
-
             if (PhotonNetwork.IsMasterClient) {
                 // If roundmanager exists, end round
                 if (roundManager != null) {
