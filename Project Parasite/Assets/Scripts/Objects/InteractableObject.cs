@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class InteractableObject : MonoBehaviour {
-    // Whether the object is in range of being interacted with
-    bool _isInRange = false;
 
 	Vector2 SIZE = new Vector2(2, 4);
     
