@@ -53,7 +53,11 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 				RemoveHud();
                 break;
 			case EventCodes.AssignPlayerTypeAndSpawnPoint:
-                UpdateHud();
+				int actorNumber = (int)EventCodes.GetEventContentAtPosition(photonEvent, 0);
+				characterType = (CharacterType)EventCodes.GetEventContentAtPosition(photonEvent, 1);
+				if (actorNumber == PhotonNetwork.LocalPlayer.ActorNumber) {
+					UpdateHud();
+				}
                 break;
             case EventCodes.GameOver: 
                 // Deconstruct event

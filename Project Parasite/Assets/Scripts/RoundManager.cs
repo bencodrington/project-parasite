@@ -22,14 +22,23 @@ public class RoundManager : MonoBehaviourPun {
 
 	NoMoreNPCsWinCondition noMoreNPCs;
 
+	#region [Public Methods]
+
+	public void EndRound() {
+		transform.GetComponentInChildren<NpcManager>().DespawnNPCs();
+		objectManager.OnRoundEnd();
+		PhotonNetwork.Destroy(photonView);
+	}
+
+	#endregion
+	
 	#region [MonoBehaviour Callbacks]
 	
 	void Start () {
 		if (!PhotonNetwork.IsMasterClient) { return; }
 		objectManagerPrefab = Resources.Load("ObjectManager") as GameObject;
 		SpawnObjectManager();
-		// TODO:
-		// SelectSpawnPoints();
+		SelectSpawnPoints();
 		SelectParasite();
 		noMoreNPCs = new NoMoreNPCsWinCondition();
 	}
@@ -48,13 +57,9 @@ public class RoundManager : MonoBehaviourPun {
 	
 	#endregion
 
-	public void EndRound() {
-		transform.GetComponentInChildren<NpcManager>().DespawnNPCs();
-		objectManager.OnRoundEnd();
-		PhotonNetwork.Destroy(photonView);
-	}
 
 	#region [Private Methods]
+
 	void SelectParasite() {
 		int n = PhotonNetwork.PlayerList.Length;
 		Vector2 spawnPoint;

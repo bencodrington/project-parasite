@@ -87,7 +87,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
     	// Initialize each player's character on their own client
     	character.GeneratePhysicsEntity(velocity);
     	character.PlayerObject = this;
-		UiManager.Instance.characterType = assignedCharacterType;
 	}
 	
 	#endregion
