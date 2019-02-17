@@ -32,8 +32,6 @@ public class Hunter : Character {
 
 	protected override void OnStart() {
 		orbs = new Queue<Orb>();
-		// TODO:
-		// PlayerObject.RegisterOnCharacterDestroyCallback(DestroyAllOrbs);
 		// Cache reference to orb beam range manager
 		orbBeamRangeManager = GetComponentInChildren<OrbBeamRangeManager>();
 		if (HasAuthority()) {
@@ -117,7 +115,28 @@ public class Hunter : Character {
 
 	void DestroyAllOrbs() {
 		while (orbs.Count > 0) {
-			photonView.RPC("RpcRecallOrb", RpcTarget.All);
+			RecallOrb();
+		}
+	}
+
+	void AlertNpcsInRange(Vector2 ofPosition) {
+		// Find all NPCs in range
+		Collider2D[] npcs = Physics2D.OverlapBoxAll(ofPosition, NPC_ALERT_RANGE, 0, Utility.GetLayerMask(CharacterType.NPC));
+		NonPlayerCharacter npc;
+		// Alert each NPC
+		foreach (Collider2D npcCollider in npcs) {
+			npc = npcCollider.transform.parent.gameObject.GetComponentInChildren<NonPlayerCharacter>();
+			npc.NearbyOrbAlert(ofPosition);
+		}
+	}
+
+	void RecallOrb() {
+		Destroy(orbs.Dequeue().gameObject);
+		if (HasAuthority()) {
+			// Update the number of remaining orbs currently displayed onscreen
+			orbUiManager.OnOrbCountChange(orbs.Count);
+			// User can definitely place at least one orb, so show markers
+			orbBeamRangeManager.shouldShowMarkers = true;
 		}
 	}
 	
@@ -125,6 +144,7 @@ public class Hunter : Character {
 
 
 	protected override void OnCharacterDestroy() {
+		DestroyAllOrbs();
 		if (HasAuthority()) {
 			Destroy(orbUiManager.gameObject);
 		}
@@ -137,7 +157,7 @@ public class Hunter : Character {
 		GameObject orbGameObject = Instantiate(orbPrefab, atPosition, Quaternion.identity);
 		Orb orb = orbGameObject.GetComponent<Orb>();
 
-		// CmdAlertNpcsInRange(atPosition);
+		AlertNpcsInRange(atPosition);
 
 		// If new orb is within "beaming" range of most recently placed orb
 		if (orbBeamRangeManager.isInRange(atPosition)) {
@@ -167,25 +187,6 @@ public class Hunter : Character {
 
 	[PunRPC]
 	void RpcRecallOrb() {
-		Destroy(orbs.Dequeue().gameObject);
-		if (HasAuthority()) {
-			// Update the number of remaining orbs currently displayed onscreen
-			orbUiManager.OnOrbCountChange(orbs.Count);
-			// User can definitely place at least one orb, so show markers
-			orbBeamRangeManager.shouldShowMarkers = true;
-		}
+		RecallOrb();
 	}
-
-	// Commands
-
-	// void CmdAlertNpcsInRange(Vector2 ofPosition) {
-	// 	// Find all NPCs in range
-	// 	Collider2D[] npcs = Physics2D.OverlapBoxAll(ofPosition, NPC_ALERT_RANGE, 0, Utility.GetLayerMask(CharacterType.NPC));
-	// 	NonPlayerCharacter npc;
-	// 	// Alert each NPC
-	// 	foreach (Collider2D npcCollider in npcs) {
-	// 		npc = npcCollider.transform.parent.gameObject.GetComponentInChildren<NonPlayerCharacter>();
-	// 		npc.RpcNearbyOrbAlert(ofPosition);
-	// 	}
-	// }
 }

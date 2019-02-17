@@ -67,6 +67,19 @@ public class NonPlayerCharacter : Character {
 		// Only update sprite if on the Parasite player's client
 		spriteRenderer.color = Color.magenta;
 	}
+
+	public void NearbyOrbAlert(Vector2 atPosition) {
+		// Show exclamation mark above NPC
+		GameObject alertIcon = Instantiate(alertIconPrefab, (Vector2)transform.position + ALERT_ICON_OFFSET, Quaternion.identity);
+		alertIcon.transform.SetParent(transform);
+		if (!HasAuthority() || isInfected) { return; }
+		// Only uninfected NPCs should flee, and the calculations
+		// 	should only be done on the server
+		Utility.Directions fleeDirection = atPosition.x < transform.position.x ?
+			Utility.Directions.Right :
+			Utility.Directions.Left;
+		FleeOrbInDirection(fleeDirection);
+	}
 	
 	#endregion
 
@@ -182,18 +195,4 @@ public class NonPlayerCharacter : Character {
 	}
 	
 	#endregion
-
-	// TODO:
-	public void RpcNearbyOrbAlert(Vector2 atPosition) {
-		// Show exclamation mark above NPC
-		GameObject alertIcon = Instantiate(alertIconPrefab, (Vector2)transform.position + ALERT_ICON_OFFSET, Quaternion.identity);
-		alertIcon.transform.SetParent(transform);
-		if (!HasAuthority() || isInfected) { return; }
-		// Only uninfected NPCs should flee, and the calculations
-		// 	should only be done on the server
-		Utility.Directions fleeDirection = atPosition.x < transform.position.x ?
-			Utility.Directions.Right :
-			Utility.Directions.Left;
-		FleeOrbInDirection(fleeDirection);
-	}
 }
