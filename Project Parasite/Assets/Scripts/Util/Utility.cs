@@ -56,12 +56,6 @@ public static class Utility {
 		return Vector2.SignedAngle(Vector2.right, GetMousePos() - point);
 	}
 
-	public static GameObject GetLocalObject(NetworkInstanceId netId, bool isServer) {
-		return isServer ? 
-			NetworkServer.FindLocalObject(netId) :
-			ClientScene.FindLocalObject(netId);
-	}
-
 	public static IEnumerator WaitXSeconds(float x, Action callback) {
         yield return new WaitForSeconds(x);
         callback();

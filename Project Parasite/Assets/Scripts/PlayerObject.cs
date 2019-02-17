@@ -132,8 +132,4 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
     // 	// Update HUD to show necessary information for this character type
     // 	RpcUpdateHud();
     // }
-
-    // public void CmdCallElevatorToStop(NetworkInstanceId elevatorId, int stopIndex) {
-    // 	NetworkServer.FindLocalObject(elevatorId).GetComponentInChildren<Elevator>().CmdCallToStop(stopIndex);
-    // }
 }
