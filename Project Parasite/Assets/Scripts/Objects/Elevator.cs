@@ -18,7 +18,7 @@ public class Elevator : MonoBehaviourPun {
 	// How far from the elevator's center should the callfield center be
 	const float STOP_X_OFFSET = 2f;
 	// The higher this value is, the snappier lag correction will be
-	const float LAG_LERP_FACTOR = 0.4f;
+	const float LAG_LERP_FACTOR = 0.1f;
 	const float MOVEMENT_SPEED = 8f;
 	// The vertical distance between elevator buttons
 	const float BUTTON_OFFSET = 0.6f;

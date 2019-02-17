@@ -60,14 +60,6 @@ public abstract class Character : MonoBehaviourPun {
 		if (HasAuthority()) {
 			// This character belongs to this client
 			HandleInput();
-		} else {
-			// Verify current position is up to date with server position
-			if (shouldSnapToServerPosition) {
-				transform.position = serverPosition;
-				shouldSnapToServerPosition = false;
-			} else {
-				transform.position = Vector3.Lerp(transform.position, serverPosition, lagLerpFactor);
-			}
 		}
 	}
 	
@@ -121,6 +113,14 @@ public abstract class Character : MonoBehaviourPun {
 			// Update the server's position
 			// OPTIMIZE: clump these updates to improve network usage?
 			photonView.RPC("RpcUpdatePosition", RpcTarget.Others, transform.position, false);
+		} else {
+			// Verify current position is up to date with server position
+			if (shouldSnapToServerPosition) {
+				transform.position = serverPosition;
+				shouldSnapToServerPosition = false;
+			} else {
+				transform.position = Vector3.Lerp(transform.position, serverPosition, lagLerpFactor);
+			}
 		}
 	}
 
