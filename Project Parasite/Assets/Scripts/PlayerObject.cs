@@ -16,8 +16,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 	public GameObject HunterControlsPrefab;
 	public GameObject HealthPrefab;
 	public GameObject NpcCountPrefab;
-	public GameObject GameOverScreenPrefab;
-	public GameObject GameOverScreenServerPrefab;
 	
 	#endregion
 
@@ -27,19 +25,10 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 	GameObject ParasitePrefab;
 
 	GameObject characterGameObject;
-	Text topRightUiText;
 	GameObject npcCountObject;
 	GameObject controlsObject;
-	GameObject gameOverScreen;
 	RoundManager roundManager;
 	CharacterType characterType;
-
-	// The text shown on the game over screen
-	const string HUNTERS_WIN = "HUNTERS WIN!";
-	const string PARASITE_WINS = "PARASITE WINS!";
-	// The colour of the text shown on the game over screen
-	Color WIN_COLOUR = Color.green;
-	Color LOSS_COLOUR = Color.red;
 	
 	#endregion
 
@@ -52,10 +41,9 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 				characterGameObject.GetComponent<Parasite>().OnTakingDamage();
 			}
 			_parasiteHealth = value;
-			UpdateHealthObject(value);
+			UiManager.Instance.UpdateHealthObject(value);
 			if (value <= 0) {
-				// No need to keep sending this event
-				if (gameOverScreen != null) { return; }
+				// TODO: No need to keep sending this event
 				Debug.Log("Hunters Win!");
                 EventCodes.RaiseGameOverEvent(CharacterType.Hunter);
 			}
@@ -81,10 +69,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 		OnCharacterDestroy -= cb;
 	}
 
-	void UpdateHealthObject(int newValue) {
-		topRightUiText.text = newValue.ToString();
-	}
-
 	public void ParasiteTakeDamage(int damage) {
 		ParasiteHealth -= damage;
 	}
@@ -93,10 +77,7 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
     {
 		switch (photonEvent.Code) {
 			case EventCodes.StartGame:
-				// TODO: extract to UI Manager
-				DestroyGameOverScreen();
 				DestroyCharacter();
-				// TODO: destroy hud
 				break;
 			case EventCodes.AssignPlayerType:
 				// Deconstruct event
@@ -106,13 +87,7 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 				if (actorNumber == PhotonNetwork.LocalPlayer.ActorNumber) {
 					// Spawn Character of type `assignedCharacterType` across clients
 					SpawnPlayerCharacter(assignedCharacterType, spawnPoint, Vector2.zero);
-					// TODO: update hud
 				}
-				break;
-			case EventCodes.GameOver: 
-				// Deconstruct event
-				CharacterType victorType = (CharacterType)EventCodes.GetFirstEventContent(photonEvent);
-				ShowGameOverScreen(victorType);
 				break;
 		}
     }
@@ -129,6 +104,7 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
     	character.GeneratePhysicsEntity(velocity);
     	character.PlayerObject = this;
 		characterType = assignedCharacterType;
+		UiManager.Instance.characterType = assignedCharacterType;
 	}
 	
 	#endregion
@@ -138,8 +114,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 	void Start() {
 		ParasitePrefab = Resources.Load("Parasite") as GameObject;
 		HunterPrefab = Resources.Load("Hunter") as GameObject;
-		// TODO: extract to UI manager
-		topRightUiText = GameObject.FindGameObjectWithTag("TopRightUI").GetComponent<Text>();
 	}
 	
 	public void OnEnable() {
@@ -153,35 +127,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 	#endregion
 
 	#region [Private Methods]
-
-	// TODO: extract to UI manager
-	void ShowGameOverScreen(CharacterType victorType) {
-		// Don't spawn another gameover screen if one already exists
-		if (gameOverScreen != null) { return; }
-		gameOverScreen = PhotonNetwork.IsMasterClient ? Instantiate(GameOverScreenServerPrefab) : Instantiate(GameOverScreenPrefab);
-		gameOverScreen.transform.SetParent(FindObjectOfType<Canvas>().transform);
-		RectTransform rect = gameOverScreen.GetComponent<RectTransform>();
-		// Position gameOverScreen;
-		rect.anchoredPosition = new Vector2(0.5f, 0.5f);
-		rect.offsetMax = Vector2.zero;
-		rect.offsetMin = Vector2.zero;
-
-		Transform VictorText = gameOverScreen.transform.Find("Victor");
-		if (VictorText == null) {
-			Debug.LogError("PlayerObject:ShowGameOverScreen: Victor Text not found");
-			return;
-		}
-		Text txt = VictorText.GetComponent<Text>();
-		txt.text = victorType == CharacterType.Hunter ? HUNTERS_WIN : PARASITE_WINS;
-		txt.color = victorType == characterType ? WIN_COLOUR : LOSS_COLOUR;
-	}
-
-	void DestroyGameOverScreen() {
-		// gameOverScreen should be null when starting the game from the main menu
-		// 	as opposed to when restarting after a round has been completed
-		if (gameOverScreen == null) { return; }
-		Destroy(gameOverScreen.gameObject);
-	}
 
 	void DestroyCharacter() {
     	if (characterGameObject != null) {
