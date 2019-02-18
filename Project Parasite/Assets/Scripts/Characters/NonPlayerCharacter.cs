@@ -89,13 +89,15 @@ public class NonPlayerCharacter : Character {
 		if (isInfected && HasAuthority()) {
 			// NPC is infected and this client is the Parasite player's client
 			HandleInput();
+			HandlePositionUpdates();
 		} else if (!isInfected && HasAuthority() && physicsEntity != null) {
 			// NPC still belongs to the server
 			TraversePath();
+			HandlePositionUpdates();
 		} else {
 			// This is a cloned representation of the authoritative NPC
 			// 	So just verify current position is up to date with server position
-			transform.position = Vector3.Lerp(transform.position, serverPosition, 0.8f);
+			transform.position = Vector3.Lerp(transform.position, serverPosition, LAG_LERP_FACTOR);
 		}
 	}
 	

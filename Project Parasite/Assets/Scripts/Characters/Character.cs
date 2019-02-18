@@ -10,21 +10,35 @@ public abstract class Character : MonoBehaviourPun {
 
 	protected List<InteractableObject> objectsInRange = new List<InteractableObject>();
 
-	protected Vector3 serverPosition;
+	// The position to send to the server next time we're sending a message (if we own this character)
+	// 	OR the most recent position we've received from the server (if we're a remote client)
+	protected Vector2 serverPosition;
 	protected bool shouldSnapToServerPosition = false;
 
-	// Horizontal movement is divided by this each physics update
-	// 	a value of 1 indicates that the character will never stop walking once they start
-	// 	a value of 2 indicates the walking speed will be halved each frame
-	const float MOVEMENT_INPUT_FRICTION = 2f;
 	protected bool isMovingRight;
 	protected bool isMovingLeft;
 	protected bool isMovingUp;
 	protected bool isMovingDown;
+
+	#region [Private Variables]
+	
+	// Horizontal movement is divided by this each physics update
+	// 	a value of 1 indicates that the character will never stop walking once they start
+	// 	a value of 2 indicates the walking speed will be halved each frame
+	const float MOVEMENT_INPUT_FRICTION = 2f;
+	const float POSITION_UPDATES_PER_SECOND = 5;
+	float timeUntilNextPositionUpdate;
+	static float timeBetweenPositionUpdates;
+
 	float inputVelocityX = 0;
 	float inputVelocityY = 0;
-
-	const float lagLerpFactor = 0.4f;
+	Vector2 lastSentPosition;
+	
+	#endregion
+	
+	// The higher this is, the snappier lag correction will be
+	// 	Should be in the range of (0..1]
+	protected const float LAG_LERP_FACTOR = 0.1f;
 
 	// Only initialized for Character objects on the server
 	private PlayerObject _playerObject;
@@ -48,6 +62,8 @@ public abstract class Character : MonoBehaviourPun {
     	//  Set character as new target of camera
     	SetCameraFollow();
     	SetRenderLayer();
+		HandlePositionUpdates();
+		timeBetweenPositionUpdates = 1f / POSITION_UPDATES_PER_SECOND;
 	}
 	
 	public virtual void Update () {
@@ -55,6 +71,7 @@ public abstract class Character : MonoBehaviourPun {
 		if (HasAuthority()) {
 			// This character belongs to this client
 			HandleInput();
+			HandlePositionUpdates();
 		}
 	}
 	
@@ -103,18 +120,16 @@ public abstract class Character : MonoBehaviourPun {
 			inputVelocityY = Mathf.Clamp(inputVelocityY, -stats.movementSpeed, stats.movementSpeed);
 			// Pass calculated velocity to physics entity
 			physicsEntity.AddInputVelocity(inputVelocityX, inputVelocityY);
-
 			physicsEntity.Update();
 			// Update the server's position
-			// OPTIMIZE: clump these updates to improve network usage?
-			photonView.RPC("RpcUpdatePosition", RpcTarget.Others, transform.position, false);
+			serverPosition = transform.position;
 		} else {
 			// Verify current position is up to date with server position
 			if (shouldSnapToServerPosition) {
 				transform.position = serverPosition;
 				shouldSnapToServerPosition = false;
 			} else {
-				transform.position = Vector3.Lerp(transform.position, serverPosition, lagLerpFactor);
+				transform.position = Vector3.Lerp(transform.position, serverPosition, LAG_LERP_FACTOR);
 			}
 		}
 	}
@@ -161,10 +176,31 @@ public abstract class Character : MonoBehaviourPun {
 		return (photonView.IsMine || !PhotonNetwork.IsConnected);
 	}
 
+	protected void HandlePositionUpdates() {
+		timeUntilNextPositionUpdate -= Time.deltaTime;
+		if (timeUntilNextPositionUpdate <= 0) {
+			SendPositionUpdate();
+			timeUntilNextPositionUpdate += timeBetweenPositionUpdates;
+		}
+	}
+
+	#endregion
+
+	#region [Private Methods]
+	
+	void SendPositionUpdate() {
+		// Don't send position update if this isn't our character or if we haven't moved
+		if (!HasAuthority() || (serverPosition == lastSentPosition)) {
+			return;
+		}
+		photonView.RPC("RpcUpdatePosition", RpcTarget.Others, serverPosition, false);
+		lastSentPosition = serverPosition;
+	}
+	
 	#endregion
 
 	[PunRPC]
-	protected void RpcUpdatePosition(Vector3 newPosition, bool snapToNewPos) {
+	protected void RpcUpdatePosition(Vector2 newPosition, bool snapToNewPos) {
 		serverPosition = newPosition;
 		shouldSnapToServerPosition = snapToNewPos;
 	}
