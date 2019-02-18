@@ -3,11 +3,13 @@ using UnityEditor;
 
 public class PhysicsEntity {
 	/// Constants ///
-	private const float DEFAULT_GRAVITY = -2f;
+	const float DEFAULT_GRAVITY = -2f;
 	// While on the ground, horizontal velocity is divided by this constant
 	// 	a value of 1 indicates no friction
 	//  a value of 2 indicates that horizontal velocity should be halved each physics update
-	private const float DEFAULT_FRICTION_DENOMINATOR = 1.25f;
+	const float DEFAULT_FRICTION_DENOMINATOR = 1.25f;
+	// How far above and below to check for floor to see if we're outside the map
+	const float OUTSIDE_MAP_DISTANCE = 100f;
 	// Gravity increases by a rate of 1 unit/second per second
 	float gravityAcceleration;
 	public float GravityAcceleration() { return gravityAcceleration; }
@@ -85,6 +87,14 @@ public class PhysicsEntity {
 	// 	Should be called in the FixedUpdate() method of that MonoBehaviour
 	//	Therefore, should run every physics update, every ~0.02 seconds
 	public void Update () {
+		if (IsOutsideMap()) {
+			Debug.LogError("PLAYER OUTSIDE MAP");
+			transform.position = Vector2.zero;
+			velocityX = 0;
+			velocityY = 0;
+			CacheSensorPixels(transform.position);
+			return;
+		}
 		HandleGravity();
 		ApplyFriction();
 		// Add velocity from moving obstacles nearby
@@ -110,6 +120,12 @@ public class PhysicsEntity {
 		CacheSensorPixels(newPosition);
 		// Reset inputVelocity, as this should be manually controlled by the character each frame
 		ResetInputVelocity();
+	}
+
+	bool IsOutsideMap() {
+		Vector3 pos = transform.position;
+		RaycastHit2D hit = Physics2D.Raycast(new Vector2(pos.x, pos.y - OUTSIDE_MAP_DISTANCE), Vector2.up, OUTSIDE_MAP_DISTANCE * 2, Utility.GetLayerMask("obstacle"));
+		return !hit;
 	}
 
 	void HandleGravity() {
