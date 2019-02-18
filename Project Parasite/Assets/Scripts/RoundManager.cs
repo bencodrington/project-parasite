@@ -18,6 +18,7 @@ public class RoundManager : MonoBehaviourPun {
 	public bool isGameOver = false;
 
 	bool huntersOnlyMode = false;
+	// If this is true, spawn all players at (0, 0)
 	bool DEBUG_MODE = false;
 
 	NoMoreNPCsWinCondition noMoreNPCs;
