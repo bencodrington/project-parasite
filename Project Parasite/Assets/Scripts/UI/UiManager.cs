@@ -129,13 +129,9 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     void ShowGameOverScreen(CharacterType victorType) {
 		// Don't spawn another gameover screen if one already exists
 		if (gameOverScreen != null) { return; }
-		gameOverScreen = PhotonNetwork.IsMasterClient ? Instantiate(GameOverScreenServerPrefab) : Instantiate(GameOverScreenPrefab);
-		gameOverScreen.transform.SetParent(canvas);
-		RectTransform rect = gameOverScreen.GetComponent<RectTransform>();
-		// Position gameOverScreen;
-		rect.anchoredPosition = new Vector2(0.5f, 0.5f);
-		rect.offsetMax = Vector2.zero;
-		rect.offsetMin = Vector2.zero;
+		gameOverScreen = PhotonNetwork.IsMasterClient ?
+			Instantiate(GameOverScreenServerPrefab, canvas.position, Quaternion.identity, canvas) :
+			Instantiate(GameOverScreenPrefab, canvas.position, Quaternion.identity, canvas);
 
 		Transform VictorText = gameOverScreen.transform.Find("Victor");
 		if (VictorText == null) {

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 53}
   - component: {fileID: 124}
   - component: {fileID: 125}
-  - component: {fileID: 152}
+  - component: {fileID: 134}
   m_Layer: 0
   m_Name: RoundManager
   m_TagString: Untagged
@@ -73,7 +73,7 @@ MonoBehaviour:
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &152
+--- !u!114 &134
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

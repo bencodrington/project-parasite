@@ -24,6 +24,8 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 	GameObject characterGameObject;
 	RoundManager roundManager;
 
+	bool hasSentGameOver = false;
+
 	#endregion
 
 	int _parasiteHealth;
@@ -36,10 +38,10 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 			}
 			_parasiteHealth = value;
 			UiManager.Instance.UpdateHealthObject(value);
-			if (value <= 0) {
-				// OPTIMIZE: No need to keep sending this event
+			if (value <= 0 && !hasSentGameOver) {
 				Debug.Log("Hunters Win!");
                 EventCodes.RaiseGameOverEvent(CharacterType.Hunter);
+				hasSentGameOver = false;
 			}
 		}
 	}
@@ -87,6 +89,10 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
     	// Initialize each player's character on their own client
     	character.GeneratePhysicsEntity(velocity);
     	character.PlayerObject = this;
+		hasSentGameOver = false;
+		if (assignedCharacterType == CharacterType.Parasite) {
+			ParasiteHealth = STARTING_PARASITE_HEALTH;
+		}
 	}
 	
 	#endregion

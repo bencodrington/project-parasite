@@ -917,7 +917,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GameOverScreenPrefab: {fileID: 1314741506534428, guid: 63bd87d6da451bd4486687110e76e6a0,
     type: 3}
-  GameOverScreenServerPrefab: {fileID: 1702133244406784, guid: db2f2e4192753d845bb4d1784213f515,
+  GameOverScreenServerPrefab: {fileID: 6062837365326791375, guid: 72085028bf9af4b4f881d931016a1c3d,
     type: 3}
   characterType: 0
   ParasiteControlsPrefab: {fileID: 1781725809795122, guid: 1ee8585f1dcdfa549be3fe95eb5b09bd,
