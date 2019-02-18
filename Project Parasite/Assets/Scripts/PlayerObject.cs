@@ -46,15 +46,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 		}
 	}
 
-
-	private Action OnCharacterDestroy;
-	public void RegisterOnCharacterDestroyCallback(Action cb) {
-		OnCharacterDestroy += cb;
-	}
-	public void UnRegisterOnCharacterDestroyCallback(Action cb) {
-		OnCharacterDestroy -= cb;
-	}
-
 	public void ParasiteTakeDamage(int damage) {
 		ParasiteHealth -= damage;
 	}
@@ -118,7 +109,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 
 	void DestroyCharacter() {
     	if (characterGameObject != null) {
-    		OnCharacterDestroy();
     		PhotonNetwork.Destroy(characterGameObject);
     	}
     }

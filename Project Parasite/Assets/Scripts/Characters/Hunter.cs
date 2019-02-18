@@ -88,6 +88,8 @@ public class Hunter : Character {
 		spriteRenderer.color = isSuitActivated ? SuitActivatedColour : SuitDeactivatedColour;
 	}
 
+	#region [Public Methods]
+	
 	public void Repel(Vector2 forceDirection, float force) {
 		if (!isSuitActivated) return;
 		// Distribute the force between the x and y coordinates
@@ -96,6 +98,19 @@ public class Hunter : Character {
 		// Transfer this force to the physics entity to handle it
 		physicsEntity.AddVelocity(forceDirection.x, forceDirection.y);
 	}
+	
+	#endregion
+
+	#region [MonoBehaviour Callbacks]
+	
+	void OnDestroy() {
+		DestroyAllOrbs();
+		if (HasAuthority()) {
+			Destroy(orbUiManager.gameObject);
+		}
+	}
+	
+	#endregion
 
 	#region [Private Methods]
 	
@@ -144,14 +159,6 @@ public class Hunter : Character {
 	}
 	
 	#endregion
-
-
-	protected override void OnCharacterDestroy() {
-		DestroyAllOrbs();
-		if (HasAuthority()) {
-			Destroy(orbUiManager.gameObject);
-		}
-	}
 
 	[PunRPC]
 	void RpcSpawnOrb(Vector2 atPosition) {

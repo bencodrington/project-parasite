@@ -32,12 +32,7 @@ public abstract class Character : MonoBehaviourPun {
 		get { return _playerObject; }
 		set {
 			_playerObject = value;
-			_playerObject.RegisterOnCharacterDestroyCallback(unregisterAndDestroy);
 		}
-	}
-	private void unregisterAndDestroy() {
-		PlayerObject.UnRegisterOnCharacterDestroyCallback(unregisterAndDestroy);
-		OnCharacterDestroy();
 	}
 
 	public CharacterStats stats;
