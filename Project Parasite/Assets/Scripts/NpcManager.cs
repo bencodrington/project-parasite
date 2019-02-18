@@ -19,8 +19,8 @@ public class NpcManager : MonoBehaviour {
 	List<NonPlayerCharacter> NpcList;
 
 	// How many NPCs are being spawned each round
-	const int MIN_NPC_COUNT = 1;//3;
-	const int MAX_NPC_COUNT = 1;//7;
+	const int MIN_NPC_COUNT = 3;
+	const int MAX_NPC_COUNT = 7;
 
 	// Each NPC will be spawned at position
 	// 	([-SPAWN_RANGE_X...SPAWN_RANGE_X], [-SPAWN_RANGE_Y...SPAWN_RANGE_Y])
@@ -28,7 +28,7 @@ public class NpcManager : MonoBehaviour {
 	const float SPAWN_RANGE_X = 6;
 	const float SPAWN_RANGE_Y = 2;
 
-	bool DEBUG_MODE = true;
+	bool DEBUG_MODE = false;
 	
 	#endregion
 
