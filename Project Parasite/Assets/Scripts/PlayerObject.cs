@@ -36,8 +36,8 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 				// Notify parasite that it is taking damage
 				characterGameObject.GetComponent<Parasite>().OnTakingDamage();
 			}
-			_parasiteHealth = value;
-			UiManager.Instance.UpdateHealthObject(value);
+			_parasiteHealth = Mathf.Clamp(value, 0, STARTING_PARASITE_HEALTH);
+			UiManager.Instance.UpdateHealthObject(_parasiteHealth);
 			if (value <= 0 && !hasSentGameOver) {
 				Debug.Log("Hunters Win!");
                 EventCodes.RaiseGameOverEvent(CharacterType.Hunter);
