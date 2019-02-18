@@ -2,43 +2,121 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.Networking.Match;
-using UnityEngine.Networking.Types;
 using UnityEngine.UI;
 
-public class MatchManager : MonoBehaviour {
+using Photon.Pun;
+using Photon.Realtime;
+using ExitGames.Client.Photon;
 
-    // Used to stop matches being created twice
-	bool matchCreated;
-    // The prefab for the object used to persist client names across menus
-    public GameObject ClientInformationPrefab;
-    // The prefab for the button that's spawned for each available server when listing open matches
-    public GameObject OpenServerButtonPrefab;
-    // List of available server buttons
-    List<GameObject> openServerButtons;
+public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
-    // How often the list of servers should be refreshed (seconds between refreshes)
-    const float SERVER_LIST_REFRESH_RATE = 1f;
-    // The current client's name, stored here for easy access when creating matches
-    string clientName;
-    // The coroutine for refreshing the server list
-    Coroutine listMatchCoroutine;
-
+    #region [Public Variables]
+    
     // Prefabs for the various menu item sets this flow requires
-    public MenuItemSet searchingForMatchMenuItemSet;
     public MenuItemSet searchingForPlayersMenuItemSet;
-    public MenuItemSet searchingForPlayersClientMenuItemSet;
+    public GameObject playerObjectPrefab;
+    
+    #endregion
 
+    #region [Private Variables]
+    
+    GameObject roundManagerPrefab;
+    RoundManager roundManager;
+    const int MAX_PLAYERS_PER_ROOM = 4;
+    Dictionary<int, bool> playersReady;
 
-    void Start() {
-        openServerButtons = new List<GameObject>();
-        NetworkManager.singleton.StartMatchMaker();
+    #endregion
+
+    #region [Public Methods]
+
+    public void Connect() {
+        StoreClientName("Anonymous Player");
+        // Entry point of all networking
+        if (PhotonNetwork.IsConnected) {
+            PhotonNetwork.JoinRandomRoom();
+        } else {
+            PhotonNetwork.ConnectUsingSettings();
+        }
+    }
+
+    public void StartGame() {
+        byte eventCode = EventCodes.StartGame;
+        EventCodes.RaiseEventAll(eventCode, null);
+    }
+    
+    #endregion
+
+    #region [MonoBehaviour Callbacks]
+
+    public void Start() {
+        playersReady = new Dictionary<int, bool>();
+        roundManagerPrefab = Resources.Load("RoundManager") as GameObject;
+    }
+    
+    #endregion
+
+    #region MonoBehaviour PunCallbacks
+
+    public override void OnConnectedToMaster() {
+        PhotonNetwork.JoinRandomRoom();
+    }
+
+    public override void OnDisconnected(DisconnectCause cause) {
+        // TODO:
+    }
+
+    public override void OnJoinRandomFailed(short returnCode, string message) {
+        Debug.Log("MatchManager:OnJoinRandomFailed(). No random room available, creating one.");
+        PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = MAX_PLAYERS_PER_ROOM });
+    }
+
+    public override void OnJoinedRoom() {
+        TransitionToMenuItemSet(searchingForPlayersMenuItemSet);
+        InstantiatePlayerObject();
+    }
+
+    #endregion
+
+    public void OnEvent(EventData photonEvent) {
+        GameObject roundManagerGameObject;
+        if (photonEvent.Code == EventCodes.SetReady) {
+            // Deconstruct event
+            object[] content = (object[])photonEvent.CustomData;
+            int actorNumber = (int)content[0];
+            bool isReady = (bool)content[1];
+            // Update playersReady dictionary
+            SetActorReady(actorNumber, isReady);
+        } else if (photonEvent.Code == EventCodes.StartGame) {
+            if (PhotonNetwork.IsMasterClient) {
+                // If roundmanager exists, end round
+                if (roundManager != null) {
+                    roundManager.EndRound();
+                }
+                // Create new roundmanager
+                if (roundManagerPrefab == null) {
+                    Debug.LogError("MatchManager: OnEvent: roundManagerPrefab not set.");
+                    return;
+                }
+                roundManagerGameObject = PhotonNetwork.Instantiate(roundManagerPrefab.name, Vector3.zero, Quaternion.identity, 0);
+                roundManager = roundManagerGameObject.GetComponent<RoundManager>();
+
+            }
+        }
+    }
+
+    #region [Private Methods]
+
+    void TransitionToMenuItemSet(MenuItemSet menuItemSet) {
+        Menu menu = FindObjectOfType<Menu>();
+        if (menu == null) {
+            Debug.LogError("MatchManager: TransitionToMenuItemSet: Menu not found");
+            return;
+        }
+        menu.TransitionToNewMenuItemSet(menuItemSet);
     }
 
     void StoreClientName(string defaultName) {
-        clientName = GetClientName(defaultName);
-        Instantiate(ClientInformationPrefab).GetComponent<ClientInformation>().clientName = clientName;
+        PhotonNetwork.LocalPlayer.NickName = GetClientName(defaultName);
     }
 
     string GetClientName(string defaultName) {
@@ -54,108 +132,32 @@ public class MatchManager : MonoBehaviour {
         return (clientName == "") ? "ERROR: DEFAULT NAME WAS EMPTY" : clientName;
     }
 
-    void TransitionToMenuItemSet(MenuItemSet menuItemSet) {
-        Menu menu = FindObjectOfType<Menu>();
-        if (menu == null) {
-            Debug.LogError("MatchManager: TransitionToMenuItemSet: Menu not found");
-            return;
-        }
-        menu.TransitionToNewMenuItemSet(menuItemSet);
+    void SetActorReady(int actorNumber, bool isReady) {
+        playersReady[actorNumber] = isReady;
+        CheckIfAllPlayersReady();
     }
 
-    // Server
-	public void CreateRoom() {
-		uint matchSize = 4;
-		bool matchAdvertise = true;
-		string matchPassword = "";
-
-        StoreClientName("Anonymous Server");
-        NetworkManager.singleton.matchMaker.CreateMatch(clientName, matchSize, matchAdvertise, matchPassword, "", "", 0, 0, OnMatchCreate);
-        TransitionToMenuItemSet(searchingForPlayersMenuItemSet);
-	}
-
-	public void OnMatchCreate(bool success, string extendedInfo, MatchInfo matchInfo) {
-        if (success) {
-            Debug.Log("MatchManager[On Server]: OnMatchCreate: Create match succeeded");
-            matchCreated = true;
-            NetworkServer.Listen(matchInfo, 9000);
-            NetworkManager.singleton.StartHost(matchInfo);
-        } else {
-            Debug.LogError("Create match failed: " + extendedInfo);
-        }
-    }
-
-    // Client
-    public void TransitionToListMatches() {
-        StoreClientName("Anonymous Client");
-        ListMatches();
-        TransitionToMenuItemSet(searchingForMatchMenuItemSet);
-    }
-
-    void ListMatches() {
-        string matchName = "";
-        NetworkManager.singleton.matchMaker.ListMatches(0, 10, matchName, true, 0, 0, OnMatchList);
-        if (listMatchCoroutine != null) {
-            StopCoroutine(listMatchCoroutine);
-        }
-        listMatchCoroutine = StartCoroutine(Utility.WaitXSeconds(1, ListMatches));
-    }
-
-    public void OnMatchList(bool success, string extendedInfo, List<MatchInfoSnapshot> matches) {
-        if (success && matches != null) {
-            UpdateOpenServerList(matches);
-        } else if (!success) {
-            Debug.LogError("MatchManager[On Client]: OnMatchList: Couldn't connect to match maker: " + extendedInfo);
-        }
-    }
-
-    void UpdateOpenServerList(List<MatchInfoSnapshot> matches) {
-        // TODO: this can be optimized by diffing previous matches with current matches
-        GameObject newButton;
-        Menu menu = FindObjectOfType<Menu>();
-        if (menu == null) {
-            Debug.LogError("MatchManager: UpdateOpenServerList: Menu not found");
-            return;
-        }
-        // Remove current match buttons
-        foreach(GameObject button in openServerButtons) {
-            menu.RemoveMenuItem(button);
-            Destroy(button);
-        }
-        // Remove references to freshly destroyed button objects
-        openServerButtons.Clear();
-        // Find menu
-        // Create new match buttons
-        foreach(MatchInfoSnapshot match in matches) {
-            // Create new button as the second-last child of the menu ("searching..." text is the last one)
-            newButton = menu.AddNewItemAtIndex(OpenServerButtonPrefab, menu.transform.childCount - 1);
-            // Set its text to reflect the match's name
-            newButton.GetComponentInChildren<Text>().text = match.name + "'s game";
-            // Join match on button press
-            newButton.GetComponentInChildren<Button>().onClick.AddListener(delegate { JoinMatch(match.networkId); });
-            // Store it for removal next update
-            openServerButtons.Add(newButton);
-        }
-    }
-
-    void JoinMatch(NetworkID matchNetworkId) {
-        NetworkManager.singleton.matchMaker.JoinMatch(matchNetworkId, "", "", "", 0, 0, OnMatchJoined);
-        if (listMatchCoroutine != null) {
-            StopCoroutine(listMatchCoroutine);
-        }
-    }
-
-    public void OnMatchJoined(bool success, string extendedInfo, MatchInfo matchInfo) {
-        if (success) {
-            Debug.Log("MatchManager[On Client]: OnMatchJoined: Join match succeeded");
-            if (matchCreated) {
-                Debug.LogWarning("Match already set up, aborting...");
+    void CheckIfAllPlayersReady() {
+        int playerNumber;
+        foreach (Player player in PhotonNetwork.PlayerList) {
+            playerNumber = player.ActorNumber;
+            if (!playersReady.ContainsKey(playerNumber) || !playersReady[playerNumber]) {
+                // Return if we haven't received a ready message from one of the players
+                //  or if the most recent message we've received from them is that they're
+                //  not ready
                 return;
             }
-            NetworkManager.singleton.StartClient(matchInfo);
-            TransitionToMenuItemSet(searchingForPlayersClientMenuItemSet);
-        } else {
-            Debug.LogError("Join match failed " + extendedInfo);
+        }
+        // If we got here, all connected players are ready
+        if (PhotonNetwork.IsMasterClient) {
+            StartGame();
         }
     }
+
+    void InstantiatePlayerObject() {
+        Instantiate(playerObjectPrefab, Vector3.zero, Quaternion.identity);
+    }
+
+    #endregion
+
 }

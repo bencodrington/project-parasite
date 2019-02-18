@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1385279692659820
+--- !u!1 &48
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,11 +8,12 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 224426519049457790}
-  - component: {fileID: 222228052620843144}
-  - component: {fileID: 114786834461845722}
-  - component: {fileID: 114183453947915510}
-  - component: {fileID: 7308824727044117836}
+  - component: {fileID: 184}
+  - component: {fileID: 149}
+  - component: {fileID: 241}
+  - component: {fileID: 212}
+  - component: {fileID: 264}
+  - component: {fileID: 314047116226672094}
   m_Layer: 5
   m_Name: PlayerList
   m_TagString: Untagged
@@ -20,13 +21,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!224 &224426519049457790
+--- !u!224 &184
 RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1385279692659820}
+  m_GameObject: {fileID: 48}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -37,30 +38,30 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 60}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &222228052620843144
+--- !u!222 &149
 CanvasRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1385279692659820}
+  m_GameObject: {fileID: 48}
   m_CullTransparentMesh: 0
---- !u!114 &114786834461845722
+--- !u!114 &241
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1385279692659820}
+  m_GameObject: {fileID: 48}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.55984706, b: 0.36320752, a: 1}
+  m_Color: {r: 0, g: 0.3217392, b: 1, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -81,13 +82,13 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 'Connected Players:'
---- !u!114 &114183453947915510
+--- !u!114 &212
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1385279692659820}
+  m_GameObject: {fileID: 48}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8562e7c9aaadb5e4b9569589650dea57, type: 3}
@@ -95,13 +96,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerListEntryPrefab: {fileID: 1862126661788688, guid: 4d8f5f8e1e80e5c419c1cd02d89f4a72,
     type: 3}
---- !u!114 &7308824727044117836
+--- !u!114 &264
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1385279692659820}
+  m_GameObject: {fileID: 48}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 1297475563, guid: f70555f144d8491a825f0804e09c671c, type: 3}
@@ -110,11 +111,25 @@ MonoBehaviour:
   m_Padding:
     m_Left: 31
     m_Right: 0
-    m_Top: 34
-    m_Bottom: 0
+    m_Top: 64
+    m_Bottom: 54
   m_ChildAlignment: 1
-  m_Spacing: -0.12
+  m_Spacing: 1
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
-  m_ChildControlHeight: 1
+  m_ChildControlHeight: 0
+--- !u!114 &314047116226672094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 48}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1741964061, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 2

@@ -3,8 +3,9 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -12,6 +13,5 @@ MonoBehaviour:
   m_Name: MainMenuItemSet
   m_EditorClassIdentifier: 
   menuItemPrefabs:
-  - {fileID: 1232227635660472, guid: 3e4d18ae02ba0d344aaaf0b80ffd3db7, type: 2}
-  - {fileID: 1241366077115434, guid: 903d50c65c5cd324bb4d0b12b2ef4976, type: 2}
-  - {fileID: 1864030464507168, guid: d6c289a92f3356249ba668fd407f0b54, type: 2}
+  - {fileID: 1232227635660472, guid: 3e4d18ae02ba0d344aaaf0b80ffd3db7, type: 3}
+  - {fileID: 8123567576744590571, guid: c72818b9bf99e584c94f70c4c04560ff, type: 3}

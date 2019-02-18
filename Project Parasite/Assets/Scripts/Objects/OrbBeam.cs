@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
-public class OrbBeam : NetworkBehaviour {
+public class OrbBeam : MonoBehaviour {
 
 	float energyRadius = 2f;
 	float energyForce = 10f;
@@ -18,7 +17,7 @@ public class OrbBeam : NetworkBehaviour {
 
 	SpriteRenderer spriteRenderer;
 
-	void Initialize(Vector2 startPoint, Vector2 endPoint) {
+	public void Initialize(Vector2 startPoint, Vector2 endPoint) {
 		this.startPoint = startPoint;
 		this.endPoint = endPoint;
 		normal = Vector2.Perpendicular(endPoint - startPoint).normalized;
@@ -48,7 +47,7 @@ public class OrbBeam : NetworkBehaviour {
 		Collider2D[] energyCenterColliders = Physics2D.OverlapBoxAll(transform.position, hitboxSize, hitboxAngle, Utility.GetLayerMask("energyCenter"));
 		foreach (Collider2D energyCenterCollider in energyCenterColliders) {
 			Hunter hunter = energyCenterCollider.transform.parent.GetComponent<Hunter>();
-			if ((Character)hunter == PlayerGrid.Instance.GetLocalCharacter()) {
+			if (hunter.photonView.IsMine) {
 				hunterPosition = energyCenterCollider.transform.position;
 				// Find the point on the orb beam line that is nearest to the hunter
 				projectionOntoOrbBeam = Utility.ProjectOntoRay2D(hunterPosition, hitboxRay);
@@ -71,10 +70,8 @@ public class OrbBeam : NetworkBehaviour {
 		// Fry each uninfected NPC on the server
 		foreach (RaycastHit2D hit in hits) {
 			npc = hit.transform.parent.GetComponent<NonPlayerCharacter>();
-			if (isServer && !npc.isInfected) {
-				FindObjectOfType<NpcManager>().DespawnNpc(npc.netId);
-			} else if (npc.isInfected && PlayerGrid.Instance.GetLocalCharacter() == npc) {
-				npc.CmdDespawnSelf();
+			if (npc.photonView.IsMine) {
+				npc.OnGotFried();
 			}
 		}
 		
@@ -82,8 +79,8 @@ public class OrbBeam : NetworkBehaviour {
 		RaycastHit2D parasiteHit = Physics2D.Linecast(startPoint, endPoint, Utility.GetLayerMask(CharacterType.Parasite));
 		if (parasiteHit != false) {
 			parasite = parasiteHit.transform.parent.GetComponent<Parasite>();
-			if (PlayerGrid.Instance.GetLocalCharacter() == parasite) {
-				PlayerGrid.Instance.GetLocalPlayerObject().ParasiteTakeDamage(1);
+			if (parasite.photonView.IsMine) {
+				parasite.PlayerObject.ParasiteTakeDamage(1);
 			}
 		}
 	}
@@ -104,12 +101,5 @@ public class OrbBeam : NetworkBehaviour {
 		// FORCE OUTPUT:	   ^--FULL FORCE--^			       0
 		float t = (distance - fullForceCutoff) / (energyRadius - fullForceCutoff);
 		return Mathf.Lerp(energyForce, 0, t);
-	}
-
-	// ClientRpc
-
-	[ClientRpc]
-	public void RpcInitialize(Vector2 startPoint, Vector2 endPoint) {
-		Initialize(startPoint, endPoint);
 	}
 }

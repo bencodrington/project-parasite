@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
-public class Orb : NetworkBehaviour {
+public class Orb : MonoBehaviour {
 
 	float energyRadius = 2f;
 	float energyForce = 1f;
@@ -15,7 +14,7 @@ public class Orb : NetworkBehaviour {
 		Vector2 forceDirection;
 		foreach (Collider2D hunterCollider in hunterColliders) {
 			Hunter hunter = hunterCollider.transform.parent.GetComponent<Hunter>();
-			if ((Character)hunter == PlayerGrid.Instance.GetLocalCharacter()) {
+			if (hunter.photonView.IsMine) {
 				forceDirection = hunterCollider.transform.position - transform.position;
 				hunter.Repel(forceDirection, CalculateForce(hunterCollider.transform.position));
 			}

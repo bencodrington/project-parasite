@@ -1,13 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using ExitGames.Client.Photon;
+using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
-using UnityEngine.Networking;
 
-public class RoundManager : NetworkBehaviour {
+public class RoundManager : MonoBehaviourPun {
 
-	PlayerObject[] connectedPlayers;
-
-	public GameObject objectManagerPrefab;
+	GameObject objectManagerPrefab;
 	ObjectManager objectManager;
 
 	public Vector2[] spawnPoints;
@@ -17,15 +17,29 @@ public class RoundManager : NetworkBehaviour {
 
 	public bool isGameOver = false;
 
-	bool huntersOnlyMode = true;
-	bool DEBUG_MODE = true;
+	bool huntersOnlyMode = false;
+	// If this is true, spawn all players at (0, 0)
+	bool DEBUG_MODE = false;
 
+	NoMoreNPCsWinCondition noMoreNPCs;
+
+	#region [Public Methods]
+
+	public void EndRound() {
+		transform.GetComponentInChildren<NpcManager>().DespawnNPCs();
+		objectManager.OnRoundEnd();
+		PhotonNetwork.Destroy(photonView);
+	}
+
+	#endregion
+	
+	#region [MonoBehaviour Callbacks]
+	
 	void Start () {
-		if (!isServer) { return; }
-		// Cache Player Objects
-		// TODO: uncache on leave
-		connectedPlayers = FindObjectsOfType<PlayerObject>();
-		CmdSpawnObjectManager();
+		noMoreNPCs = new NoMoreNPCsWinCondition();
+		if (!PhotonNetwork.IsMasterClient) { return; }
+		objectManagerPrefab = Resources.Load("ObjectManager") as GameObject;
+		SpawnObjectManager();
 		SelectSpawnPoints();
 		SelectParasite();
 	}
@@ -36,14 +50,19 @@ public class RoundManager : NetworkBehaviour {
 			objectManager.PhysicsUpdate();
 		}
 		// Update all characters in the scene
-		// TODO: optimize (maybe by going through the cached players and calling PhysicsUpdate for them?)
+		// OPTIMIZE: (maybe by going through the cached players and calling PhysicsUpdate for them?)
 		foreach(Character character in FindObjectsOfType<Character>()) {
 			character.PhysicsUpdate();
 		}
 	}
+	
+	#endregion
+
+
+	#region [Private Methods]
 
 	void SelectParasite() {
-		int n = connectedPlayers.Length;
+		int n = PhotonNetwork.PlayerList.Length;
 		Vector2 spawnPoint;
 		// Randomly select one of the players to be parasite, the rest are hunters
 		int indexOfParasite = Random.Range(0, n);
@@ -57,10 +76,10 @@ public class RoundManager : NetworkBehaviour {
 				characterType = CharacterType.Hunter;
 				spawnPoint = hunterSpawnPoint;
 			}
-			connectedPlayers[i].CmdAssignCharacterTypeAndSpawnPoint(characterType, spawnPoint);
+			RaiseSpawnEvent(i, characterType, spawnPoint);
 		}
 	}
-	
+
 	void SelectSpawnPoints() {
 		int n = spawnPoints.Length;
 		int parasiteSpawnPointIndex, hunterSpawnPointIndex;
@@ -81,28 +100,23 @@ public class RoundManager : NetworkBehaviour {
 		}
 	}
 
-	public void EndRound() {
-		foreach (PlayerObject player in connectedPlayers) {
-			player.CmdEndRound();
-		}
-		transform.GetComponentInChildren<NpcManager>().DespawnNPCs();
-		objectManager.OnRoundEnd();
+	void SpawnObjectManager() {
+		GameObject oMGameObject = PhotonNetwork.Instantiate(objectManagerPrefab.name, Vector3.zero, Quaternion.identity, 0);
+		objectManager = oMGameObject.GetComponent<ObjectManager>();
+		photonView.RPC("RpcSetObjectManager", RpcTarget.All, objectManager.photonView.ViewID);
 	}
 
-	// Commands
-	[Command]
-	void CmdSpawnObjectManager() {
-		// Create new ObjectManager game object on the server
-		GameObject objectManagerGameObject = Instantiate(objectManagerPrefab);
-		NetworkServer.Spawn(objectManagerGameObject);
-		RpcSetObjectManager(objectManagerGameObject.GetComponent<NetworkIdentity>().netId);
+	void RaiseSpawnEvent(int playerIndex, CharacterType characterType, Vector2 spawnPoint) {
+		byte eventCode = EventCodes.AssignPlayerTypeAndSpawnPoint;
+		object[] content = { PhotonNetwork.PlayerList[playerIndex].ActorNumber, characterType, spawnPoint };
+		EventCodes.RaiseEventAll(eventCode, content);
 	}
+	
+	#endregion
 
-	// ClientRpc
-	[ClientRpc]
-	void RpcSetObjectManager(NetworkInstanceId objectManagerNetId) {
-		objectManager = Utility.GetLocalObject(objectManagerNetId, isServer).GetComponentInChildren<ObjectManager>();
+	[PunRPC]
+	void RpcSetObjectManager(int objectManagerViewId) {
+		objectManager = PhotonView.Find(objectManagerViewId).GetComponentInChildren<ObjectManager>();
 		objectManager.OnRoundStart();
 	}
-
 }

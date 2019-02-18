@@ -1,11 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
+using Photon.Pun;
 
-public class NpcManager : NetworkBehaviour {
+public class NpcManager : MonoBehaviour {
 
-	public GameObject NpcPrefab;
+	#region [Public Variables]
+	
+	// The points around which groups of NPCs will be spawned
+	public Vector2[] spawnCenters;
+
+	#endregion
+
+	#region [Private Variables]
+	
+	GameObject NpcPrefab;
+
 	List<NonPlayerCharacter> NpcList;
 
 	// How many NPCs are being spawned each round
@@ -18,71 +28,53 @@ public class NpcManager : NetworkBehaviour {
 	const float SPAWN_RANGE_X = 6;
 	const float SPAWN_RANGE_Y = 2;
 
-	// The points around which groups of NPCs will be spawned
-	public Vector2[] spawnCenters;
-
+	// If this is true, spawn only one npc, at (0, 0)
 	bool DEBUG_MODE = false;
+	
+	#endregion
 
+	#region [MonoBehaviour Callbacks]
+	
 	void Start () {
-		if (!isServer) { return; }
 		NpcList = new List<NonPlayerCharacter>();
+		if (!PhotonNetwork.IsMasterClient) { return; }
+		NpcPrefab = (GameObject)Resources.Load("NonPlayerCharacter");
 		SpawnNPCs();
 	}
+	
+	#endregion
 
-	public void DespawnNPCs() {
-		// Remove NPCs
-		foreach (NonPlayerCharacter npc in NpcList) {
-			if (npc == null) {
-				Debug.LogError("NpcManager: Attempting to destroy an NPC that is null");
-			} else {
-				NetworkServer.Destroy(npc.gameObject);
+	#region [Private Methods]
+	
+	void SpawnNPCs() {
+		if (DEBUG_MODE) { 
+			SpawnNpcAtPosition(Vector2.zero);
+		} else {
+			foreach (Vector2 spawnCenter in spawnCenters) {
+				SpawnNpcGroup(spawnCenter);
 			}
 		}
-		NpcList.Clear();
+		object[] content = { NpcList.Count };
+		EventCodes.RaiseEventAll(EventCodes.SetNpcCount, content);
 	}
-
-	public void DespawnNpc(NetworkInstanceId npcNetId) {
-		NonPlayerCharacter npc = NpcList.Find((value) => {return value.netId == npcNetId;});
-		int index = NpcList.IndexOf(npc);
-		NpcList.RemoveAt(index);
-		NetworkServer.Destroy(npc.gameObject);
-		// TODO: there has to be a more efficient way of updating this
-		foreach (PlayerObject playerObject in FindObjectsOfType<PlayerObject>()) {
-			playerObject.RpcUpdateRemainingNpcCount(NpcList.Count);
-		}
-		if (NpcList.Count == 0) {
-			// Game Over
-			PlayerGrid.Instance.GetLocalPlayerObject().CmdShowGameOverScreen(CharacterType.Parasite);
-		}
-	}
-
-	void SpawnNPCs() {
-		if (DEBUG_MODE) { return; }
-		foreach(Vector2 spawnCenter in spawnCenters) {
-			SpawnNpcGroup(spawnCenter);
-		}
-		// TODO: there has to be a more efficient way of updating this
-		foreach (PlayerObject playerObject in FindObjectsOfType<PlayerObject>()) {
-			playerObject.RpcUpdateRemainingNpcCount(NpcList.Count);
-		}
-	}
-
+	
 	void SpawnNpcGroup(Vector2 spawnCenter) {
+		// This should only ever run on the Master Client
 		int npcCount = SelectNpcGroupSize();
 		Vector2 spawnPosition;
-		NonPlayerCharacter npc;
 		for (int i = 0; i < npcCount; i++) {
 			spawnPosition = SelectSpawnPosition(spawnCenter);
-			npc = Instantiate(NpcPrefab, spawnPosition, Quaternion.identity).GetComponentInChildren<NonPlayerCharacter>();
-			NpcList.Add(npc);
-
-			// Propogate to all clients
-			NetworkServer.Spawn(npc.gameObject);
-			npc.RpcGeneratePhysicsEntity(Vector2.zero);
-			// Ensure npc snaps to its starting position on all clients
-			npc.CmdUpdatePosition(spawnPosition, true);
-			StartCoroutine(npc.Idle());
+			SpawnNpcAtPosition(spawnPosition);
 		}
+	}
+
+	void SpawnNpcAtPosition(Vector2 position) {
+		NonPlayerCharacter npc;
+		npc = PhotonNetwork.Instantiate(NpcPrefab.name, position, Quaternion.identity)
+				.GetComponentInChildren<NonPlayerCharacter>();
+		npc.GeneratePhysicsEntity(Vector2.zero);
+		StartCoroutine(npc.Idle());
+		NpcList.Add(npc);
 	}
 
 	int SelectNpcGroupSize() {
@@ -94,6 +86,18 @@ public class NpcManager : NetworkBehaviour {
 				Random.Range(-SPAWN_RANGE_X, SPAWN_RANGE_X),
 				Random.Range(-SPAWN_RANGE_Y, SPAWN_RANGE_Y)
 			);
+	}
+	
+	#endregion
+
+	public void DespawnNPCs() {
+		// Remove NPCs
+		foreach (NonPlayerCharacter npc in NpcList) {
+			if (npc != null) {
+				PhotonNetwork.Destroy(npc.gameObject);
+			}
+		}
+		NpcList.Clear();
 	}
 
 }

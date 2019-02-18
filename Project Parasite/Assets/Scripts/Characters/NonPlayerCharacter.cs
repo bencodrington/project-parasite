@@ -1,12 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
-using UnityEngine.Networking;
 
 public class NonPlayerCharacter : Character {
 
+	#region [Public Variables]
+	
 	public bool isInfected = false;
+	
+	// The exclamation mark that is shown when orbs are placed nearby
+	public GameObject alertIconPrefab;
 
+	#endregion
+
+	#region [Private Variables]
+	
 	private const float PARASITE_LAUNCH_VELOCITY = 30f;
 
 	// Pathfinding
@@ -20,37 +29,81 @@ public class NonPlayerCharacter : Character {
 	private float maxTargetDistance = 5f;
 	private float minTargetDistance = 2f;
 
-	// The exclamation mark that is shown when orbs are placed nearby
-	public GameObject alertIconPrefab;
 	// How far from the npc's center to display the icon
 	Vector2 ALERT_ICON_OFFSET = new Vector2(0, 1);
 	
-	public override void Update() {
-		if (isInfected && hasAuthority) {
-			// NPC is infected and this client is the Parasite player's client
-			HandleInput();
-		} else if (!isInfected && isServer && physicsEntity != null) {
-			// NPC still belongs to the server
-			TraversePath();
-		} else {
-			// This is a cloned representation of the authoritative NPC
-			// 	So just verify current position is up to date with server position
-			transform.position = Vector3.Lerp(transform.position, serverPosition, 0.8f);
-		}
-	}
+	#endregion
 
-    protected override void HandleInput()
-    {
+	protected override void HandleInput() {
 		// This function is only called when this NPC is infected,
 		// 	and is only called on the Parasite player's client
 		// Movement
 		HandleHorizontalMovement();
 		// Self Destruct
 		if (Input.GetMouseButtonDown(1)) {
-			// Destroy this NPC
-			CmdDespawnSelf();
+			BurstMeatSuit();
 		}
-    }
+	}
+
+	#region [Public Methods]
+
+	public IEnumerator Idle() {
+		yield return new WaitForSeconds(Random.Range(minTimeUntilNewPath, maxTimeUntilNewPath));
+		// Check that we are still uninfected and still exist
+		if (this != null && !isInfected) { FindNewPath(); }
+		
+	}
+
+	public void OnGotFried() {
+		if (isInfected) {
+			BurstMeatSuit();
+		} else {
+			DespawnSelf();
+		}
+	}
+
+	public void Infect() {
+		isInfected = true;
+		// Only update sprite if on the Parasite player's client
+		spriteRenderer.color = Color.magenta;
+	}
+
+	public void NearbyOrbAlert(Vector2 atPosition) {
+		// Show exclamation mark above NPC
+		GameObject alertIcon = Instantiate(alertIconPrefab, (Vector2)transform.position + ALERT_ICON_OFFSET, Quaternion.identity);
+		alertIcon.transform.SetParent(transform);
+		if (!HasAuthority() || isInfected) { return; }
+		// Only uninfected NPCs should flee, and the calculations
+		// 	should only be done on the server
+		Utility.Directions fleeDirection = atPosition.x < transform.position.x ?
+			Utility.Directions.Right :
+			Utility.Directions.Left;
+		FleeOrbInDirection(fleeDirection);
+	}
+	
+	#endregion
+
+	#region [MonoBehaviour Callbacks]
+	
+	public override void Update() {
+		if (isInfected && HasAuthority()) {
+			// NPC is infected and this client is the Parasite player's client
+			HandleInput();
+			HandlePositionUpdates();
+		} else if (!isInfected && HasAuthority() && physicsEntity != null) {
+			// NPC still belongs to the server
+			TraversePath();
+			HandlePositionUpdates();
+		} else {
+			// This is a cloned representation of the authoritative NPC
+			// 	So just verify current position is up to date with server position
+			transform.position = Vector3.Lerp(transform.position, serverPosition, LAG_LERP_FACTOR);
+		}
+	}
+	
+	#endregion
+
+	#region [Private Methods]
 
 	void TraversePath() {
 		isMovingLeft = false;
@@ -128,51 +181,20 @@ public class NonPlayerCharacter : Character {
 		return target;
 	}
 
-	public IEnumerator Idle() {
-		yield return new WaitForSeconds(Random.Range(minTimeUntilNewPath, maxTimeUntilNewPath));
-		// Check that we are still uninfected and still exist
-		if (this != null && !isInfected) { FindNewPath(); }
-		
+	void BurstMeatSuit() {
+		DespawnSelf();
+		SpawnParasite();
 	}
 
-	// Commands
-
-	[Command]
-	public void CmdDespawnSelf() {
-		// Spawn new Parasite Object
-		PlayerObject.CmdSpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY));
-		// Despawn this NPC object
-		FindObjectOfType<NpcManager>().DespawnNpc(netId);
+	void DespawnSelf() {
+		// Send out an event to decrement counter
+		EventCodes.RaiseEventAll(EventCodes.NpcDespawned, null);
+		PhotonNetwork.Destroy(photonView);
 	}
 
-	// ClientRpc
-
-	[ClientRpc]
-	public void RpcSetLocalPlayerAuthority(bool newValue) {
-		GetComponentInChildren<NetworkIdentity>().localPlayerAuthority = newValue;
+	void SpawnParasite() {
+		PlayerObject.SpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY));
 	}
-
-	[ClientRpc]
-	public void RpcInfect() {
-		isInfected = true;
-		if (hasAuthority) {
-			// Only update sprite if on the Parasite player's client
-			spriteRenderer.color = Color.magenta;
-		}
-	}
-
-	[ClientRpc]
-	public void RpcNearbyOrbAlert(Vector2 atPosition) {
-		// Show exclamation mark above NPC
-		GameObject alertIcon = Instantiate(alertIconPrefab, (Vector2)transform.position + ALERT_ICON_OFFSET, Quaternion.identity);
-		alertIcon.transform.SetParent(transform);
-		if (!isServer || isInfected) { return; }
-		// Only uninfected NPCs should flee, and the calculations
-		// 	should only be done on the server
-		Utility.Directions fleeDirection = atPosition.x < transform.position.x ?
-			Utility.Directions.Right :
-			Utility.Directions.Left;
-		FleeOrbInDirection(fleeDirection);
-		
-	}
+	
+	#endregion
 }

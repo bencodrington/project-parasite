@@ -1,74 +1,51 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class Elevator : NetworkBehaviour {
+public class Elevator : MonoBehaviourPun {
+
+	#region [Public Variables]
 	
-	const float LAG_LERP_FACTOR = 0.4f;
-	const float MOVEMENT_SPEED = 8f;
-	const float BUTTON_OFFSET = 0.6f;
-
-	public float[] stops;
-	public Vector2 SIZE = new Vector2(2, 3);
-
 	public GameObject buttonPrefab;
+	public GameObject elevatorCallFieldPrefab;
+	
+	#endregion
 
+	#region [Private Variables]
+
+	// How far from the elevator's center should the callfield center be
+	const float STOP_X_OFFSET = 2f;
+	// The higher this value is, the snappier lag correction will be
+	const float LAG_LERP_FACTOR = 0.1f;
+	const float MOVEMENT_SPEED = 8f;
+	// The vertical distance between elevator buttons
+	const float BUTTON_OFFSET = 0.6f;
+	Vector2 SIZE = new Vector2(2, 3);
+	float[] stopYCoordinates;
 	int targetStop;
 	Vector3 serverPosition;
 	bool isMoving = false;
 	
-	private Collider2D[] passengers;
-	private ElevatorButton[] buttons;
+	Collider2D[] passengers;
+	ElevatorButton[] buttons;
+	List<ElevatorCallField> callFields;
 
-	private KinematicPhysicsEntity[] kinematicPhysicsEntities;
+	KinematicPhysicsEntity[] kinematicPhysicsEntities;
+	
+	#endregion
 
-	void Start() {
-		kinematicPhysicsEntities = GetComponentsInChildren<KinematicPhysicsEntity>();
-	}
 
-	void InitializeButtons() {
-		ElevatorButton button;
-		buttons = new ElevatorButton[stops.Length];
-
-		Vector2 spawnPos = new Vector2(transform.position.x,
-								transform.position.y +	// Base vertical position of the center of the elevator
-								(SIZE.y / 2) +			// Get to the top of the elevator
-								BUTTON_OFFSET / 2 );	// Add some padding before start of first button
-		// Spawn button prefabs based on # of stops
-		for (int i = 0; i < stops.Length; i++) {
-			button = Instantiate(buttonPrefab, spawnPos, Quaternion.identity, transform).GetComponentInChildren<ElevatorButton>();
-			button.gameObject.GetComponentInChildren<Text>().text = (i + 1).ToString();
-			button.stopIndex = i;
-			button.elevatorId = this.netId;
-			buttons[i] = button;
-			spawnPos.y += BUTTON_OFFSET;
-		}
-
-	}
+	#region [Public Methods]
 	
 	public void PhysicsUpdate() {
-		if (isServer) {
+		HandlePassengers();
+		if (PhotonNetwork.IsMasterClient) {
 			if (isMoving) {
 				MoveToTargetStop();
-			} else {
-				// TODO: this probably doesn't need to run every single physics update
-				// Check for entity within borders
-				Vector2 halfSize = SIZE / 2;
-				passengers = Physics2D.OverlapAreaAll((Vector2)transform.position - halfSize,
-												(Vector2)transform.position + halfSize,
-												Utility.GetLayerMask("character"));
-				Debug.DrawLine((Vector2)transform.position - halfSize, (Vector2)transform.position + halfSize);
-				if (passengers.Length > 0) {
-					// Show buttons on client
-					RpcSetButtonActive(true);
-				} else {
-					// Hide buttons on client
-					RpcSetButtonActive(false);
-				}
 			}
-			RpcUpdateServerPosition(transform.position);
+			photonView.RPC("RpcUpdateServerPosition", RpcTarget.All, transform.position);
 		} else {
 			transform.position = Vector3.Lerp(transform.position, serverPosition, LAG_LERP_FACTOR);
 		}
@@ -76,68 +53,151 @@ public class Elevator : NetworkBehaviour {
 		foreach(KinematicPhysicsEntity entity in kinematicPhysicsEntities) {
 			entity.PhysicsUpdate();
 		}
+		// Update each callfield (a.k.a. stop) that belongs to this elevator
+		foreach(ElevatorCallField callField in callFields) {
+			callField.PhysicsUpdate();
+		}
+	}
+
+	public void CallToStop(int stopIndex) {
+		photonView.RPC("RpcCallToStop", RpcTarget.All, stopIndex);
+	}
+	
+	#endregion
+
+	#region [MonoBehaviour Callbacks]
+	
+	void Awake() {
+		kinematicPhysicsEntities = GetComponentsInChildren<KinematicPhysicsEntity>();
+		callFields = new List<ElevatorCallField>();
+	}
+
+	void OnDestroy() {
+		foreach (ElevatorCallField callField in callFields) {
+			Destroy(callField.gameObject);
+		}
+	}
+	
+	#endregion
+
+	#region [Private Methods]
+	
+	void SpawnStops(float[] yCoordinates, bool[] isOnRightSideValues) {
+		for (int i = 0; i < yCoordinates.Length; i++) {
+			SpawnStop(yCoordinates[i], isOnRightSideValues[i], i);
+		}
+	}
+
+	void SpawnStop(float yCoordinate, bool isOnRightSide, int index) {
+		// Instantiate GameObject
+		GameObject callFieldGameObject = GameObject.Instantiate(
+								elevatorCallFieldPrefab,
+								GetStopSpawnCoordinates(transform.position.x, yCoordinate, isOnRightSide),
+								Quaternion.identity);
+		ElevatorCallField callField = callFieldGameObject.GetComponent<ElevatorCallField>();
+		callField.elevator = this;
+		callField.stopIndex = index;
+		callFields.Add(callField);
+	}
+
+	Vector2 GetStopSpawnCoordinates(float xCoordinate, float yCoordinate, bool isOnRightSide) {
+		// -1f is because call fields are positioned by their bottom left corner, not the middle
+		// CLEANUP: this can be cleaner
+		xCoordinate += isOnRightSide ? STOP_X_OFFSET - 1f : -STOP_X_OFFSET - 1f;
+		// CLEANUP: replace magic number, half of elevator height
+		return new Vector2(xCoordinate, yCoordinate - 1.5f);
+	}
+
+	void InitializeButtons(int buttonCount) {
+		ElevatorButton button;
+		buttons = new ElevatorButton[buttonCount];
+
+		Vector2 spawnPos = new Vector2(transform.position.x,
+								transform.position.y +	// Base vertical position of the center of the elevator
+								(SIZE.y / 2) +			// Get to the top of the elevator
+								BUTTON_OFFSET / 2 );	// Add some padding before start of first button
+		// Spawn button prefabs based on # of stops
+		for (int i = 0; i < buttonCount; i++) {
+			button = Instantiate(buttonPrefab, spawnPos, Quaternion.identity, transform).GetComponentInChildren<ElevatorButton>();
+			button.gameObject.GetComponentInChildren<Text>().text = (i + 1).ToString();
+			button.stopIndex = i;
+			button.elevator = this;
+			buttons[i] = button;
+			spawnPos.y += BUTTON_OFFSET;
+		}
+	}
+
+	void DisableButton(int index) {
+		buttons[index].isDisabled = true;
+	}
+
+	void EnableButton(int index) {
+		buttons[index].isDisabled = false;
+	}
+
+	void HandlePassengers() {
+		// Only show buttons when a character enters a halted elevator
+		if (isMoving) { return; }
+		// Check for entity within borders
+		Vector2 halfSize = SIZE / 2;
+		passengers = Physics2D.OverlapAreaAll((Vector2)transform.position - halfSize,
+										(Vector2)transform.position + halfSize,
+										Utility.GetLayerMask("character"));
+		Debug.DrawLine((Vector2)transform.position - halfSize, (Vector2)transform.position + halfSize);
+		if (passengers.Length > 0) {
+			// Show buttons on client
+			SetAllButtonsActive(true);
+		} else {
+			// Hide buttons on client
+			SetAllButtonsActive(false);
+		}
 	}
 
 	void MoveToTargetStop() {
-			Vector2 targetPosition;
-			float potentialMovement = MOVEMENT_SPEED * Time.deltaTime;
-			targetPosition = new Vector2(transform.position.x, stops[targetStop]);
-			if (Vector3.Distance(transform.position, targetPosition) < potentialMovement) {
-				// Destination reached
-				transform.position = targetPosition;
-				isMoving = false;
-				// Disable this floor's button
-				RpcDisableButton(targetStop);
-			} else {
-				transform.position = Vector3.MoveTowards(transform.position, targetPosition, potentialMovement);
-			}
-
+		Vector2 targetPosition;
+		float potentialMovement = MOVEMENT_SPEED * Time.deltaTime;
+		targetPosition = new Vector2(transform.position.x, stopYCoordinates[targetStop]);
+		if (Vector3.Distance(transform.position, targetPosition) < potentialMovement) {
+			// Destination reached
+			transform.position = targetPosition;
+			isMoving = false;
+			// Disable this floor's button
+			DisableButton(targetStop);
+		} else {
+			transform.position = Vector3.MoveTowards(transform.position, targetPosition, potentialMovement);
+		}
 	}
 
-	void SetButtonActive(bool isActive) {
+	void SetAllButtonsActive(bool isActive) {
 		for (int i = 0; i < buttons.Length; i++) {
 			buttons[i].gameObject.SetActive(isActive);
 		}
 	}
+	
+	#endregion
 
-	// Commands
+	[PunRPC]
+	public void RpcSetStopData(float[] yCoordinates, bool[] isOnRightSideValues) {
+		SpawnStops(yCoordinates, isOnRightSideValues);
+		InitializeButtons(yCoordinates.Length);
+		stopYCoordinates = yCoordinates;
+	}
 
-	[Command]
-	public void CmdCallToStop(int indexOfStop) {
-		RpcEnableButton(targetStop);
+	[PunRPC]
+	public void RpcCallToStop(int indexOfStop) {
+		EnableButton(targetStop);
 		targetStop = indexOfStop;
 		isMoving = true;
-		SetButtonActive(false);
-		RpcSetButtonActive(false);
+		SetAllButtonsActive(false);
 	}
 
-	// ClientRpc
-
-	[ClientRpc]
+	[PunRPC]
 	void RpcUpdateServerPosition(Vector3 newPosition) {
-		if (isServer) { return; }
+		if (PhotonNetwork.IsMasterClient) { return; }
+		if (serverPosition == newPosition) {
+			isMoving = false;
+		}
 		// Else, on a client machine, so update our record of the elevator's true position
 		serverPosition = newPosition;
-	}
-
-	[ClientRpc]
-	void RpcSetButtonActive(bool isEnabled) {
-		SetButtonActive(isEnabled);
-	}
-
-	[ClientRpc]
-	public void RpcSetStopCoordinates(float[] stops) {
-		this.stops = stops;
-		InitializeButtons();
-	}
-
-	[ClientRpc]
-	void RpcDisableButton(int index) {
-		buttons[index].isDisabled = true;
-	}
-
-	[ClientRpc]
-	void RpcEnableButton(int index) {
-		buttons[index].isDisabled = false;
 	}
 }
