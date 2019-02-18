@@ -75,6 +75,7 @@ public class ObjectManager : MonoBehaviourPun {
 	public void OnRoundEnd() {
 		if (!PhotonNetwork.IsMasterClient) { return; }
 		DestroyElevators();
+		Destroy(gameObject);
 	}
 
 	public void PhysicsUpdate() {

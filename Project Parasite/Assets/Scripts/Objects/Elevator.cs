@@ -73,9 +73,8 @@ public class Elevator : MonoBehaviourPun {
 	}
 
 	void OnDestroy() {
-		Debug.Log("Destroying elevator and its callFields");
 		foreach (ElevatorCallField callField in callFields) {
-			Destroy(callField);
+			Destroy(callField.gameObject);
 		}
 	}
 	
