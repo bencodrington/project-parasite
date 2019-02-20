@@ -13,6 +13,7 @@ public abstract class Character : MonoBehaviourPun {
 	// The position to send to the server next time we're sending a message (if we own this character)
 	// 	OR the most recent position we've received from the server (if we're a remote client)
 	protected Vector2 serverPosition;
+	protected byte serverInputs;
 	protected bool shouldSnapToServerPosition = false;
 
 	protected bool isMovingRight;
@@ -33,6 +34,7 @@ public abstract class Character : MonoBehaviourPun {
 	float inputVelocityX = 0;
 	float inputVelocityY = 0;
 	Vector2 lastSentPosition;
+	byte lastSentInputs;
 	
 	#endregion
 	
@@ -56,13 +58,14 @@ public abstract class Character : MonoBehaviourPun {
 
 	void Start() {
 		spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+		GeneratePhysicsEntity();
 		OnStart();
 
 		if (!HasAuthority()) { return; }
     	//  Set character as new target of camera
     	SetCameraFollow();
     	SetRenderLayer();
-		HandlePositionUpdates();
+		SendPositionUpdate(true);
 		timeBetweenPositionUpdates = 1f / POSITION_UPDATES_PER_SECOND;
 	}
 	
@@ -71,66 +74,63 @@ public abstract class Character : MonoBehaviourPun {
 		if (HasAuthority()) {
 			// This character belongs to this client
 			HandleInput();
-			HandlePositionUpdates();
+			HandlePositionAndInputUpdates();
 		}
 	}
 	
 	#endregion
 
 	#region [Public Methods]
-	
-	public void GeneratePhysicsEntity(Vector2 velocity) {
-		// Add physics entity
-		physicsEntity = new PhysicsEntity(transform, stats.height, stats.width);
-		// With starting velocity
-		physicsEntity.AddVelocity(velocity.x, velocity.y);
-	}
 
 	public void PhysicsUpdate() {
-		if (HasAuthority() && physicsEntity != null) {
-			// Based on input, accelerate in direction that's being pressed
-			// Horizontal
-			if (isMovingLeft) {
-				inputVelocityX -= stats.accelerationSpeed;
-			} else if (isMovingRight) {
-				inputVelocityX += stats.accelerationSpeed;
-			} else {
-				inputVelocityX /= MOVEMENT_INPUT_FRICTION;
-				// If inputVelocity is sufficiently close to 0
-				if (inputVelocityX < 0.001) {
-					// snap to 0
-					inputVelocityX = 0;
-				}
+		if (physicsEntity == null) {
+			Debug.LogError("Character: PhysicsUpdate(): physics entity is null");
+			return;
+		}
+		// Based on input, accelerate in direction that's being pressed
+		// Horizontal
+		if (isMovingLeft) {
+			inputVelocityX -= stats.accelerationSpeed;
+		} else if (isMovingRight) {
+			inputVelocityX += stats.accelerationSpeed;
+		} else {
+			inputVelocityX /= MOVEMENT_INPUT_FRICTION;
+			// If inputVelocity is sufficiently close to 0
+			if (inputVelocityX < 0.001) {
+				// snap to 0
+				inputVelocityX = 0;
 			}
-			// Vertical
-			if (isMovingDown) {
-				inputVelocityY -= stats.accelerationSpeed;
-			} else if (isMovingUp) {
-				inputVelocityY += stats.accelerationSpeed;
-			} else {
-				inputVelocityY /= MOVEMENT_INPUT_FRICTION;
-				// If inputVelocity is sufficiently close to 0
-				if (inputVelocityY < 0.001) {
-					// snap to 0
-					inputVelocityY = 0;
-				}
+		}
+		// Vertical
+		if (isMovingDown) {
+			inputVelocityY -= stats.accelerationSpeed;
+		} else if (isMovingUp) {
+			inputVelocityY += stats.accelerationSpeed;
+		} else {
+			inputVelocityY /= MOVEMENT_INPUT_FRICTION;
+			// If inputVelocity is sufficiently close to 0
+			if (inputVelocityY < 0.001) {
+				// snap to 0
+				inputVelocityY = 0;
 			}
-			// Clamp to maximum input speed
-			inputVelocityX = Mathf.Clamp(inputVelocityX, -stats.movementSpeed, stats.movementSpeed);
-			inputVelocityY = Mathf.Clamp(inputVelocityY, -stats.movementSpeed, stats.movementSpeed);
-			// Pass calculated velocity to physics entity
-			physicsEntity.AddInputVelocity(inputVelocityX, inputVelocityY);
-			physicsEntity.Update();
+		}
+		// Clamp to maximum input speed
+		inputVelocityX = Mathf.Clamp(inputVelocityX, -stats.movementSpeed, stats.movementSpeed);
+		inputVelocityY = Mathf.Clamp(inputVelocityY, -stats.movementSpeed, stats.movementSpeed);
+		// Pass calculated velocity to physics entity
+		physicsEntity.AddInputVelocity(inputVelocityX, inputVelocityY);
+		physicsEntity.Update();
+		if (HasAuthority()) {
 			// Update the server's position
 			serverPosition = transform.position;
-		} else {
+			serverInputs = PackInputs();
+		} else if (shouldSnapToServerPosition) {
 			// Verify current position is up to date with server position
-			if (shouldSnapToServerPosition) {
-				transform.position = serverPosition;
-				shouldSnapToServerPosition = false;
-			} else {
-				transform.position = Vector3.Lerp(transform.position, serverPosition, LAG_LERP_FACTOR);
-			}
+			transform.position = serverPosition;
+			shouldSnapToServerPosition = false;
+		} else {
+			// Get a bit closer to the correct position
+			transform.position = Vector3.Lerp(transform.position, serverPosition, LAG_LERP_FACTOR);
 		}
 	}
 
@@ -147,6 +147,15 @@ public abstract class Character : MonoBehaviourPun {
 
 	public void SetRenderLayer() {
 		spriteRenderer.sortingLayerName = "ClientCharacter";
+	}
+
+	public void SetStartingVelocity(Vector2 velocity) {
+		if (physicsEntity == null) {
+			// This will likely always happen, as the physics entity is generated
+			// 	in Start(), and this function is called before then
+			GeneratePhysicsEntity();
+		}
+		physicsEntity.AddVelocity(velocity.x, velocity.y);
 	}
 	
 	#endregion
@@ -176,10 +185,11 @@ public abstract class Character : MonoBehaviourPun {
 		return (photonView.IsMine || !PhotonNetwork.IsConnected);
 	}
 
-	protected void HandlePositionUpdates() {
+	protected void HandlePositionAndInputUpdates() {
 		timeUntilNextPositionUpdate -= Time.deltaTime;
 		if (timeUntilNextPositionUpdate <= 0) {
 			SendPositionUpdate();
+			SendInputUpdate();
 			timeUntilNextPositionUpdate += timeBetweenPositionUpdates;
 		}
 	}
@@ -188,13 +198,53 @@ public abstract class Character : MonoBehaviourPun {
 
 	#region [Private Methods]
 	
-	void SendPositionUpdate() {
+	void GeneratePhysicsEntity() {
+		if (physicsEntity != null) {
+			// This will happen if SetStartingVelocity() has been called already
+			// 	as this will be the second time this is being generated
+			return;
+		}
+		// Add physics entity
+		physicsEntity = new PhysicsEntity(transform, stats.height, stats.width);
+	}
+	
+	void SendPositionUpdate(bool shouldSnapToNewPosition = false) {
 		// Don't send position update if this isn't our character or if we haven't moved
 		if (!HasAuthority() || (serverPosition == lastSentPosition)) {
 			return;
 		}
-		photonView.RPC("RpcUpdatePosition", RpcTarget.Others, serverPosition, false);
+		photonView.RPC("RpcUpdatePosition", RpcTarget.Others, serverPosition, shouldSnapToNewPosition);
 		lastSentPosition = serverPosition;
+	}
+	
+	void SendInputUpdate() {
+		// Don't send input update if this isn't our character or if we haven't started/stopped pressing buttons
+		if (!HasAuthority() || (serverInputs == lastSentInputs)) {
+			return;
+		}
+		photonView.RPC("RpcUpdateInputs", RpcTarget.Others, serverInputs);
+		lastSentInputs = serverInputs;
+	}
+
+	byte PackInputs() {
+		byte packedInputs = isMovingUp ? (byte)1 : (byte)0;
+		if (isMovingDown) {
+			packedInputs |= ((byte)1 << 1);
+		}
+		if (isMovingLeft) {
+			packedInputs |= ((byte)1 << 2);
+		}
+		if (isMovingRight) {
+			packedInputs |= ((byte)1 << 3);
+		}
+		return packedInputs;
+	}
+
+	void UnpackInputs(byte packedInputs) {
+		isMovingUp = ((byte) 1 & packedInputs) == 1;
+		isMovingDown = ((byte) 2 & packedInputs) == 2;
+		isMovingLeft = ((byte) 4 & packedInputs) == 4;
+		isMovingRight = ((byte) 8 & packedInputs) == 8;
 	}
 	
 	#endregion
@@ -203,6 +253,11 @@ public abstract class Character : MonoBehaviourPun {
 	protected void RpcUpdatePosition(Vector2 newPosition, bool snapToNewPos) {
 		serverPosition = newPosition;
 		shouldSnapToServerPosition = snapToNewPos;
+	}
+
+	[PunRPC]
+	protected void RpcUpdateInputs(byte newInputs) {
+		UnpackInputs(newInputs);
 	}
 
 	protected void InteractWithObjectsInRange() {

@@ -95,7 +95,7 @@ public class Parasite : Character {
 		isMovingDown = false;
 		if (up && !oldUp && physicsEntity.IsOnGround() && !IsChargingPounce()) {
 			// Jump
-			physicsEntity.AddVelocity(0, jumpVelocity);
+			photonView.RPC("RpcJump", RpcTarget.All);
 		}  else if (up && physicsEntity.IsOnWall() && !IsChargingPounce()) {
 			// Climb Up
 			isMovingUp = true;
@@ -213,6 +213,10 @@ public class Parasite : Character {
 
 	}
 
+	void Jump() {
+		physicsEntity.AddVelocity(0, jumpVelocity);
+	}
+
 	void DestroySelf() {
 		PhotonNetwork.Destroy(gameObject);
 	}
@@ -222,8 +226,6 @@ public class Parasite : Character {
 		npc.photonView.RequestOwnership();
 		// Store playerObject for eventual transfer back to parasite
 		npc.PlayerObject = PlayerObject;
-		// Ensure the npc has a physics entity on this client
-		npc.GeneratePhysicsEntity(Vector2.zero);
 		// Set isInfected to true/update sprite on new authority's client
 		npc.Infect();
 		// Update client's camera and render settings to reflect new character
@@ -232,5 +234,10 @@ public class Parasite : Character {
 	}
 	
 	#endregion
+
+	[PunRPC]
+	void RpcJump() {
+		Jump();
+	}
 
 }

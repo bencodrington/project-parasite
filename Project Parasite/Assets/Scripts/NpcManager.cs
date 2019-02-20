@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
@@ -72,7 +72,6 @@ public class NpcManager : MonoBehaviour {
 		NonPlayerCharacter npc;
 		npc = PhotonNetwork.Instantiate(NpcPrefab.name, position, Quaternion.identity)
 				.GetComponentInChildren<NonPlayerCharacter>();
-		npc.GeneratePhysicsEntity(Vector2.zero);
 		StartCoroutine(npc.Idle());
 		NpcList.Add(npc);
 	}

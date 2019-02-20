@@ -73,7 +73,9 @@ public class PhysicsEntity {
 	bool IsStuckToCeiling() {
 		return _isTryingToStickToCeiling && IsOnCeiling();
 	}
-	/// Constructor and Methods ///
+
+	#region [Public Methods]
+	
 	public PhysicsEntity(Transform transform, float height = 0.5f, float width = 0.5f) {
 		this.transform = transform;
 		this.height = height;
@@ -121,7 +123,11 @@ public class PhysicsEntity {
 		// Reset inputVelocity, as this should be manually controlled by the character each frame
 		ResetInputVelocity();
 	}
+	
+	#endregion
 
+	#region [Private Methods]
+	
 	bool IsOutsideMap() {
 		Vector3 pos = transform.position;
 		RaycastHit2D hit = Physics2D.Raycast(new Vector2(pos.x, pos.y - OUTSIDE_MAP_DISTANCE), Vector2.up, OUTSIDE_MAP_DISTANCE * 2, Utility.GetLayerMask("obstacle"));
@@ -332,4 +338,8 @@ public class PhysicsEntity {
 	Vector2 GetPixelToTheRight(Vector2 position) {
 		return position + new Vector2(width, 0);
 	}
+	
+	#endregion
+
+	
 }

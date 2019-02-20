@@ -78,7 +78,7 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
     	// Get PlayerCharacter script
     	Character character = characterGameObject.GetComponentInChildren<Character>();
     	// Initialize each player's character on their own client
-    	character.GeneratePhysicsEntity(velocity);
+    	character.SetStartingVelocity(velocity);
     	character.PlayerObject = this;
 		hasSentGameOver = false;
 		if (assignedCharacterType == CharacterType.Parasite) {

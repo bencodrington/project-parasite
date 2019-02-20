@@ -63,7 +63,7 @@ public class Hunter : Character {
 		// If up was pressed this frame for the first time and the player is on the ground
 		if (up && !oldUp && physicsEntity.IsOnGround()) {
 			// Jump
-			physicsEntity.AddVelocity(0, jumpVelocity);
+			photonView.RPC("RpcJump", RpcTarget.All);
 		}
 		oldUp = up;
 
@@ -157,6 +157,10 @@ public class Hunter : Character {
 			orbBeamRangeManager.shouldShowMarkers = true;
 		}
 	}
+
+	void Jump() {
+		physicsEntity.AddVelocity(0, jumpVelocity);
+	}
 	
 	#endregion
 
@@ -198,5 +202,10 @@ public class Hunter : Character {
 	[PunRPC]
 	void RpcRecallOrb() {
 		RecallOrb();
+	}
+
+	[PunRPC]
+	void RpcJump() {
+		Jump();
 	}
 }
