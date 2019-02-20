@@ -47,18 +47,16 @@ public class OrbBeam : MonoBehaviour {
 		Collider2D[] energyCenterColliders = Physics2D.OverlapBoxAll(transform.position, hitboxSize, hitboxAngle, Utility.GetLayerMask("energyCenter"));
 		foreach (Collider2D energyCenterCollider in energyCenterColliders) {
 			Hunter hunter = energyCenterCollider.transform.parent.GetComponent<Hunter>();
-			if (hunter.photonView.IsMine) {
-				hunterPosition = energyCenterCollider.transform.position;
-				// Find the point on the orb beam line that is nearest to the hunter
-				projectionOntoOrbBeam = Utility.ProjectOntoRay2D(hunterPosition, hitboxRay);
-				distanceToHunter = Vector2.Distance(projectionOntoOrbBeam, hunterPosition);
-				forceDirection = CalculateForceDirection(hunterPosition, projectionOntoOrbBeam);
-				// Default to launching hunters up
-				forceDirection = forceDirection == Vector2.zero ? Vector2.up : forceDirection;
-				// Repel hunter away from projected point with a force that is greater if the hunter is
-				//	close to the orb beam
-				hunter.Repel(forceDirection, CalculateForce(distanceToHunter));
-			}
+			hunterPosition = energyCenterCollider.transform.position;
+			// Find the point on the orb beam line that is nearest to the hunter
+			projectionOntoOrbBeam = Utility.ProjectOntoRay2D(hunterPosition, hitboxRay);
+			distanceToHunter = Vector2.Distance(projectionOntoOrbBeam, hunterPosition);
+			forceDirection = CalculateForceDirection(hunterPosition, projectionOntoOrbBeam);
+			// Default to launching hunters up
+			forceDirection = forceDirection == Vector2.zero ? Vector2.up : forceDirection;
+			// Repel hunter away from projected point with a force that is greater if the hunter is
+			//	close to the orb beam
+			hunter.Repel(forceDirection, CalculateForce(distanceToHunter));
 		}
 	}
 
