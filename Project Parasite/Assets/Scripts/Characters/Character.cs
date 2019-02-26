@@ -10,11 +10,8 @@ public abstract class Character : MonoBehaviourPun {
 
 	protected List<InteractableObject> objectsInRange = new List<InteractableObject>();
 
-	// The position to send to the server next time we're sending a message (if we own this character)
-	// 	OR the most recent position we've received from the server (if we're a remote client)
-	protected Vector2 serverPosition;
 	protected byte serverInputs;
-	protected bool shouldSnapToServerPosition = false;
+	protected bool shouldSnapToTruePosition = false;
 
 	protected bool isMovingRight;
 	protected bool isMovingLeft;
@@ -36,11 +33,11 @@ public abstract class Character : MonoBehaviourPun {
 	Vector2 lastSentPosition;
 	byte lastSentInputs;
 	
-	#endregion
-	
 	// The higher this is, the snappier lag correction will be
 	// 	Should be in the range of (0..1]
-	protected const float LAG_LERP_FACTOR = 0.1f;
+	const float LAG_LERP_FACTOR = 0.2f;
+	
+	#endregion
 
 	// Only initialized for Character objects on the server
 	private PlayerObject _playerObject;
@@ -121,16 +118,16 @@ public abstract class Character : MonoBehaviourPun {
 		physicsEntity.AddInputVelocity(inputVelocityX, inputVelocityY);
 		physicsEntity.Update();
 		if (HasAuthority()) {
-			// Update the server's position
-			serverPosition = transform.position;
+			// Update the local position based on physics simulation
+			transform.position = physicsEntity.transformPosition;
 			serverInputs = PackInputs();
-		} else if (shouldSnapToServerPosition) {
+		} else if (shouldSnapToTruePosition) {
 			// Verify current position is up to date with server position
-			transform.position = serverPosition;
-			shouldSnapToServerPosition = false;
+			transform.position = physicsEntity.transformPosition;
+			shouldSnapToTruePosition = false;
 		} else {
-			// Get a bit closer to the correct position
-			transform.position = Vector3.Lerp(transform.position, serverPosition, LAG_LERP_FACTOR);
+			// Move visual representation a bit closer to the correct position
+			transform.position = Vector3.Lerp(transform.position, physicsEntity.transformPosition, LAG_LERP_FACTOR);
 		}
 	}
 
@@ -210,11 +207,11 @@ public abstract class Character : MonoBehaviourPun {
 	
 	void SendPositionUpdate(bool shouldSnapToNewPosition = false) {
 		// Don't send position update if this isn't our character or if we haven't moved
-		if (!HasAuthority() || (serverPosition == lastSentPosition)) {
+		if (!HasAuthority() || ((Vector2)transform.position == lastSentPosition)) {
 			return;
 		}
-		photonView.RPC("RpcUpdatePosition", RpcTarget.Others, serverPosition, shouldSnapToNewPosition);
-		lastSentPosition = serverPosition;
+		photonView.RPC("RpcUpdatePosition", RpcTarget.Others, (Vector2)transform.position, shouldSnapToNewPosition);
+		lastSentPosition = transform.position;
 	}
 	
 	void SendInputUpdate() {
@@ -251,8 +248,8 @@ public abstract class Character : MonoBehaviourPun {
 
 	[PunRPC]
 	protected void RpcUpdatePosition(Vector2 newPosition, bool snapToNewPos) {
-		serverPosition = newPosition;
-		shouldSnapToServerPosition = snapToNewPos;
+		physicsEntity.SetTransformPosition(newPosition);
+		shouldSnapToTruePosition = snapToNewPos;
 	}
 
 	[PunRPC]

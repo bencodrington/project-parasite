@@ -2,6 +2,17 @@
 using UnityEditor;
 
 public class PhysicsEntity {
+	#region [Public Variables]
+	
+	// The current in-world position of the physics entity
+	// 	Separate from the object's transform.position as this
+	// 	lets us accurately run the physics simulation while smoothly
+	// 	interpolating the visual representation to the correct position
+	public Vector2 transformPosition {get; private set;}
+	
+	#endregion
+
+	#region [Private Variables]
 	/// Constants ///
 	const float DEFAULT_GRAVITY = -2f;
 	// While on the ground, horizontal velocity is divided by this constant
@@ -10,40 +21,28 @@ public class PhysicsEntity {
 	const float DEFAULT_FRICTION_DENOMINATOR = 1.25f;
 	// How far above and below to check for floor to see if we're outside the map
 	const float OUTSIDE_MAP_DISTANCE = 100f;
-	// Gravity increases by a rate of 1 unit/second per second
-	float gravityAcceleration;
-	public float GravityAcceleration() { return gravityAcceleration; }
+	
+	// The (currently only vertical) velocity of kinematic objects affecting this entity
+	//	e.g. elevators, etc.
+	float movingObstacleVelocity;
+
 	// Hitbox dimensions: 2*height by 2*width
 	float height;
 	float width;
 	/// Velocity ///
 	float velocityX = 0f;
 	float velocityY = 0f;
-	public void AddVelocity(float x, float y) {
-		velocityX += x;
-		velocityY += y;
-	}
-	public void AddVelocity(Vector2 velocity) {
-		velocityX += velocity.x;
-		velocityY += velocity.y;
-	}
+
+	// Gravity increases by a rate of 1 unit/second per second
+	float gravityAcceleration;
+
 	// Maintain the velocity from movement input separately
 	// 	this allows us to limit movement speed on its own
 	float inputVelocityX = 0f;
 	float inputVelocityY = 0f;
-	public void AddInputVelocity(float velocityX, float velocityY) {
-		inputVelocityX += velocityX;
-		inputVelocityY += velocityY;
-	}
-	void ResetInputVelocity() {
-		inputVelocityX = 0;
-		inputVelocityY = 0;
-	}
-	// The (currently only vertical) velocity of kinematic objects affecting this entity
-	//	e.g. elevators, etc.
-	float movingObstacleVelocity;
+
+	#endregion
 	/// Objects ///
-	Transform transform;
 	// Keep track of obstacles for determining how far they've moved since last frame
 	// 	so that this object can absorb their momentum (elevators, etc.)
 	private Collider2D obstacleBelow;
@@ -77,12 +76,12 @@ public class PhysicsEntity {
 	#region [Public Methods]
 	
 	public PhysicsEntity(Transform transform, float height = 0.5f, float width = 0.5f) {
-		this.transform = transform;
+		this.transformPosition = transform.position;
 		this.height = height;
 		this.width = width;
 		this.gravityAcceleration = DEFAULT_GRAVITY;
 		// Ensure that first collision check isn't from default positions (0, 0) to starting positions
-		CacheSensorPixels(transform.position);
+		CacheSensorPixels(transformPosition);
 	}
 
 	// Called by the component that this entity simulates the physics for
@@ -91,10 +90,11 @@ public class PhysicsEntity {
 	public void Update () {
 		if (IsOutsideMap()) {
 			Debug.LogError("PLAYER OUTSIDE MAP");
-			transform.position = Vector2.zero;
+			transformPosition = Vector2.zero;
 			velocityX = 0;
 			velocityY = 0;
-			CacheSensorPixels(transform.position);
+			ResetInputVelocity();
+			CacheSensorPixels(transformPosition);
 			return;
 		}
 		HandleGravity();
@@ -111,17 +111,43 @@ public class PhysicsEntity {
 		// 	to incorporate it's changes in future frames
 		velocityY += movingObstacleVelocity / Time.deltaTime;
 		// Store attempted new position
-		Vector2 newPosition = (Vector2)transform.position + attemptedDisplacement;
+		Vector2 newPosition = (Vector2)transformPosition + attemptedDisplacement;
 		// Add velocity from character movement input
 		newPosition += new Vector2(inputVelocityX, inputVelocityY) * Time.deltaTime;
 		// Check for and resolve collisions
 		newPosition = ResolveCollisionsAt(newPosition);
 		// Set new position
-		transform.position = newPosition;
+		transformPosition = newPosition;
 		// Cache the current sensor pixels for tracking movement next frame
 		CacheSensorPixels(newPosition);
 		// Reset inputVelocity, as this should be manually controlled by the character each frame
 		ResetInputVelocity();
+	}
+
+	public void SetTransformPosition(Vector2 newPosition) {
+		transformPosition = newPosition;
+		CacheSensorPixels(newPosition);
+	}
+
+	public float GravityAcceleration() { return gravityAcceleration; }
+
+	public void AddVelocity(float x, float y) {
+		velocityX += x;
+		velocityY += y;
+	}
+	public void AddVelocity(Vector2 velocity) {
+		velocityX += velocity.x;
+		velocityY += velocity.y;
+	}
+
+	public void AddInputVelocity(float velocityX, float velocityY) {
+		inputVelocityX += velocityX;
+		inputVelocityY += velocityY;
+	}
+
+	void ResetInputVelocity() {
+		inputVelocityX = 0;
+		inputVelocityY = 0;
 	}
 	
 	#endregion
@@ -129,7 +155,7 @@ public class PhysicsEntity {
 	#region [Private Methods]
 	
 	bool IsOutsideMap() {
-		Vector3 pos = transform.position;
+		Vector3 pos = transformPosition;
 		RaycastHit2D hit = Physics2D.Raycast(new Vector2(pos.x, pos.y - OUTSIDE_MAP_DISTANCE), Vector2.up, OUTSIDE_MAP_DISTANCE * 2, Utility.GetLayerMask("obstacle"));
 		return !hit;
 	}

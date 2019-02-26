@@ -94,10 +94,6 @@ public class NonPlayerCharacter : Character {
 			// NPC still belongs to the server
 			TraversePath();
 			HandlePositionAndInputUpdates();
-		} else {
-			// This is a cloned representation of the authoritative NPC
-			// 	So just verify current position is up to date with server position
-			transform.position = Vector3.Lerp(transform.position, serverPosition, LAG_LERP_FACTOR);
 		}
 	}
 	
