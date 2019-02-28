@@ -25,7 +25,7 @@ public class Elevator : MonoBehaviourPun {
 	Vector2 SIZE = new Vector2(2, 3);
 	float[] stopYCoordinates;
 	int targetStop;
-	Vector3 serverPosition;
+	Vector3 estimatedServerPosition;
 	bool isMoving = false;
 	
 	Collider2D[] passengers;
@@ -41,13 +41,13 @@ public class Elevator : MonoBehaviourPun {
 	
 	public void PhysicsUpdate() {
 		HandlePassengers();
-		if (PhotonNetwork.IsMasterClient) {
-			if (isMoving) {
-				MoveToTargetStop();
-			}
+		if (PhotonNetwork.IsMasterClient && isMoving) {
+			transform.position = GetPositionAfterOneMovementFrame(transform.position);
 			photonView.RPC("RpcUpdateServerPosition", RpcTarget.All, transform.position);
-		} else {
-			transform.position = Vector3.Lerp(transform.position, serverPosition, LAG_LERP_FACTOR);
+		} else if (isMoving) {
+			// Remote client, so update our estimated position
+			estimatedServerPosition = GetPositionAfterOneMovementFrame(estimatedServerPosition);
+			transform.position = Vector3.Lerp(transform.position, estimatedServerPosition, 1);
 		}
 		// Update each kinematicPhysicsEntity in this component's children (floor/ceiling)
 		foreach(KinematicPhysicsEntity entity in kinematicPhysicsEntities) {
@@ -153,18 +153,18 @@ public class Elevator : MonoBehaviourPun {
 		}
 	}
 
-	void MoveToTargetStop() {
+	Vector2 GetPositionAfterOneMovementFrame(Vector2 currentPosition) {
 		Vector2 targetPosition;
 		float potentialMovement = MOVEMENT_SPEED * Time.deltaTime;
 		targetPosition = new Vector2(transform.position.x, stopYCoordinates[targetStop]);
 		if (Vector3.Distance(transform.position, targetPosition) < potentialMovement) {
-			// Destination reached
-			transform.position = targetPosition;
 			isMoving = false;
 			// Disable this floor's button
 			DisableButton(targetStop);
+			// Destination reached
+			return targetPosition;
 		} else {
-			transform.position = Vector3.MoveTowards(transform.position, targetPosition, potentialMovement);
+			return Vector3.MoveTowards(transform.position, targetPosition, potentialMovement);
 		}
 	}
 
@@ -194,10 +194,7 @@ public class Elevator : MonoBehaviourPun {
 	[PunRPC]
 	void RpcUpdateServerPosition(Vector3 newPosition) {
 		if (PhotonNetwork.IsMasterClient) { return; }
-		if (serverPosition == newPosition) {
-			isMoving = false;
-		}
 		// Else, on a client machine, so update our record of the elevator's true position
-		serverPosition = newPosition;
+		estimatedServerPosition = newPosition;
 	}
 }
