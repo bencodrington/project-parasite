@@ -43,6 +43,10 @@ public class NonPlayerCharacter : Character {
 		if (Input.GetMouseButtonDown(1)) {
 			BurstMeatSuit();
 		}
+
+		if (Input.GetKeyDown(KeyCode.E)) {
+			InteractWithObjectsInRange();
+		}
 	}
 
 	#region [Public Methods]
