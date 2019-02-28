@@ -169,12 +169,11 @@ public class PhysicsEntity {
 
 	void ApplyFriction() {
 		// Apply horizontal friction
-		if (applyGravity && _isOnGround) {
+		if (ShouldApplyHorizontalFriction()) {
 			velocityX /= DEFAULT_FRICTION_DENOMINATOR;
 		}
 		// Apply vertical friction
-		// TODO: if moving towards wall
-		if (IsOnWall()) {
+		if (IsMovingIntoWall()) {
 			velocityY /= DEFAULT_FRICTION_DENOMINATOR;
 		}
 	}
@@ -338,6 +337,14 @@ public class PhysicsEntity {
 	}
 	bool isMovingRight() {
 		return velocityX + inputVelocityX > 0;
+	}
+
+	bool IsMovingIntoWall() {
+		return (IsOnLeftWall() && isMovingLeft()) || (IsOnRightWall() && isMovingRight());
+	}
+
+	bool ShouldApplyHorizontalFriction() {
+		return (applyGravity && _isOnGround) || IsStuckToCeiling();
 	}
 
 	void CacheSensorPixels(Vector2 newPosition) {
