@@ -8,9 +8,11 @@ public class Orb : MonoBehaviour {
 	const float BURST_ENERGY_FORCE = 20f;
 	const float RESTING_ENERGY_RADIUS = 2f;
 	const float BURST_ENERGY_RADIUS = 4f;
-	const float BURST_FADE_TIME = 1f;
+	const float BURST_FADE_TIME = .3f;
 	float energyRadius = 2f;
 	float energyForce = BURST_ENERGY_FORCE;
+
+	public SpriteRenderer burstSprite;
 
 	Coroutine intensityCoroutine;
 
@@ -78,10 +80,13 @@ public class Orb : MonoBehaviour {
 			remainingFadeTime -= Time.deltaTime;
 			energyForce = Mathf.Lerp(RESTING_ENERGY_FORCE, BURST_ENERGY_FORCE, remainingFadeTime / BURST_FADE_TIME);
 			energyRadius = Mathf.Lerp(RESTING_ENERGY_RADIUS, BURST_ENERGY_RADIUS, remainingFadeTime / BURST_FADE_TIME);
+			burstSprite.transform.localScale = Vector2.Lerp(Vector2.zero, new Vector2(3, 3), remainingFadeTime / BURST_FADE_TIME);
+			burstSprite.color = new Color(burstSprite.color.r, burstSprite.color.g, burstSprite.color.b, Random.Range(0.25f, 0.5f));
 		}
 		energyForce = RESTING_ENERGY_FORCE;
 		energyRadius = RESTING_ENERGY_RADIUS;
 		intensityCoroutine = null;
+		Destroy(burstSprite.gameObject);
 	}
 	
 	#endregion
