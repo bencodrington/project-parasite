@@ -27,6 +27,7 @@ public class Hunter : Character {
 	public GameObject orbUiManagerPrefab;
 	OrbUiManager orbUiManager;
 	OrbBeamRangeManager orbBeamRangeManager;
+	AudioSource orbAudioSource;
 
 	Queue<Orb> orbs;
 
@@ -44,6 +45,8 @@ public class Hunter : Character {
 			).GetComponent<OrbUiManager>();
 			// Initialize it with the maximum orbs to spawn
 			orbUiManager.setMaxOrbCount(MAX_ORB_COUNT);
+
+			orbAudioSource = GetComponent<AudioSource>();
 		} else {
 			orbBeamRangeManager.shouldShowMarkers = false;
 		}
@@ -124,6 +127,7 @@ public class Hunter : Character {
 
 	void OrbSpawnFailed() {
 		orbUiManager.FlashPlaceholders();
+		orbAudioSource.Play();
 	}
 
 	void AttemptToRecallOrb() {
