@@ -38,6 +38,8 @@ public class Parasite : Character {
 		spriteRenderer.color = new Color(1, isAttempting ? .5f : 0, 0, 1);
 	}
 
+	bool oldIsTryingToStickToCeiling;
+
 	PounceIndicator pounceIndicator;
 
 	PounceIndicator PounceIndicator {
@@ -131,7 +133,13 @@ public class Parasite : Character {
 			PounceIndicator.Hide();
 		}
 		oldAction1 = action1;
-		physicsEntity.SetIsTryingToStickToCeiling(isTryingToStickToCeiling);
+		
+		
+		if (oldIsTryingToStickToCeiling != isTryingToStickToCeiling) {
+			// Only send updates
+			photonView.RPC("RpcSetIsTryingToStickToCeiling", RpcTarget.All, isTryingToStickToCeiling);
+			oldIsTryingToStickToCeiling = isTryingToStickToCeiling;
+		}
 
 		// Infect
 		if (Input.GetMouseButton(1)) {
@@ -238,6 +246,11 @@ public class Parasite : Character {
 	[PunRPC]
 	void RpcJump() {
 		Jump();
+	}
+
+	[PunRPC]
+	void RpcSetIsTryingToStickToCeiling(bool isTrying) {
+		physicsEntity.SetIsTryingToStickToCeiling(isTrying);
 	}
 
 }
