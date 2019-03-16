@@ -8,7 +8,7 @@ public class Orb : MonoBehaviour {
 	const float BURST_ENERGY_FORCE = 20f;
 	const float RESTING_ENERGY_RADIUS = 2f;
 	const float BURST_ENERGY_RADIUS = 4f;
-	const float BURST_FADE_TIME = .3f;
+	const float BURST_FADE_TIME = .1f;
 	float energyRadius = 2f;
 	float energyForce = BURST_ENERGY_FORCE;
 
