@@ -69,7 +69,7 @@ public class NonPlayerCharacter : Character {
 	public void Infect() {
 		isInfected = true;
 		// Only update sprite if on the Parasite player's client
-		spriteRenderer.color = Color.magenta;
+		SetSpriteRenderersColour(Color.magenta);
 	}
 
 	public void NearbyOrbAlert(Vector2 atPosition) {
@@ -138,7 +138,8 @@ public class NonPlayerCharacter : Character {
 	}
 
 	float ModifyTargetToAvoidObstacles(float target) {
-		Vector2 pathHitboxSize = new Vector2(target - transform.position.x, spriteRenderer.transform.localScale.y);
+		// TODO: fix following line
+		Vector2 pathHitboxSize = new Vector2(target - transform.position.x, spriteRenderers[0].transform.localScale.y);
 		// TODO: the below can cause npcs to walk into beams at head height,
 		//  but also stops the hitbox from being triggered by the floor
 		pathHitboxSize.y -= 0.1f;
@@ -162,7 +163,7 @@ public class NonPlayerCharacter : Character {
 
 	float FindTargetBeforeObstacle(float target) {
 		// Size of box that will be cast to look for obstacles
-		Vector2 size = new Vector2(spriteRenderer.transform.localScale.x, spriteRenderer.transform.localScale.y);
+		Vector2 size = new Vector2(spriteRenderers[0].transform.localScale.x, spriteRenderers[0].transform.localScale.y);
 		// TODO: the below can cause npcs to walk into beams at head height,
 		//  but also stops the hitbox from being triggered by the floor
 		size.y -= 0.1f;

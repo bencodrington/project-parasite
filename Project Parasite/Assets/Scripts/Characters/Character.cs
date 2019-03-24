@@ -5,7 +5,7 @@ using UnityEngine;
 
 public abstract class Character : MonoBehaviourPun {
 
-	protected SpriteRenderer spriteRenderer;
+	protected SpriteRenderer[] spriteRenderers;
 	protected PhysicsEntity physicsEntity;
 
 	protected List<InteractableObject> objectsInRange = new List<InteractableObject>();
@@ -54,7 +54,7 @@ public abstract class Character : MonoBehaviourPun {
 	#region [MonoBehaviour Callbacks]
 
 	void Start() {
-		spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+		spriteRenderers = GetSpriteRenderers();
 		GeneratePhysicsEntity();
 		OnStart();
 
@@ -143,7 +143,9 @@ public abstract class Character : MonoBehaviourPun {
 	}
 
 	public void SetRenderLayer() {
-		spriteRenderer.sortingLayerName = "ClientCharacter";
+		foreach (SpriteRenderer sR in spriteRenderers) {
+			sR.sortingLayerName = "ClientCharacter";
+		}
 	}
 
 	public void SetStartingVelocity(Vector2 velocity) {
@@ -191,9 +193,26 @@ public abstract class Character : MonoBehaviourPun {
 		}
 	}
 
+	protected void SetSpriteRenderersColour(Color color) {
+		foreach (SpriteRenderer sR in spriteRenderers) {
+			sR.color = color;
+		}
+	}
+
 	#endregion
 
 	#region [Private Methods]
+
+	SpriteRenderer[] GetSpriteRenderers() {
+		List<SpriteRenderer> renderers = new List<SpriteRenderer>();
+		foreach (SpriteRenderer sR in GetComponentsInChildren<SpriteRenderer>()) {
+			// Exclude renderers that shouldn't be controlled by this code (e.g. arrow indicator for parasite)
+			if (!sR.gameObject.CompareTag("IgnoreComponent")) {
+				renderers.Add(sR);
+			}
+		}
+		return renderers.ToArray();
+	}
 	
 	void GeneratePhysicsEntity() {
 		if (physicsEntity != null) {

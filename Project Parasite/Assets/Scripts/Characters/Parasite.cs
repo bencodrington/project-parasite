@@ -6,6 +6,9 @@ using UnityEngine.Networking;
 
 public class Parasite : Character {
 
+	Color IS_ATTEMPTING_INFECTION_COLOUR = new Color(1, 0, 0, 1);
+	Color RESTING_COLOUR = Color.white;
+
 	private float jumpVelocity = 30f;
 	private const float MAX_POUNCE_VELOCITY = 45f;
 	// Whether the directional keys were being pressed last frame
@@ -35,7 +38,7 @@ public class Parasite : Character {
 		}
 	}
 	void SetIsAttemptingInfectionSprite(bool isAttempting) {
-		spriteRenderer.color = new Color(1, isAttempting ? .5f : 0, 0, 1);
+		SetSpriteRenderersColour(isAttempting ? IS_ATTEMPTING_INFECTION_COLOUR : RESTING_COLOUR);
 	}
 
 	bool oldIsTryingToStickToCeiling;
@@ -202,7 +205,7 @@ public class Parasite : Character {
 	IEnumerator FlashColours() {
 		// How long to flash for
 		float timeRemaining = 0.5f;
-		Color currentColour = spriteRenderer.color;
+		Color currentColour = Color.red;
 		// Used for cycling colours
 		Dictionary<Color, Color> nextColour = new Dictionary<Color, Color>();
 		nextColour.Add(Color.red, Color.cyan);
@@ -213,11 +216,11 @@ public class Parasite : Character {
 			// Switch to next colour
 			nextColour.TryGetValue(currentColour, out currentColour);
 			// Update spriterenderer
-			spriteRenderer.color = currentColour;
+			SetSpriteRenderersColour(currentColour);
 			yield return null;
 		}
 		// Return to default colour
-		spriteRenderer.color = Color.red;
+		SetSpriteRenderersColour(RESTING_COLOUR);
 
 	}
 

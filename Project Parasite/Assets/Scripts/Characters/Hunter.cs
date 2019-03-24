@@ -19,7 +19,7 @@ public class Hunter : Character {
 
 	bool isSuitActivated = true;
 
-	Color SuitActivatedColour = new Color(0, 1f, 1f, 1);
+	Color SuitActivatedColour = new Color(1f, 1f, 1f, 1);
 	Color SuitDeactivatedColour = new Color(0, .5f, 0.6f, 1);
 
 	public GameObject orbPrefab;
@@ -88,7 +88,7 @@ public class Hunter : Character {
 		}
 		// De-activate suit
 		isSuitActivated = !Input.GetKey(KeyCode.LeftShift);
-		spriteRenderer.color = isSuitActivated ? SuitActivatedColour : SuitDeactivatedColour;
+		SetSpriteRenderersColour(isSuitActivated ? SuitActivatedColour : SuitDeactivatedColour);
 	}
 
 	#region [Public Methods]
