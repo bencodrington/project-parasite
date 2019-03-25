@@ -11,15 +11,18 @@ using ExitGames.Client.Photon;
 public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
     #region [Public Variables]
-    
-    // Prefabs for the various menu item sets this flow requires
+
+    public GameObject menuPrefab;
     public MenuItemSet searchingForPlayersMenuItemSet;
     public GameObject playerObjectPrefab;
+    // If this is true, skip straight to game and don't connect to multiplayer
+    public bool DEBUG_MODE = false;
     
     #endregion
 
     #region [Private Variables]
     
+    private Menu menu;
     GameObject roundManagerPrefab;
     RoundManager roundManager;
     const int MAX_PLAYERS_PER_ROOM = 4;
@@ -39,7 +42,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         }
     }
 
-    public void StartGame() {
+    public void SendStartGameEvent() {
         byte eventCode = EventCodes.StartGame;
         EventCodes.RaiseEventAll(eventCode, null);
     }
@@ -51,6 +54,19 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     public void Start() {
         playersReady = new Dictionary<int, bool>();
         roundManagerPrefab = Resources.Load("RoundManager") as GameObject;
+
+        if (DEBUG_MODE) {
+            // Start offline round
+            PhotonNetwork.OfflineMode = true;
+            SendStartGameEvent();
+        } else {
+            // Initialize main menu
+            menu = Instantiate(menuPrefab).GetComponent<Menu>();
+            // FIXME: This depends on UiManager.Start() running before this method
+            menu.transform.SetParent(UiManager.Instance.GetCanvas());
+            // FIXME: Menu not drawing in the correct place
+            menu.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+        }
     }
     
     #endregion
@@ -71,14 +87,17 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     }
 
     public override void OnJoinedRoom() {
-        TransitionToMenuItemSet(searchingForPlayersMenuItemSet);
+        if (!DEBUG_MODE) {
+            // We're not in debug mode, so the menu object has been created
+            //  and should transition now
+            TransitionToMenuItemSet(searchingForPlayersMenuItemSet);
+        }
         InstantiatePlayerObject();
     }
 
     #endregion
 
     public void OnEvent(EventData photonEvent) {
-        GameObject roundManagerGameObject;
         if (photonEvent.Code == EventCodes.SetReady) {
             // Deconstruct event
             object[] content = (object[])photonEvent.CustomData;
@@ -88,18 +107,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
             SetActorReady(actorNumber, isReady);
         } else if (photonEvent.Code == EventCodes.StartGame) {
             if (PhotonNetwork.IsMasterClient) {
-                // If roundmanager exists, end round
-                if (roundManager != null) {
-                    roundManager.EndRound();
-                }
-                // Create new roundmanager
-                if (roundManagerPrefab == null) {
-                    Debug.LogError("MatchManager: OnEvent: roundManagerPrefab not set.");
-                    return;
-                }
-                roundManagerGameObject = PhotonNetwork.Instantiate(roundManagerPrefab.name, Vector3.zero, Quaternion.identity, 0);
-                roundManager = roundManagerGameObject.GetComponent<RoundManager>();
-
+                StartGame();
             }
         }
     }
@@ -107,7 +115,6 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     #region [Private Methods]
 
     void TransitionToMenuItemSet(MenuItemSet menuItemSet) {
-        Menu menu = FindObjectOfType<Menu>();
         if (menu == null) {
             Debug.LogError("MatchManager: TransitionToMenuItemSet: Menu not found");
             return;
@@ -150,12 +157,27 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         }
         // If we got here, all connected players are ready
         if (PhotonNetwork.IsMasterClient) {
-            StartGame();
+            SendStartGameEvent();
         }
     }
 
     void InstantiatePlayerObject() {
         Instantiate(playerObjectPrefab, Vector3.zero, Quaternion.identity);
+    }
+
+    void StartGame() {
+        GameObject roundManagerGameObject;
+        // If roundmanager exists, end round
+        if (roundManager != null) {
+            roundManager.EndRound();
+        }
+        // Create new roundmanager
+        if (roundManagerPrefab == null) {
+            Debug.LogError("MatchManager: OnEvent: roundManagerPrefab not set.");
+            return;
+        }
+        roundManagerGameObject = PhotonNetwork.Instantiate(roundManagerPrefab.name, Vector3.zero, Quaternion.identity, 0);
+        roundManager = roundManagerGameObject.GetComponent<RoundManager>();
     }
 
     #endregion

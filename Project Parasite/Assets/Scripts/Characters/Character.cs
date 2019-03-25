@@ -57,11 +57,8 @@ public abstract class Character : MonoBehaviourPun {
 		spriteRenderers = GetSpriteRenderers();
 		GeneratePhysicsEntity();
 		OnStart();
-
+		// Only continue if this client owns this gameObject
 		if (!HasAuthority()) { return; }
-    	//  Set character as new target of camera
-    	SetCameraFollow();
-    	SetRenderLayer();
 		SendPositionUpdate(true);
 		timeBetweenPositionUpdates = 1f / POSITION_UPDATES_PER_SECOND;
 	}
@@ -143,6 +140,10 @@ public abstract class Character : MonoBehaviourPun {
 	}
 
 	public void SetRenderLayer() {
+		// CLEANUP: This can be neater
+		if (spriteRenderers == null) {
+			spriteRenderers = GetSpriteRenderers();
+		}
 		foreach (SpriteRenderer sR in spriteRenderers) {
 			sR.sortingLayerName = "ClientCharacter";
 		}
@@ -181,7 +182,7 @@ public abstract class Character : MonoBehaviourPun {
 	protected virtual void OnCharacterDestroy() {}
 	
 	protected bool HasAuthority() {
-		return (photonView.IsMine || !PhotonNetwork.IsConnected);
+		return photonView.IsMine;
 	}
 
 	protected void HandlePositionAndInputUpdates() {
