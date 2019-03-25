@@ -6,6 +6,7 @@ using UnityEngine;
 public abstract class Character : MonoBehaviourPun {
 
 	protected SpriteRenderer[] spriteRenderers;
+	protected Animator animator;
 	protected PhysicsEntity physicsEntity;
 
 	protected List<InteractableObject> objectsInRange = new List<InteractableObject>();
@@ -55,6 +56,7 @@ public abstract class Character : MonoBehaviourPun {
 
 	void Start() {
 		spriteRenderers = GetSpriteRenderers();
+		animator = GetComponentInChildren<Animator>();
 		GeneratePhysicsEntity();
 		OnStart();
 		// Only continue if this client owns this gameObject
@@ -69,6 +71,9 @@ public abstract class Character : MonoBehaviourPun {
 			// This character belongs to this client
 			HandleInput();
 			HandlePositionAndInputUpdates();
+		}
+		if (animator) {
+			animator.SetBool("isRunning", (isMovingLeft || isMovingRight));
 		}
 	}
 	

@@ -28,7 +28,6 @@ public class Hunter : Character {
 	OrbUiManager orbUiManager;
 	OrbBeamRangeManager orbBeamRangeManager;
 	AudioSource orbAudioSource;
-	Animator animator;
 
 	Queue<Orb> orbs;
 
@@ -36,7 +35,6 @@ public class Hunter : Character {
 		orbs = new Queue<Orb>();
 		// Cache reference to orb beam range manager
 		orbBeamRangeManager = GetComponentInChildren<OrbBeamRangeManager>();
-		animator = GetComponentInChildren<Animator>();
 		if (HasAuthority()) {
 			// Spawn orb UI manager to display how many orbs are remaining
 			orbUiManager = Instantiate(orbUiManagerPrefab,
@@ -112,13 +110,6 @@ public class Hunter : Character {
 		DestroyAllOrbs();
 		if (HasAuthority()) {
 			Destroy(orbUiManager.gameObject);
-		}
-	}
-
-	public override void Update() {
-		base.Update();
-		if (animator) {
-			animator.SetBool("isRunning", (isMovingLeft || isMovingRight));
 		}
 	}
 	
