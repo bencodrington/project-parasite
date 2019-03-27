@@ -50,6 +50,8 @@ public class Hunter : Character {
 		} else {
 			orbBeamRangeManager.shouldShowMarkers = false;
 		}
+		
+		GetComponentInChildren<SpriteTransform>().SetTargetTransform(transform);
 	}
 
 	protected override void HandleInput()  {

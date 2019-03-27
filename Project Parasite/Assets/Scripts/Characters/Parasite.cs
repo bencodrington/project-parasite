@@ -174,6 +174,7 @@ public class Parasite : Character {
 	
 	protected override void OnStart() {
 		spriteTransform = GetComponentInChildren<SpriteTransform>();
+		spriteTransform.SetTargetTransform(transform);
 	}
 
 	#region [Private Methods]
