@@ -15,6 +15,10 @@ public class SpriteTransform : MonoBehaviour
     // A buffer to stop float rounding from making us flip wildly
     float minDistanceBeforeFlipping = 0.01f;
 
+    // The sprites local position relative to its parent object at the start of the game
+    //  i.e. what's defined in the inspector/prefab
+    Vector2 localOffset;
+
     Transform objectTransform;
 
     #region [Public Methods]
@@ -27,6 +31,9 @@ public class SpriteTransform : MonoBehaviour
     public void SetRotateDirection(Utility.Directions newDirection) {
         if (direction == newDirection) { return; }
         direction = newDirection;
+        // The origin of rotation is not at the center of the object, but rather the
+        //  center of the sprite, so we need to account for that by changing its offset
+        SetOffset();
         transform.eulerAngles = new Vector3(0, 0, Utility.DirectionToAngle(newDirection));
         isFlipped = false;
     }
@@ -34,6 +41,10 @@ public class SpriteTransform : MonoBehaviour
     #endregion
 
     #region [MonoBehaviour Callbacks]
+
+    void Start() {
+        localOffset = transform.localPosition;
+    }
 
     void Update() {
         if (objectTransform == null) { return; }
@@ -96,6 +107,25 @@ public class SpriteTransform : MonoBehaviour
     void UpdateCoords() {
         lastX = objectTransform.position.x;
         lastY = objectTransform.position.y;
+    }
+
+    void SetOffset() {
+        switch (direction) {
+            case Utility.Directions.Left:
+                // CLEANUP: Magic number on next line is (Parasite width - height) / 2 
+                transform.localPosition = new Vector2(localOffset.y - 0.25f, localOffset.x);
+                break;
+            case Utility.Directions.Right:
+                // CLEANUP: Magic number on next line is (Parasite width - height) / 2 
+                transform.localPosition = new Vector2(-localOffset.y + 0.25f, localOffset.x);
+                break;
+            case Utility.Directions.Up:
+                transform.localPosition = new Vector2(localOffset.x, -localOffset.y);
+                break;
+            default:
+                transform.localPosition = localOffset;
+                break;
+        }
     }
     
     #endregion
