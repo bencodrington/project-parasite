@@ -69,6 +69,17 @@ public static class Utility {
 		Null
 	}
 
+	public static float DirectionToAngle(Directions direction) {
+		switch (direction) {
+			case Directions.Up: return 180;
+			case Directions.Down:
+			case Directions.Null: return 0;
+			case Directions.Left: return 270;
+			case Directions.Right: return 90;
+		}
+		return 0;
+	}
+
 	public static bool MouseIsWithinBounds(Vector2 bottomLeft, Vector2 topRight) {
 		return WithinBounds(bottomLeft, GetMousePos(), topRight);
 	}

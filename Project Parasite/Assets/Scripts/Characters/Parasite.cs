@@ -44,7 +44,6 @@ public class Parasite : Character {
 	bool oldIsTryingToStickToCeiling;
 
 	PounceIndicator pounceIndicator;
-
 	PounceIndicator PounceIndicator {
 		get {
 			if (pounceIndicator == null) {
@@ -53,6 +52,8 @@ public class Parasite : Character {
 			return pounceIndicator;
 		}
 	}
+
+	SpriteTransform spriteTransform;
 
 	// The direction that the parasite is attached to (left wall, right wall, ceiling)
 	// 	when it began charging a pounce
@@ -120,6 +121,8 @@ public class Parasite : Character {
 			PounceIndicator.Show();
 			UpdateAttachedDirection();
 		}
+		// TODO:
+		UpdateAttachedDirection();
 		if (action1) {
 			// Action key is down
 			// Charge leap
@@ -169,6 +172,10 @@ public class Parasite : Character {
 	
 	#endregion
 	
+	protected override void OnStart() {
+		spriteTransform = GetComponentInChildren<SpriteTransform>();
+	}
+
 	#region [Private Methods]
 	
 	void UpdateAttachedDirection() {
@@ -180,6 +187,7 @@ public class Parasite : Character {
 		} else if (physicsEntity.IsOnRightWall()) {
 			attachedDirection = Utility.Directions.Right;
 		}
+		spriteTransform.SetRotateDirection(attachedDirection);
 	}
 
 	Vector2 CalculatePounceVelocity() {
