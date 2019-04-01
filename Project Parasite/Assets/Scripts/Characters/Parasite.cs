@@ -9,8 +9,8 @@ public class Parasite : Character {
 	Color IS_ATTEMPTING_INFECTION_COLOUR = new Color(1, 0, 0, 1);
 	Color RESTING_COLOUR = Color.white;
 
-	private float jumpVelocity = 30f;
-	private const float MAX_POUNCE_VELOCITY = 45f;
+	private float jumpVelocity = 12f;
+	private const float MAX_POUNCE_VELOCITY = 30f;
 	// Whether the directional keys were being pressed last frame
 	private bool oldUp = false;
 	private bool oldRight = false;

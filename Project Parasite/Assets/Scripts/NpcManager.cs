@@ -29,7 +29,7 @@ public class NpcManager : MonoBehaviour {
 	const float SPAWN_RANGE_Y = 2;
 
 	// If this is true, spawn only one npc, at (0, 0)
-	bool DEBUG_MODE = true;
+	bool DEBUG_MODE = false;
 	
 	#endregion
 

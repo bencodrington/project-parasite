@@ -6,7 +6,7 @@ using Photon.Pun;
 
 public class Hunter : Character {
 
-	private float jumpVelocity = 30f;
+	private float jumpVelocity = 15f;
 	// The maximum number of orbs that this hunter can have spawned at any given time 
 	const int MAX_ORB_COUNT = 4;
 
