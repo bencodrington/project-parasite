@@ -162,6 +162,10 @@ public abstract class Character : MonoBehaviourPun {
 		}
 		physicsEntity.AddVelocity(velocity.x, velocity.y);
 	}
+
+	public virtual bool IsUninfectedNpc() {
+		return false;
+	}
 	
 	#endregion
 

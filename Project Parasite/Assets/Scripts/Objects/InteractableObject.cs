@@ -77,7 +77,9 @@ public abstract class InteractableObject : MonoBehaviour {
 				character = GetCharacterFromCollider(caller);
                 if (character.photonView.IsMine) {
                     character.RegisterInteractableObject(this);
-                    ShowControlKey();
+					if (!character.IsUninfectedNpc()) {
+						ShowControlKey();
+					}
                 }
 			}
 		}

@@ -103,6 +103,10 @@ public class NonPlayerCharacter : Character {
 	
 	#endregion
 
+	public override bool IsUninfectedNpc() {
+		return !isInfected;
+	}
+
 	#region [Private Methods]
 
 	void TraversePath() {
