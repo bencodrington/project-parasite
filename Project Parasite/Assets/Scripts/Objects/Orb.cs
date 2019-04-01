@@ -9,7 +9,7 @@ public class Orb : MonoBehaviour {
 	const float RESTING_ENERGY_RADIUS = 2f;
 	const float BURST_ENERGY_RADIUS = 4f;
 	const float BURST_FADE_TIME = .1f;
-	float energyRadius = 2f;
+	float energyRadius = BURST_ENERGY_RADIUS;
 	float energyForce = BURST_ENERGY_FORCE;
 
 	public SpriteRenderer burstSprite;
@@ -62,7 +62,7 @@ public class Orb : MonoBehaviour {
 		float distance = Vector2.Distance(transform.position, hunterPosition);
 		// The maximum distance from the orb that the force recipient will receive full force
 		// 	after this point, the force starts to fall off
-		float fullForceCutoff = energyRadius * (3 / 4);
+		float fullForceCutoff = energyRadius * (3f / 4f);
 		if (distance < fullForceCutoff) {
 			return energyForce;
 		}
