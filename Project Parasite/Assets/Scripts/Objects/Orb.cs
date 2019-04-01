@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Orb : MonoBehaviour {
 
-	const float RESTING_ENERGY_FORCE = 1f;
+	const float RESTING_ENERGY_FORCE = 0f;
 	const float BURST_ENERGY_FORCE = 15f;
-	const float RESTING_ENERGY_RADIUS = 2f;
+	const float RESTING_ENERGY_RADIUS = 0f;
 	const float BURST_ENERGY_RADIUS = 4f;
 	const float BURST_FADE_TIME = .1f;
 	float energyRadius = BURST_ENERGY_RADIUS;
