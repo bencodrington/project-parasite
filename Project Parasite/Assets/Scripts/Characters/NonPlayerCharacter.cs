@@ -16,7 +16,7 @@ public class NonPlayerCharacter : Character {
 
 	#region [Private Variables]
 	
-	private const float PARASITE_LAUNCH_VELOCITY = 30f;
+	private const float PARASITE_LAUNCH_VELOCITY = 20f;
 
 	// Pathfinding
 	private float validDistanceFromTarget = .5f;
@@ -29,6 +29,9 @@ public class NonPlayerCharacter : Character {
 	private float maxTargetDistance = 5f;
 	private float minTargetDistance = 2f;
 
+	// Whether or not right click was being pressed last frame
+	bool oldAction2;
+
 	// How far from the npc's center to display the icon
 	Vector2 ALERT_ICON_OFFSET = new Vector2(0, 1);
 	
@@ -40,9 +43,11 @@ public class NonPlayerCharacter : Character {
 		// Movement
 		HandleHorizontalMovement();
 		// Self Destruct
-		if (Input.GetMouseButtonDown(1)) {
+		bool action2 = Input.GetMouseButtonDown(1); 
+		if (action2 && !oldAction2) {
 			BurstMeatSuit();
 		}
+		oldAction2 = action2;
 
 		if (Input.GetKeyDown(KeyCode.E)) {
 			InteractWithObjectsInRange();
@@ -68,6 +73,8 @@ public class NonPlayerCharacter : Character {
 
 	public void Infect() {
 		isInfected = true;
+		// Right click was pressed last frame on the parasite player's client
+		oldAction2 = true;
 		// Only update sprite if on the Parasite player's client
 		SetSpriteRenderersColour(Color.magenta);
 	}
