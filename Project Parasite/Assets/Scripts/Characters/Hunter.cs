@@ -17,11 +17,6 @@ public class Hunter : Character {
 	// Used when getting user input to determine if key was down last frame
 	private bool oldUp = false;
 
-	bool isSuitActivated = true;
-
-	Color SuitActivatedColour = new Color(1f, 1f, 1f, 1);
-	Color SuitDeactivatedColour = new Color(0, .5f, 0.6f, 1);
-
 	public GameObject orbPrefab;
 	public GameObject orbBeamPrefab;
 	public GameObject orbUiManagerPrefab;
@@ -88,15 +83,11 @@ public class Hunter : Character {
 		if (Input.GetMouseButtonDown(1)) {
 			AttemptToRecallOrb();
 		}
-		// De-activate suit
-		isSuitActivated = !Input.GetKey(KeyCode.LeftShift);
-		SetSpriteRenderersColour(isSuitActivated ? SuitActivatedColour : SuitDeactivatedColour);
 	}
 
 	#region [Public Methods]
 	
 	public void Repel(Vector2 forceDirection, float force) {
-		if (!isSuitActivated) return;
 		// Distribute the force between the x and y coordinates
 		forceDirection.Normalize();
 		forceDirection *= force;
