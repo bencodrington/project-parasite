@@ -68,12 +68,12 @@ public class OrbUiManager : MonoBehaviour {
 		return orbSpritePlaceholder;
 	}
 
-	public void OnOrbCountChange(int numberOfOrbsPlaced) {
-		UpdateOrbSpriteCount(numberOfOrbsPlaced);
-	}
-
 	void UpdateOrbSpriteCount(int numberOfOrbsPlaced) {
 		int numOrbsRemaining = maxOrbCount - numberOfOrbsPlaced;
+		if (flashing != null) {
+			// Must have recalled an orb while flashing placeholders
+			StopCoroutine(flashing);
+		}
 		while (numOrbSpritesEnabled < numOrbsRemaining) {
 			// Enable sprite
 			EnableOrbSprite();
@@ -101,6 +101,8 @@ public class OrbUiManager : MonoBehaviour {
 		float x = (-(DISTANCE_BETWEEN_ORB_SPRITES + ORB_SPRITE_WIDTH) * index) - ORB_SPRITE_WIDTH / 2;
 		return new Vector2(x, ORB_SPRITE_HEIGHT / 2);
 	}
+	
+	#region [Public Methods]
 
 	public void FlashPlaceholders() {
 		if (flashing != null) {
@@ -108,6 +110,12 @@ public class OrbUiManager : MonoBehaviour {
 		}
 		flashing = StartCoroutine(Flash());
 	}
+
+	public void OnOrbCountChange(int numberOfOrbsPlaced) {
+		UpdateOrbSpriteCount(numberOfOrbsPlaced);
+	}
+	
+	#endregion
 
 	IEnumerator Flash() {
 		int numFlashesCompleted = 0;
