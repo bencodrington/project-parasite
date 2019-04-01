@@ -15,6 +15,9 @@ public class OrbBeam : MonoBehaviour {
 	Vector2 hitboxSize;
 	float hitboxAngle;
 	Color currentColour = Color.red;
+	// The opacity that the beam should be rendered at if
+	//	a hunter is blocking it
+	float blockedByHunterAlpha = 0.25f;
 
 	SpriteRenderer spriteRenderer;
 
@@ -51,8 +54,9 @@ public class OrbBeam : MonoBehaviour {
 		nextColour.Add(Color.yellow, Color.red);
 		// Switch to next colour
 		nextColour.TryGetValue(currentColour, out currentColour);
+		bool isOverlappingHunter = Physics2D.OverlapBox(transform.position, hitboxSize, hitboxAngle, Utility.GetLayerMask(CharacterType.Hunter));
 		// Update spriterenderer
-		SetColour(currentColour);
+		SetColour(currentColour, isOverlappingHunter);
 	}
 	
 	#endregion
@@ -100,9 +104,13 @@ public class OrbBeam : MonoBehaviour {
 		return Mathf.Lerp(energyForce, 0, t);
 	}
 
-	void SetColour(Color colour) {
+	void SetColour(Color colour, bool isOverlappingHunter) {
 		currentColour = colour;
-		spriteRenderer.color = colour;
+		// If hunter is blocking beam, fade the beam slightly
+		spriteRenderer.color = new Color(
+				colour.r, colour.g, colour.b,
+				isOverlappingHunter ? blockedByHunterAlpha : 1
+			);
 	}
 	
 	#endregion
