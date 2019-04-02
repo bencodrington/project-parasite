@@ -810,7 +810,7 @@ MonoBehaviour:
     type: 2}
   playerObjectPrefab: {fileID: 1820297792491458, guid: c3d12b587d0975b4787bf47335c8913f,
     type: 3}
-  DEBUG_MODE: 1
+  DEBUG_MODE: 0
 --- !u!1 &1123706892
 GameObject:
   m_ObjectHideFlags: 0
