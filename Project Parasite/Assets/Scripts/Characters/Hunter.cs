@@ -120,6 +120,7 @@ public class Hunter : Character {
 
 	void OrbSpawnFailed() {
 		orbUiManager.FlashPlaceholders();
+		orbUiManager.ShowRecallAlert();
 		orbAudioSource.Play();
 	}
 

@@ -8,7 +8,7 @@ public class PlatformCalledAlert : MonoBehaviour
     Text text;
     Color startingColour;
     Color fadeColour;
-    float LIFETIME = .5f;
+    public float totalLifetime = .5f;
     float remainingLifetime;
     Vector2 startingPosition;
     Vector2 displacement = new Vector2(0, .125f);
@@ -19,7 +19,7 @@ public class PlatformCalledAlert : MonoBehaviour
         startingColour = text.color;
         // Fade out and turn bluish over time
         fadeColour = new Color(startingColour.r, startingColour.g, 1, 0f);
-        remainingLifetime = LIFETIME;
+        remainingLifetime = totalLifetime;
         startingPosition = transform.position;
     }
 
@@ -30,8 +30,8 @@ public class PlatformCalledAlert : MonoBehaviour
             Destroy(gameObject);
         } else {
             // Update colour and position
-            text.color = Color.Lerp(fadeColour, startingColour, remainingLifetime / LIFETIME);;
-            offset = (1 - remainingLifetime / LIFETIME) * displacement;
+            text.color = Color.Lerp(fadeColour, startingColour, remainingLifetime / totalLifetime);;
+            offset = (1 - remainingLifetime / totalLifetime) * displacement;
             transform.position = startingPosition + offset;
             // Decrement the remaining lifetime
             remainingLifetime -= Time.deltaTime;

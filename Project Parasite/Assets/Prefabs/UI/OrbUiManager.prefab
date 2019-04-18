@@ -52,3 +52,5 @@ MonoBehaviour:
     type: 3}
   orbSpritePlaceholderPrefab: {fileID: 4585239314956471318, guid: 7c1f7b5fde94f26408a84f664d8ce835,
     type: 3}
+  recallOrbAlertPrefab: {fileID: 296580648822321038, guid: d9d3931583fb6e643b8f7c6c175ec71e,
+    type: 3}
