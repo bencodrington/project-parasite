@@ -40,6 +40,7 @@ public class Menu : MonoBehaviour {
 		// NOTE: the false on the next line is important for not messing with scaling
 		// 	and is necessary because of the Canvas Scaler component
 		item.transform.SetParent(transform, false);
+		item.transform.Translate(0, -150 * (menuItems.Count - 1), 0);
 		// Add it to the list of items to remove on transition
 		menuItems.Add(item);
 		return item;

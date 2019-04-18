@@ -64,8 +64,10 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
             menu = Instantiate(menuPrefab).GetComponent<Menu>();
             // FIXME: This depends on UiManager.Start() running before this method
             menu.transform.SetParent(UiManager.Instance.GetCanvas());
-            // FIXME: Menu not drawing in the correct place
-            menu.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+            // FIXME: Menu not drawing in the correct place;
+            RectTransform menuRect = menu.GetComponent<RectTransform>();
+            menuRect.anchorMin = Vector2.zero;
+            menuRect.anchorMax = new Vector2(1, 1); 
         }
     }
     
