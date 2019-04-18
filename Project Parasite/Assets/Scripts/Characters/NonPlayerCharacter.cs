@@ -16,18 +16,25 @@ public class NonPlayerCharacter : Character {
 
 	#region [Private Variables]
 	
-	private const float PARASITE_LAUNCH_VELOCITY = 20f;
+	const float PARASITE_LAUNCH_VELOCITY = 20f;
+	// The amount of time Action 2 must be held before the NPC can be burst
+	//	upon ejecting
+	const float MIN_BURST_TIME = 1f;
 
 	// Pathfinding
-	private float validDistanceFromTarget = .5f;
+	float validDistanceFromTarget = .5f;
 	// Note that target is currently only used to move horizontally,
 	//	and as a result is only the x coordinate of the target location
-	private float targetX;
-	private float minTimeUntilNewPath = 2f;
-	private float maxTimeUntilNewPath = 5f;
-	private bool hasTarget = false;
-	private float maxTargetDistance = 5f;
-	private float minTargetDistance = 2f;
+	float targetX;
+	float minTimeUntilNewPath = 2f;
+	float maxTimeUntilNewPath = 5f;
+	bool hasTarget = false;
+	float maxTargetDistance = 5f;
+	float minTargetDistance = 2f;
+
+	// The amount of time Action 2 has been held down since it was pressed
+	float timeChargingForBurst = 0f;
+	bool isChargingForBurst = false;
 
 	// Whether or not right click was being pressed last frame
 	bool oldAction2;
@@ -41,11 +48,20 @@ public class NonPlayerCharacter : Character {
 		// This function is only called when this NPC is infected,
 		// 	and is only called on the Parasite player's client
 		// Movement
-		HandleHorizontalMovement();
+		if (isChargingForBurst) {
+			isMovingLeft = false;
+			isMovingRight = false;
+		} else {
+			// Only allow movement if we're not charging
+			HandleHorizontalMovement();
+		}
+
 		// Self Destruct
-		bool action2 = Input.GetMouseButtonDown(1); 
+		bool action2 = Input.GetMouseButton(1);
 		if (action2 && !oldAction2) {
-			BurstMeatSuit();
+			OnAction2Down();
+		} else if (oldAction2 && !action2) {
+			OnAction2Up();
 		}
 		oldAction2 = action2;
 
@@ -101,6 +117,7 @@ public class NonPlayerCharacter : Character {
 			// NPC is infected and this client is the Parasite player's client
 			HandleInput();
 			HandlePositionAndInputUpdates();
+			HandleBurstCharging();
 		} else if (!isInfected && HasAuthority()) {
 			// NPC still belongs to the server
 			TraversePath();
@@ -115,6 +132,25 @@ public class NonPlayerCharacter : Character {
 	}
 
 	#region [Private Methods]
+
+	void OnAction2Down() {
+		timeChargingForBurst = 0f;
+		isChargingForBurst = true;
+	}
+
+	void OnAction2Up() {
+		if (!isChargingForBurst) {
+			// When Action 2 was pressed, it was used to infect this NPC
+			// Require another press of Action 2 to eject/burst
+			return;
+		}
+		isChargingForBurst = false;
+		if (timeChargingForBurst > MIN_BURST_TIME) {
+			BurstMeatSuit();
+		} else {
+			EjectMeatSuit();
+		}
+	}
 
 	void TraversePath() {
 		isMovingLeft = false;
@@ -198,6 +234,19 @@ public class NonPlayerCharacter : Character {
 		SpawnParasite();
 	}
 
+	void EjectMeatSuit() {
+		SpawnParasite();
+		Uninfect();
+	}
+
+	void Uninfect() {
+		isInfected = false;
+		// Only update sprite if on the Parasite player's client
+		SetSpriteRenderersColour(Color.white);
+		// Return npc to the same render layer as the other NPCs
+		SetRenderLayer("Characters");
+	}
+
 	void DespawnSelf() {
 		// Send out an event to decrement counter
 		EventCodes.RaiseEventAll(EventCodes.NpcDespawned, null);
@@ -206,6 +255,12 @@ public class NonPlayerCharacter : Character {
 
 	void SpawnParasite() {
 		PlayerObject.SpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY));
+	}
+
+	void HandleBurstCharging() {
+		if (isChargingForBurst) {
+			timeChargingForBurst += Time.deltaTime;
+		}
 	}
 	
 	#endregion

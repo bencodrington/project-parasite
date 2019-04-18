@@ -144,13 +144,13 @@ public abstract class Character : MonoBehaviourPun {
 		objectsInRange.Remove(netId);
 	}
 
-	public void SetRenderLayer() {
+	public void SetRenderLayer(string renderLayerName = "ClientCharacter") {
 		// CLEANUP: This can be neater
 		if (spriteRenderers == null) {
 			spriteRenderers = GetSpriteRenderers();
 		}
 		foreach (SpriteRenderer sR in spriteRenderers) {
-			sR.sortingLayerName = "ClientCharacter";
+			sR.sortingLayerName = renderLayerName;
 		}
 	}
 
