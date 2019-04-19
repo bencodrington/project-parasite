@@ -12,6 +12,7 @@ public class BurstIndicator : MonoBehaviour
 
     SpriteRenderer spriteRenderer;
     SpriteMask spriteMask;
+    Animator animator;
 
     float timeToFill = 0.25f;
     float timeElapsed = 0f;
@@ -42,6 +43,7 @@ public class BurstIndicator : MonoBehaviour
     void Start() {
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         spriteMask = GetComponentInChildren<SpriteMask>();
+        animator = GetComponentInChildren<Animator>();
         // Hide at start
         spriteRenderer.color = Color.clear;
     }
@@ -52,9 +54,13 @@ public class BurstIndicator : MonoBehaviour
             float progress = isFilling ? Mathf.Min(timeElapsed / timeToFill, 1) : 0f;
             spriteRenderer.color = Color.Lerp(START_COLOUR, END_COLOUR, progress);
             spriteMask.alphaCutoff = 1 - progress;
+            if (timeElapsed >= timeToFill) {
+                animator.SetBool("isActive", true);
+            }
         } else {
             spriteRenderer.color = Color.clear;
             spriteMask.alphaCutoff = 0;
+                animator.SetBool("isActive", false);
         }
     }
     
