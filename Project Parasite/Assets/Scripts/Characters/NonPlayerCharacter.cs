@@ -21,6 +21,8 @@ public class NonPlayerCharacter : Character {
 	//	upon ejecting
 	const float MIN_BURST_TIME = 1f;
 
+	BurstIndicator burstIndicator;
+
 	// Pathfinding
 	float validDistanceFromTarget = .5f;
 	// Note that target is currently only used to move horizontally,
@@ -109,6 +111,11 @@ public class NonPlayerCharacter : Character {
 	}
 	
 	#endregion
+	
+	protected override void OnStart() {
+		burstIndicator = GetComponentInChildren<BurstIndicator>();
+		burstIndicator.SetTimeToFill(MIN_BURST_TIME);
+	}
 
 	#region [MonoBehaviour Callbacks]
 	
@@ -136,6 +143,7 @@ public class NonPlayerCharacter : Character {
 	void OnAction2Down() {
 		timeChargingForBurst = 0f;
 		isChargingForBurst = true;
+		burstIndicator.StartFilling();
 	}
 
 	void OnAction2Up() {
@@ -145,6 +153,7 @@ public class NonPlayerCharacter : Character {
 			return;
 		}
 		isChargingForBurst = false;
+		burstIndicator.StopFilling();
 		if (timeChargingForBurst > MIN_BURST_TIME) {
 			BurstMeatSuit();
 		} else {
