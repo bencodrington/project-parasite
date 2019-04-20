@@ -21,6 +21,14 @@ public class NonPlayerCharacter : Character {
 	//	upon ejecting
 	const float MIN_BURST_TIME = 1f;
 
+	// The range of distances that NPCs will randomly select from
+	// 	when choosing a new point to travel to
+	const float MAX_TARGET_DISTANCE = 5f;
+	const float MIN_TARGET_DISTANCE = 2f;
+
+	// The farthest that NPCs will try to move when running away
+	const float FLEE_DISTANCE = 8f;
+
 	BurstIndicator burstIndicator;
 
 	// Pathfinding
@@ -31,8 +39,6 @@ public class NonPlayerCharacter : Character {
 	float minTimeUntilNewPath = 2f;
 	float maxTimeUntilNewPath = 5f;
 	bool hasTarget = false;
-	float maxTargetDistance = 5f;
-	float minTargetDistance = 2f;
 
 	// The amount of time Action 2 has been held down since it was pressed
 	float timeChargingForBurst = 0f;
@@ -182,9 +188,9 @@ public class NonPlayerCharacter : Character {
 
 	void FindNewPath() {
 		// Randomly select offset that is +/-[minTargetDistance, maxTargetDistance]
-		float rangeDifference = maxTargetDistance - minTargetDistance;
+		float rangeDifference = MAX_TARGET_DISTANCE - MIN_TARGET_DISTANCE;
 		float offset = Random.Range(-rangeDifference, rangeDifference);
-		offset += (offset >= 0) ? minTargetDistance : -minTargetDistance;
+		offset += (offset >= 0) ? MIN_TARGET_DISTANCE : -MIN_TARGET_DISTANCE;
 		// Set target relative to current location
 		targetX = transform.position.x + offset;
 		// If there is a wall/ beam in the way, don't move to new target
@@ -211,7 +217,7 @@ public class NonPlayerCharacter : Character {
 
 	void FleeOrbInDirection(Utility.Directions direction) {
 		// Target a location that is the maximum movement unit away from the current position
-		float offset = direction == Utility.Directions.Right ? maxTargetDistance : -maxTargetDistance;
+		float offset = direction == Utility.Directions.Right ? FLEE_DISTANCE : -FLEE_DISTANCE;
 		// Without running into obstacles (walls/beams)
 		targetX = FindTargetBeforeObstacle(transform.position.x + offset);
 		hasTarget = true;

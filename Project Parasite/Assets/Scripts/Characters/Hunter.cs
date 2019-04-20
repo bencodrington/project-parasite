@@ -12,7 +12,7 @@ public class Hunter : Character {
 
 	// The size of the box around newly-placed orbs, inside of which
 	// 	NPCs will be alerted to run away
-	Vector2 NPC_ALERT_RANGE = new Vector2(6, 4);
+	Vector2 NPC_ALERT_RANGE = new Vector2(12, 4);
 
 	// Used when getting user input to determine if key was down last frame
 	private bool oldUp = false;
