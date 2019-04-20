@@ -12,8 +12,6 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
     #region [Public Variables]
 
-    public GameObject menuPrefab;
-    public MenuItemSet searchingForPlayersMenuItemSet;
     public GameObject playerObjectPrefab;
     // If this is true, skip straight to game and don't connect to multiplayer
     public bool DEBUG_MODE = false;
@@ -27,8 +25,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     #endregion
 
     #region [Private Variables]
-    
-    private Menu menu;
+
     GameObject roundManagerPrefab;
     RoundManager roundManager;
     const int MAX_PLAYERS_PER_ROOM = 4;
@@ -66,14 +63,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
             PhotonNetwork.OfflineMode = true;
             SendStartGameEvent();
         } else {
-            // Initialize main menu
-            menu = Instantiate(menuPrefab).GetComponent<Menu>();
-            // FIXME: This depends on UiManager.Start() running before this method
-            menu.transform.SetParent(UiManager.Instance.GetCanvas());
-            // FIXME: Menu not drawing in the correct place;
-            RectTransform menuRect = menu.GetComponent<RectTransform>();
-            menuRect.anchorMin = Vector2.zero;
-            menuRect.anchorMax = new Vector2(1, 1); 
+            UiManager.Instance.ShowMainMenu();
         }
     }
     
@@ -98,7 +88,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         if (!DEBUG_MODE) {
             // We're not in debug mode, so the menu object has been created
             //  and should transition now
-            TransitionToMenuItemSet(searchingForPlayersMenuItemSet);
+            UiManager.Instance.OnJoinedRoom();
         }
         InstantiatePlayerObject();
     }
@@ -121,14 +111,6 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     }
 
     #region [Private Methods]
-
-    void TransitionToMenuItemSet(MenuItemSet menuItemSet) {
-        if (menu == null) {
-            Debug.LogError("MatchManager: TransitionToMenuItemSet: Menu not found");
-            return;
-        }
-        menu.TransitionToNewMenuItemSet(menuItemSet);
-    }
 
     void StoreClientName(string defaultName) {
         PhotonNetwork.LocalPlayer.NickName = GetClientName(defaultName);
@@ -160,12 +142,16 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
                 // Return if we haven't received a ready message from one of the players
                 //  or if the most recent message we've received from them is that they're
                 //  not ready
+                if (PhotonNetwork.IsMasterClient) {
+                    // Ensure the start game button isn't being shown
+                    UiManager.Instance.SetStartGameButtonActive(false);
+                }
                 return;
             }
         }
         // If we got here, all connected players are ready
         if (PhotonNetwork.IsMasterClient) {
-            SendStartGameEvent();
+            UiManager.Instance.SetStartGameButtonActive(true);
         }
     }
 

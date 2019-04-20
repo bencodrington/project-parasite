@@ -40,6 +40,10 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	Color LOSS_COLOUR = Color.red;
 
 	const int UI_PADDING_DISTANCE = 9;
+
+	GameObject mainMenu;
+	GameObject lobby;
+	GameObject startGameButton;
     
     #endregion
 
@@ -78,6 +82,20 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	public Transform GetCanvas() {
 		return canvas;
 	}
+
+	public void ShowMainMenu() {
+		mainMenu.SetActive(true);
+	}
+
+	public void OnJoinedRoom() {
+		// Show the lobby
+		mainMenu.SetActive(false);
+		lobby.SetActive(true);
+	}
+
+	public void SetStartGameButtonActive(bool isActive) {
+		startGameButton.SetActive(isActive);
+	}
     
     #endregion
 
@@ -93,6 +111,12 @@ public class UiManager : MonoBehaviour, IOnEventCallback
             return;
         }
         Instance = this;
+		mainMenu = GameObject.FindGameObjectWithTag("Main Menu");
+		lobby = GameObject.FindGameObjectWithTag("Lobby");
+		startGameButton = GameObject.FindObjectOfType<StartGameButton>().gameObject;
+		mainMenu.SetActive(false);
+		lobby.SetActive(false);
+		startGameButton.SetActive(false);
     }
 
     void Start() {
@@ -118,12 +142,8 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     }
 
     void HideMenu() {
-        Menu menu = FindObjectOfType<Menu>();
-        if (menu == null) {
-            Debug.LogError("UiManager: HideMenu: Menu not found");
-            return;
-        }
-        menu.DeleteMenuItems();
+		mainMenu.SetActive(false);
+		lobby.SetActive(false);
     }
 
     void ShowGameOverScreen(CharacterType victorType) {

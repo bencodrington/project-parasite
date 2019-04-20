@@ -8,6 +8,8 @@ TagManager:
   - TopRightUI
   - Name Field
   - IgnoreComponent
+  - Main Menu
+  - Lobby
   layers:
   - Default
   - TransparentFX
