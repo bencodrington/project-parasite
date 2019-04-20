@@ -68,7 +68,7 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 
 	#region [Public Methods]
 	
-	public void SpawnPlayerCharacter(CharacterType assignedCharacterType, Vector3 atPosition, Vector2 velocity) {
+	public void SpawnPlayerCharacter(CharacterType assignedCharacterType, Vector3 atPosition, Vector2 velocity, bool forceCameraSnap = true) {
 		String characterPrefabName = assignedCharacterType == CharacterType.Parasite ? "Parasite" : "Hunter";
 		GameObject characterPrefab = Resources.Load(characterPrefabName) as GameObject;
     	// Create PlayerCharacter game object on the server
@@ -79,7 +79,7 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
     	character.SetStartingVelocity(velocity);
     	character.PlayerObject = this;
 		// Make the camera follow this character
-    	character.SetCameraFollow();
+    	character.SetCameraFollow(forceCameraSnap);
 		// Make the character draw in front of other characters
     	character.SetRenderLayer();
 		hasSentGameOver = false;
@@ -112,12 +112,4 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 	
 	#endregion
 
-    // public void CmdAssignCharacterTypeAndSpawnPoint(CharacterType characterType, Vector2 spawnPoint) {
-    // 	// Spawn Character across clients
-    // 	CmdSpawnPlayerCharacter(characterType, spawnPoint, Vector2.zero);
-    // 	// Update grid entry to include new character type
-    // 	PlayerGrid.Instance.CmdSetCharacterType(netId, characterType);
-    // 	// Update HUD to show necessary information for this character type
-    // 	RpcUpdateHud();
-    // }
 }

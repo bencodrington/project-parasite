@@ -15,8 +15,12 @@ public class CameraFollow : MonoBehaviour {
 		transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * SMOOTH_TIME);
 	}
 
-	public void SetTarget(Transform newTarget) {
+	public void SetTarget(Transform newTarget, bool forceSnapToTargetPosition = false) {
 		target = newTarget;
+		if (forceSnapToTargetPosition) {
+			// Jump to new target's position immediately
+			transform.position = target.position + offset;
+		}
 	}
 
 }

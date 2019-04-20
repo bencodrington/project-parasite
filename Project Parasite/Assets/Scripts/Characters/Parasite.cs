@@ -267,7 +267,7 @@ public class Parasite : Character {
 		// Set isInfected to true/update sprite on new authority's client
 		npc.Infect();
 		// Update client's camera and render settings to reflect new character
-		npc.SetCameraFollow();
+		npc.SetCameraFollow(false);
 		npc.SetRenderLayer();
 	}
 	

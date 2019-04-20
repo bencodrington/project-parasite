@@ -133,8 +133,8 @@ public abstract class Character : MonoBehaviourPun {
 		}
 	}
 
-	public void SetCameraFollow() {
-		FindObjectOfType<CameraFollow>().SetTarget(transform);
+	public void SetCameraFollow(bool forceSnapToTarget) {
+		FindObjectOfType<CameraFollow>().SetTarget(transform, forceSnapToTarget);
 	}
 
 	public void RegisterInteractableObject(InteractableObject netId) {
