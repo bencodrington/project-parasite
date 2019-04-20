@@ -228,6 +228,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stats: {fileID: 11400000, guid: d8e7f79a48638e44a891f27cd0c71354, type: 2}
+  screechSound: {fileID: 8300000, guid: 4f1d4314cd5fb68469745854852dc50c, type: 3}
 --- !u!114 &332
 MonoBehaviour:
   m_ObjectHideFlags: 0
