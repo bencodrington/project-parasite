@@ -88,4 +88,11 @@ public static class Utility {
 		return (bottomLeft.x <= point.x && point.x <= topRight.x &&
 				bottomLeft.y <= point.y && point.y <= topRight.y);
 	}
+
+	public static AudioSource AddAudioSource(GameObject gameObject, AudioClip clip) {
+		AudioSource newSource;
+		newSource = gameObject.AddComponent<AudioSource>();
+		newSource.clip = clip;
+		return newSource;
+	}
 }

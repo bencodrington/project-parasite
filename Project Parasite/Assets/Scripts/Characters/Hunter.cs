@@ -17,12 +17,15 @@ public class Hunter : Character {
 	// Used when getting user input to determine if key was down last frame
 	private bool oldUp = false;
 
+	public AudioClip cantPlaceOrbSound;
+	public AudioClip placeOrbSound;
 	public GameObject orbPrefab;
 	public GameObject orbBeamPrefab;
 	public GameObject orbUiManagerPrefab;
 	OrbUiManager orbUiManager;
 	OrbBeamRangeManager orbBeamRangeManager;
-	AudioSource orbAudioSource;
+	AudioSource cantPlaceOrbAudioSource;
+	AudioSource placeOrbAudioSource;
 
 	Queue<Orb> orbs;
 
@@ -41,12 +44,14 @@ public class Hunter : Character {
 			// Initialize it with the maximum orbs to spawn
 			orbUiManager.setMaxOrbCount(MAX_ORB_COUNT);
 
-			orbAudioSource = GetComponent<AudioSource>();
+			cantPlaceOrbAudioSource = Utility.AddAudioSource(gameObject, cantPlaceOrbSound);
+
 		} else {
 			orbBeamRangeManager.shouldShowMarkers = false;
 		}
 		
 		GetComponentInChildren<SpriteTransform>().SetTargetTransform(transform);
+		placeOrbAudioSource = Utility.AddAudioSource(gameObject, placeOrbSound);
 	}
 
 	protected override void HandleInput()  {
@@ -121,7 +126,7 @@ public class Hunter : Character {
 	void OrbSpawnFailed() {
 		orbUiManager.FlashPlaceholders();
 		orbUiManager.ShowRecallAlert();
-		orbAudioSource.Play();
+		cantPlaceOrbAudioSource.Play();
 	}
 
 	void AttemptToRecallOrb() {
@@ -168,6 +173,7 @@ public class Hunter : Character {
 		// Create orb game object
 		GameObject orbGameObject = Instantiate(orbPrefab, atPosition, Quaternion.identity);
 		Orb orb = orbGameObject.GetComponent<Orb>();
+		placeOrbAudioSource.Play();
 
 		AlertNpcsInRange(atPosition);
 
