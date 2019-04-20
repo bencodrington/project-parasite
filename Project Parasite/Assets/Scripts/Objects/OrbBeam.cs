@@ -80,9 +80,7 @@ public class OrbBeam : MonoBehaviour {
 		RaycastHit2D parasiteHit = Physics2D.Linecast(startPoint, endPoint, Utility.GetLayerMask(CharacterType.Parasite));
 		if (parasiteHit != false) {
 			parasite = parasiteHit.transform.parent.GetComponent<Parasite>();
-			if (parasite.photonView.IsMine) {
-				parasite.PlayerObject.ParasiteTakeDamage(1);
-			}
+			parasite.TakeDamage(1);
 		}
 	}
 

@@ -29,10 +29,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 	int ParasiteHealth {
 		get { return _parasiteHealth; }
 		set {
-			if (value < _parasiteHealth) {
-				// Notify parasite that it is taking damage
-				characterGameObject.GetComponent<Parasite>().OnTakingDamage();
-			}
 			_parasiteHealth = Mathf.Clamp(value, 0, STARTING_PARASITE_HEALTH);
 			UiManager.Instance.UpdateHealthObject(_parasiteHealth);
 			if (value <= 0 && !hasSentGameOver) {

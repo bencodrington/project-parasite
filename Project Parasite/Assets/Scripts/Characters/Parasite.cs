@@ -178,13 +178,12 @@ public class Parasite : Character {
 	}
 
 	#region [Public Methods]
-	
-	public void OnTakingDamage() {
-		StartCoroutine(FlashColours());
-		if (!screechAudioSource.isPlaying) {
-			screechAudioSource.pitch = Random.Range(0.5f, 1.5f);
-			screechAudioSource.Play();
+
+	public void TakeDamage(int damage) {
+		if (photonView.IsMine) {
+			PlayerObject.ParasiteTakeDamage(damage);
 		}
+		OnTakingDamage();
 	}
 	
 	#endregion
@@ -227,6 +226,14 @@ public class Parasite : Character {
 
 	void ResetPounceCharge() {
 		timeSpentCharging = 0f;
+	}
+	
+	void OnTakingDamage() {
+		StartCoroutine(FlashColours());
+		if (!screechAudioSource.isPlaying) {
+			screechAudioSource.pitch = Random.Range(0.5f, 1.5f);
+			screechAudioSource.Play();
+		}
 	}
 
 	IEnumerator FlashColours() {
