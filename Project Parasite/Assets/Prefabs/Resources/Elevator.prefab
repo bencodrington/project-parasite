@@ -49,6 +49,8 @@ MonoBehaviour:
     type: 3}
   elevatorCallFieldPrefab: {fileID: 1071992796203306, guid: 25d1080c17a5fad428d3d1dec9ffdab9,
     type: 3}
+  elevatorArrivedSound: {fileID: 8300000, guid: d1a8c517286c3d64089d8afe636840f6,
+    type: 3}
 --- !u!114 &329
 MonoBehaviour:
   m_ObjectHideFlags: 0

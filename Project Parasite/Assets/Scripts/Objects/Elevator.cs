@@ -10,6 +10,7 @@ public class Elevator : MonoBehaviourPun {
 	
 	public GameObject buttonPrefab;
 	public GameObject elevatorCallFieldPrefab;
+	public AudioClip elevatorArrivedSound;
 	
 	#endregion
 
@@ -33,6 +34,8 @@ public class Elevator : MonoBehaviourPun {
 	List<ElevatorCallField> callFields;
 
 	KinematicPhysicsEntity[] kinematicPhysicsEntities;
+
+	AudioSource elevatorArrivedSource;
 	
 	#endregion
 
@@ -70,6 +73,7 @@ public class Elevator : MonoBehaviourPun {
 	void Awake() {
 		kinematicPhysicsEntities = GetComponentsInChildren<KinematicPhysicsEntity>();
 		callFields = new List<ElevatorCallField>();
+		elevatorArrivedSource = Utility.AddAudioSource(gameObject, elevatorArrivedSound);
 	}
 
 	void OnDestroy() {
@@ -162,10 +166,11 @@ public class Elevator : MonoBehaviourPun {
 		float potentialMovement = MOVEMENT_SPEED * Time.deltaTime;
 		targetPosition = new Vector2(transform.position.x, stopYCoordinates[targetStop]);
 		if (Vector3.Distance(transform.position, targetPosition) < potentialMovement) {
+			// Destination reached
 			isMoving = false;
+			elevatorArrivedSource.Play();
 			// Disable this floor's button
 			DisableButton(targetStop);
-			// Destination reached
 			return targetPosition;
 		} else {
 			return Vector3.MoveTowards(transform.position, targetPosition, potentialMovement);
