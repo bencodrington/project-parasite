@@ -29,7 +29,6 @@ public abstract class InteractableObject : MonoBehaviour {
 		charactersInRange = Physics2D.OverlapAreaAll(transform.position,
 										transform.position + new Vector3(SIZE.x, SIZE.y, 0),
 										Utility.GetLayerMask("character"));
-		Debug.DrawLine(transform.position, transform.position + new Vector3(SIZE.x, SIZE.y, 0));
 		ResolveCharacterListDiff(oldCharactersInRange, charactersInRange);
 		oldCharactersInRange = charactersInRange;
 	}
@@ -64,7 +63,7 @@ public abstract class InteractableObject : MonoBehaviour {
 		foreach (Collider2D oldCaller in oldCallers) {
 			if (oldCaller != null) {
 				// Character is leaving the field
-				character = GetCharacterFromCollider(oldCaller);
+				character = Utility.GetCharacterFromCollider(oldCaller);
                 if (character.photonView.IsMine) {
                     character.UnregisterInteractableObject(this);
                     HideControlKey();
@@ -74,7 +73,7 @@ public abstract class InteractableObject : MonoBehaviour {
 		foreach (Collider2D caller in callers) {
 			if (caller != null) {
 				// Character is entering the field
-				character = GetCharacterFromCollider(caller);
+				character = Utility.GetCharacterFromCollider(caller);
                 if (character.photonView.IsMine) {
                     character.RegisterInteractableObject(this);
 					if (!character.IsUninfectedNpc()) {
@@ -83,10 +82,6 @@ public abstract class InteractableObject : MonoBehaviour {
                 }
 			}
 		}
-	}
-
-	Character GetCharacterFromCollider(Collider2D collider) {
-		return collider.GetComponentInParent<Character>();
 	}
 
     void ShowControlKey() {

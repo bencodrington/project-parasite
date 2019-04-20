@@ -96,4 +96,8 @@ public static class Utility {
 		newSource.volume = volume;
 		return newSource;
 	}
+
+	public static Character GetCharacterFromCollider(Collider2D collider) {
+		return collider.GetComponentInParent<Character>();
+	}
 }

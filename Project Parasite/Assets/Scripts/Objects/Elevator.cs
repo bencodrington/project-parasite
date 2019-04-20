@@ -143,14 +143,18 @@ public class Elevator : MonoBehaviourPun {
 		passengers = Physics2D.OverlapAreaAll((Vector2)transform.position - halfSize,
 										(Vector2)transform.position + halfSize,
 										Utility.GetLayerMask("character"));
-		Debug.DrawLine((Vector2)transform.position - halfSize, (Vector2)transform.position + halfSize);
-		if (passengers.Length > 0) {
-			// Show buttons on client
-			SetAllButtonsActive(true);
-		} else {
-			// Hide buttons on client
-			SetAllButtonsActive(false);
+		// Only show elevator buttons if the client's character is in the elevator
+		Character character;
+		foreach (Collider2D collider in passengers) {
+			character = Utility.GetCharacterFromCollider(collider);
+			if (character.photonView.IsMine && !character.IsUninfectedNpc()) {
+				// Show buttons on client
+				SetAllButtonsActive(true);
+				return;
+			} 
 		}
+		// Client's character is not a passenger, so hide buttons
+		SetAllButtonsActive(false);
 	}
 
 	Vector2 GetPositionAfterOneMovementFrame(Vector2 currentPosition) {
