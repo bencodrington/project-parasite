@@ -7,22 +7,30 @@ using UnityEngine;
 
 public class RoundManager : MonoBehaviourPun {
 
-	GameObject objectManagerPrefab;
-	ObjectManager objectManager;
+	#region [Public Variables]
 
 	public Vector2[] spawnPoints;
+
+	public bool isGameOver = false;
+	
+	#endregion
+
+	#region [Private Variables]
+
+	GameObject objectManagerPrefab;
+	ObjectManager objectManager;
 
 	Vector2 parasiteSpawnPoint;
 	Vector2 hunterSpawnPoint;
 
-	public bool isGameOver = false;
+	NoMoreNPCsWinCondition noMoreNPCs;
 
 	// If this is true, spawn all players as hunters
 	bool huntersOnlyMode = false;
 	// If this is true, spawn all players at (0, 0)
-	bool DEBUG_MODE = false;
-
-	NoMoreNPCsWinCondition noMoreNPCs;
+	bool spawnPlayersAtZero = false;
+	
+	#endregion
 
 	#region [Public Methods]
 
@@ -30,6 +38,14 @@ public class RoundManager : MonoBehaviourPun {
 		transform.GetComponentInChildren<NpcManager>().DespawnNPCs();
 		objectManager.OnRoundEnd();
 		PhotonNetwork.Destroy(photonView);
+	}
+
+	public void SetHuntersOnlyMode(bool value) {
+		huntersOnlyMode = value;
+	}
+
+	public void SetSpawnPlayersAtZero(bool value) {
+		spawnPlayersAtZero = value;
 	}
 
 	#endregion
@@ -95,7 +111,7 @@ public class RoundManager : MonoBehaviourPun {
 		parasiteSpawnPoint = spawnPoints[parasiteSpawnPointIndex];
 		hunterSpawnPoint = spawnPoints[hunterSpawnPointIndex];
 
-		if (DEBUG_MODE) {
+		if (spawnPlayersAtZero) {
 			parasiteSpawnPoint = Vector2.zero;
 			hunterSpawnPoint = Vector2.zero;
 		}

@@ -29,7 +29,15 @@ public class NpcManager : MonoBehaviour {
 	const float SPAWN_RANGE_Y = 2;
 
 	// If this is true, spawn only one npc, at (0, 0)
-	bool DEBUG_MODE = false;
+	bool spawnOneNpcOnly = false;
+	
+	#endregion
+
+	#region [Public Methods]
+	
+	public void SetSpawnOneNpcOnly(bool value) {
+		spawnOneNpcOnly = value;
+	}
 	
 	#endregion
 
@@ -47,7 +55,7 @@ public class NpcManager : MonoBehaviour {
 	#region [Private Methods]
 	
 	void SpawnNPCs() {
-		if (DEBUG_MODE) { 
+		if (spawnOneNpcOnly) { 
 			SpawnNpcAtPosition(Vector2.zero);
 		} else {
 			foreach (Vector2 spawnCenter in spawnCenters) {

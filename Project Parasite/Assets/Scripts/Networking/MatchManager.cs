@@ -17,6 +17,12 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     public GameObject playerObjectPrefab;
     // If this is true, skip straight to game and don't connect to multiplayer
     public bool DEBUG_MODE = false;
+	// If this is true, spawn all players at (0, 0)
+    public bool spawnPlayersAtZero = false;
+	// If this is true, spawn all players as hunters
+    public bool huntersOnlyMode = false;
+	// If this is true, only spawn one NPC rather than usual spawn patterns
+	public bool spawnOneNpcOnly = false;
     
     #endregion
 
@@ -180,6 +186,9 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         }
         roundManagerGameObject = PhotonNetwork.Instantiate(roundManagerPrefab.name, Vector3.zero, Quaternion.identity, 0);
         roundManager = roundManagerGameObject.GetComponent<RoundManager>();
+        roundManager.SetSpawnPlayersAtZero(spawnPlayersAtZero);
+        roundManager.SetHuntersOnlyMode(huntersOnlyMode);
+        roundManagerGameObject.GetComponent<NpcManager>().SetSpawnOneNpcOnly(spawnOneNpcOnly);
     }
 
     #endregion
