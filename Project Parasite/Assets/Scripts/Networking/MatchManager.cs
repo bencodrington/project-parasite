@@ -12,6 +12,13 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
     #region [Public Variables]
 
+    // Use the singleton pattern, as there should only ever
+    //  be one MatchManager per client
+    public static MatchManager Instance;
+
+    // Keeps track of which players have selected which characters
+    public CharacterSelectionManager characterSelectionManager {get; private set;}
+
     public GameObject playerObjectPrefab;
     // If this is true, skip straight to game and don't connect to multiplayer
     public bool DEBUG_MODE = false;
@@ -30,6 +37,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     RoundManager roundManager;
     const int MAX_PLAYERS_PER_ROOM = 4;
     Dictionary<int, bool> playersReady;
+    bool isRandomParasite = false;
 
     #endregion
 
@@ -49,14 +57,28 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         byte eventCode = EventCodes.StartGame;
         EventCodes.RaiseEventAll(eventCode, null);
     }
+
+    public void SetIsRandomParasite(bool isRandom) {
+        isRandomParasite = isRandom;
+        characterSelectionManager.SetEnabled(!isRandom);
+    }
     
     #endregion
 
     #region [MonoBehaviour Callbacks]
 
-    public void Start() {
+    void Awake() {
+        if (Instance != null) {
+            Debug.LogError("MatchManager:Awake: Attempting to make a second MatchManager");
+            return;
+        }
+        Instance = this;
+    }
+
+    void Start() {
         playersReady = new Dictionary<int, bool>();
         roundManagerPrefab = Resources.Load("RoundManager") as GameObject;
+        characterSelectionManager = new CharacterSelectionManager();
 
         if (DEBUG_MODE) {
             // Start offline round
@@ -175,6 +197,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         roundManager.SetSpawnPlayersAtZero(spawnPlayersAtZero);
         roundManager.SetHuntersOnlyMode(huntersOnlyMode);
         roundManagerGameObject.GetComponent<NpcManager>().SetSpawnOneNpcOnly(spawnOneNpcOnly);
+        roundManager.SetSelectParasiteRandomly(isRandomParasite);
     }
 
     #endregion

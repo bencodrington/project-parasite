@@ -14,7 +14,7 @@ public class PlayerList : MonoBehaviour {
 
 	List<GameObject> children;
 
-	#region MonoBehaviour Callbacks
+	#region [MonoBehaviour Callbacks]
 
 	void Start() {
 		oldPlayerNames = "";
@@ -33,15 +33,27 @@ public class PlayerList : MonoBehaviour {
 
 	#endregion
 
-	#region Private Methods
+	#region [Private Methods]
 
 	List<string> GetPlayerNames() {
 		List<string> playerNamesList = new List<string>();
-
+		Dictionary<int, CharacterType> characterSelections = MatchManager.Instance.characterSelectionManager.GetCharacterSelections();
+		
 		foreach (Player player in PhotonNetwork.PlayerList) {
-			playerNamesList.Add(player.NickName);
+			playerNamesList.Add(GetPlayerName(player, characterSelections));
 		}
 		return playerNamesList;
+	}
+
+	string GetPlayerName(Player player, Dictionary<int, CharacterType> characterSelections) {
+		if (characterSelections == null || !characterSelections.ContainsKey(player.ActorNumber)) {
+			// Currently on random character assignment mode,
+			// 	or the player doesn't currently have a character selected
+			// 	just show the name
+			return player.NickName;
+		}
+		// Append selected character type to player's name
+		return player.NickName + " - " + characterSelections[player.ActorNumber].ToString();
 	}
 
 	void UpdateChildren() {

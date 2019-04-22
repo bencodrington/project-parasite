@@ -96,6 +96,10 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	public void SetStartGameButtonActive(bool isActive) {
 		startGameButton.SetActive(isActive);
 	}
+
+	public void UpdateHealthObject(int newValue) {
+		topRightUiText.text = newValue.ToString();
+	}
     
     #endregion
 
@@ -132,10 +136,6 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     #endregion
 
     #region [Private Methods]
-
-	public void UpdateHealthObject(int newValue) {
-		topRightUiText.text = newValue.ToString();
-	}
 
     void DestroyTitleScreen() {
         Destroy(GameObject.FindWithTag("TitleScreen"));
@@ -203,6 +203,10 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     		Destroy(controlsObject);
     	}
     }
+
+	void SetIsRandomParasite(bool isRandom) {
+		MatchManager.Instance.SetIsRandomParasite(isRandom);
+	}
     
     #endregion
 }

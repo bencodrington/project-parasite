@@ -29,6 +29,9 @@ public class RoundManager : MonoBehaviourPun {
 	bool huntersOnlyMode = false;
 	// If this is true, spawn all players at (0, 0)
 	bool spawnPlayersAtZero = false;
+	// If this is true, randomly select one of the connected
+	// 	players to be the parasite
+	bool shouldSelectParasiteRandomly = false;
 	
 	#endregion
 
@@ -46,6 +49,10 @@ public class RoundManager : MonoBehaviourPun {
 
 	public void SetSpawnPlayersAtZero(bool value) {
 		spawnPlayersAtZero = value;
+	}
+
+	public void SetSelectParasiteRandomly(bool isRandom) {
+		shouldSelectParasiteRandomly = isRandom;
 	}
 
 	#endregion
@@ -81,8 +88,13 @@ public class RoundManager : MonoBehaviourPun {
 	void SelectParasite() {
 		int n = PhotonNetwork.PlayerList.Length;
 		Vector2 spawnPoint;
-		// Randomly select one of the players to be parasite, the rest are hunters
-		int indexOfParasite = Random.Range(0, n);
+		int indexOfParasite;
+		if (shouldSelectParasiteRandomly) {
+			// Randomly select one of the players to be parasite, the rest are hunters
+			indexOfParasite = Random.Range(0, n);
+		} else {
+			indexOfParasite = 0;
+		}
 		if (huntersOnlyMode) { indexOfParasite = -1; }
 		CharacterType characterType;
 		for (int i = 0; i < n; i++) {
