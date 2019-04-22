@@ -45,6 +45,8 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	GameObject lobby;
 	GameObject startGameButton;
     GameObject readyToggleButton;
+	GameObject selectParasiteButton;
+	GameObject selectHunterButton;
     
     #endregion
 
@@ -104,11 +106,10 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 
 	public void OnIsRandomParasiteChanged(bool isRandomParasite) {
         // Only need to show ready button if parasite is randomly selected
-        if (isRandomParasite) {
-            readyToggleButton.SetActive(true);
-            return;
-        }
-        readyToggleButton.SetActive(false);
+        readyToggleButton.SetActive(isRandomParasite);
+		// Only need to show character select buttons if it isn't
+		selectHunterButton.SetActive(!isRandomParasite);
+		selectParasiteButton.SetActive(!isRandomParasite);
 	}
     
     #endregion
@@ -129,6 +130,13 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 		lobby = GameObject.FindGameObjectWithTag("Lobby");
 		startGameButton = GameObject.FindObjectOfType<StartGameButton>().gameObject;
         readyToggleButton = FindObjectOfType<ReadyButton>().gameObject;
+		foreach (CharacterSelectButton selectButton in FindObjectsOfType<CharacterSelectButton>()) {
+			if (selectButton.characterType == CharacterType.Parasite) {
+				selectParasiteButton = selectButton.gameObject;
+			} else if (selectButton.characterType == CharacterType.Hunter) {
+				selectHunterButton = selectButton.gameObject;
+			}
+		}
 
 		mainMenu.SetActive(false);
 		lobby.SetActive(false);
