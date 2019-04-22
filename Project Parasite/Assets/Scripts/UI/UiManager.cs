@@ -44,6 +44,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	GameObject mainMenu;
 	GameObject lobby;
 	GameObject startGameButton;
+    GameObject readyToggleButton;
     
     #endregion
 
@@ -100,6 +101,15 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	public void UpdateHealthObject(int newValue) {
 		topRightUiText.text = newValue.ToString();
 	}
+
+	public void OnIsRandomParasiteChanged(bool isRandomParasite) {
+        // Only need to show ready button if parasite is randomly selected
+        if (isRandomParasite) {
+            readyToggleButton.SetActive(true);
+            return;
+        }
+        readyToggleButton.SetActive(false);
+	}
     
     #endregion
 
@@ -118,9 +128,12 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 		mainMenu = GameObject.FindGameObjectWithTag("Main Menu");
 		lobby = GameObject.FindGameObjectWithTag("Lobby");
 		startGameButton = GameObject.FindObjectOfType<StartGameButton>().gameObject;
+        readyToggleButton = FindObjectOfType<ReadyButton>().gameObject;
+
 		mainMenu.SetActive(false);
 		lobby.SetActive(false);
 		startGameButton.SetActive(false);
+        readyToggleButton.SetActive(false);
     }
 
     void Start() {
@@ -203,10 +216,6 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     		Destroy(controlsObject);
     	}
     }
-
-	void SetIsRandomParasite(bool isRandom) {
-		MatchManager.Instance.SetIsRandomParasite(isRandom);
-	}
     
     #endregion
 }

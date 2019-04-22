@@ -61,6 +61,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     public void SetIsRandomParasite(bool isRandom) {
         isRandomParasite = isRandom;
         characterSelectionManager.SetEnabled(!isRandom);
+        UiManager.Instance.OnIsRandomParasiteChanged(isRandom);
     }
     
     #endregion
