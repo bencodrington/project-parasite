@@ -25,6 +25,8 @@ public class RoundManager : MonoBehaviourPun {
 
 	NoMoreNPCsWinCondition noMoreNPCs;
 
+	Dictionary<int, CharacterType> characterSelections;
+
 	// If this is true, spawn all players as hunters
 	bool huntersOnlyMode = false;
 	// If this is true, spawn all players at (0, 0)
@@ -53,6 +55,10 @@ public class RoundManager : MonoBehaviourPun {
 
 	public void SetSelectParasiteRandomly(bool isRandom) {
 		shouldSelectParasiteRandomly = isRandom;
+	}
+
+	public void SetCharacterSelections(Dictionary<int, CharacterType> selections) {
+		characterSelections = selections;
 	}
 
 	#endregion
@@ -86,26 +92,20 @@ public class RoundManager : MonoBehaviourPun {
 	#region [Private Methods]
 
 	void SelectParasite() {
-		int n = PhotonNetwork.PlayerList.Length;
 		Vector2 spawnPoint;
-		int indexOfParasite;
-		if (shouldSelectParasiteRandomly) {
-			// Randomly select one of the players to be parasite, the rest are hunters
-			indexOfParasite = Random.Range(0, n);
-		} else {
-			indexOfParasite = 0;
-		}
-		if (huntersOnlyMode) { indexOfParasite = -1; }
+		int actorNumber;
+		int parasiteActorNumber = GetActorNumberOfParasitePlayer();
 		CharacterType characterType;
-		for (int i = 0; i < n; i++) {
-			if (i == indexOfParasite) {
+		foreach (Player player in PhotonNetwork.PlayerList) {
+			actorNumber = player.ActorNumber;
+			if (actorNumber == parasiteActorNumber) {
 				characterType = CharacterType.Parasite;
 				spawnPoint = parasiteSpawnPoint;
 			} else { // Player is a hunter
 				characterType = CharacterType.Hunter;
 				spawnPoint = hunterSpawnPoint;
 			}
-			RaiseSpawnEvent(i, characterType, spawnPoint);
+			RaiseSpawnEvent(actorNumber, characterType, spawnPoint);
 		}
 	}
 
@@ -135,12 +135,29 @@ public class RoundManager : MonoBehaviourPun {
 		photonView.RPC("RpcSetObjectManager", RpcTarget.All, objectManager.photonView.ViewID);
 	}
 
-	void RaiseSpawnEvent(int playerIndex, CharacterType characterType, Vector2 spawnPoint) {
+	void RaiseSpawnEvent(int actorNumber, CharacterType characterType, Vector2 spawnPoint) {
 		byte eventCode = EventCodes.AssignPlayerTypeAndSpawnPoint;
-		object[] content = { PhotonNetwork.PlayerList[playerIndex].ActorNumber, characterType, spawnPoint };
+		object[] content = { actorNumber, characterType, spawnPoint };
 		EventCodes.RaiseEventAll(eventCode, content);
 	}
 	
+	int GetActorNumberOfParasitePlayer() {
+		if (shouldSelectParasiteRandomly) {
+			// Ensure that if we're in huntersOnlyMode, no parasite player is chosen	
+			if (huntersOnlyMode) { return -1; }
+			// Randomly select one of the players to be parasite, the rest are hunters
+			int indexOfParasite = Random.Range(0, PhotonNetwork.PlayerList.Length);
+			return PhotonNetwork.PlayerList[indexOfParasite].ActorNumber;
+		}
+		foreach (int key in characterSelections.Keys) {
+			if (characterSelections[key] == CharacterType.Parasite) {
+				return key;
+			}
+		}
+		Debug.LogError("RoundManager:GetActorNumberOfParasitePlayer: No entry with parasite selected found.");
+		return PhotonNetwork.PlayerList[0].ActorNumber;
+	}
+
 	#endregion
 
 	[PunRPC]

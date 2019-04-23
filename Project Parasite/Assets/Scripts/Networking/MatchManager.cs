@@ -189,6 +189,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         roundManager.SetHuntersOnlyMode(huntersOnlyMode);
         roundManagerGameObject.GetComponent<NpcManager>().SetSpawnOneNpcOnly(spawnOneNpcOnly);
         roundManager.SetSelectParasiteRandomly(isRandomParasite);
+        roundManager.SetCharacterSelections(characterSelectionManager.GetCharacterSelections());
     }
 
     void SetIsRandomParasite(bool isRandom) {
