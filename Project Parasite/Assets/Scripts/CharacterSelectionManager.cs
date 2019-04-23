@@ -39,6 +39,14 @@ public class CharacterSelectionManager : IOnEventCallback
         return characterSelections;
     }
     
+    public bool IsValidComposition() {
+        // Return true iff everyone has made a selection
+        //  and only one person has selected parasite
+        bool everyoneHasSelected = characterSelections.Count == PhotonNetwork.PlayerList.Length;
+        bool exactlyOneParasite = IsExactlyOneParasite();
+        return everyoneHasSelected && exactlyOneParasite;
+    }
+    
     #endregion
 
     public void OnEvent(EventData photonEvent) {
@@ -62,7 +70,25 @@ public class CharacterSelectionManager : IOnEventCallback
         } else {
             characterSelections[actorNumber] = selectedCharacter;
         }
-        // TODO: check valid team composition
+        // Check to see if the valid composition status has changed
+        //  and update UI accordingly
+        if (PhotonNetwork.IsMasterClient) {
+            UiManager.Instance.SetStartGameButtonActive(IsValidComposition());
+        }
+    }
+
+    bool IsExactlyOneParasite() {
+        bool hasSeenParasite = false;
+        foreach (int key in characterSelections.Keys) {
+            if (hasSeenParasite && characterSelections[key] == CharacterType.Parasite) {
+                // This is the second parasite we've seen
+                return false;
+            } else if (characterSelections[key] == CharacterType.Parasite) {
+                // This is the first parasite we've seen
+                hasSeenParasite = true;
+            }
+        }
+        return hasSeenParasite;
     }
 
     #endregion

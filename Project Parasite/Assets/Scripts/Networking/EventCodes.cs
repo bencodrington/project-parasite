@@ -12,6 +12,7 @@ public class EventCodes
     public const byte GameOver                      = 5;
     public const byte RequestNpcCount               = 6;
     public const byte SelectCharacter               = 7;
+    public const byte ToggleRandomParasite          = 8;
 
     public static void RaiseEventAll(byte eventCode, object[] content) {
         RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };

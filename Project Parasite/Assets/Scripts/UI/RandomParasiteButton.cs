@@ -27,8 +27,17 @@ public class RandomParasiteButton : MonoBehaviour
 
     public void ToggleIsRandomParasite() {
         bool isRandomParasite = toggle.isOn;
-        MatchManager.Instance.SetIsRandomParasite(isRandomParasite);
+        RaiseToggleEvent(isRandomParasite);
     }
 
+    #endregion
+
+    #region [Private Methods]
+    
+    void RaiseToggleEvent(bool isRandomParasite) {
+		object[] content = { isRandomParasite };
+        EventCodes.RaiseEventAll(EventCodes.ToggleRandomParasite, content);
+    }
+    
     #endregion
 }

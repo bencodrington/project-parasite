@@ -57,12 +57,6 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         byte eventCode = EventCodes.StartGame;
         EventCodes.RaiseEventAll(eventCode, null);
     }
-
-    public void SetIsRandomParasite(bool isRandom) {
-        isRandomParasite = isRandom;
-        characterSelectionManager.SetEnabled(!isRandom);
-        UiManager.Instance.OnIsRandomParasiteChanged(isRandom);
-    }
     
     #endregion
 
@@ -130,6 +124,8 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
             if (PhotonNetwork.IsMasterClient) {
                 StartGame();
             }
+        } else if (photonEvent.Code == EventCodes.ToggleRandomParasite) {
+            SetIsRandomParasite((bool)EventCodes.GetFirstEventContent(photonEvent));
         }
     }
 
@@ -154,28 +150,22 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
     void SetActorReady(int actorNumber, bool isReady) {
         playersReady[actorNumber] = isReady;
-        CheckIfAllPlayersReady();
+        HandleShouldShowStartGameButton();
     }
 
-    void CheckIfAllPlayersReady() {
+    bool AreAllPlayersReady() {
         int playerNumber;
         foreach (Player player in PhotonNetwork.PlayerList) {
             playerNumber = player.ActorNumber;
             if (!playersReady.ContainsKey(playerNumber) || !playersReady[playerNumber]) {
-                // Return if we haven't received a ready message from one of the players
+                // Return false if we haven't received a ready message from one of the players
                 //  or if the most recent message we've received from them is that they're
                 //  not ready
-                if (PhotonNetwork.IsMasterClient) {
-                    // Ensure the start game button isn't being shown
-                    UiManager.Instance.SetStartGameButtonActive(false);
-                }
-                return;
+                return false;
             }
         }
         // If we got here, all connected players are ready
-        if (PhotonNetwork.IsMasterClient) {
-            UiManager.Instance.SetStartGameButtonActive(true);
-        }
+        return true;
     }
 
     void InstantiatePlayerObject() {
@@ -199,6 +189,25 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         roundManager.SetHuntersOnlyMode(huntersOnlyMode);
         roundManagerGameObject.GetComponent<NpcManager>().SetSpawnOneNpcOnly(spawnOneNpcOnly);
         roundManager.SetSelectParasiteRandomly(isRandomParasite);
+    }
+
+    void SetIsRandomParasite(bool isRandom) {
+        isRandomParasite = isRandom;
+        // Let characterSelectionManager know if it should be active
+        characterSelectionManager.SetEnabled(!isRandom);
+        // Let UiManager know which controls to show
+        UiManager.Instance.OnIsRandomParasiteChanged(isRandom);
+        HandleShouldShowStartGameButton();
+    }
+
+    void HandleShouldShowStartGameButton() {
+        // Should only ever show the start game button if we are the master client
+        if (!PhotonNetwork.IsMasterClient) { return; }
+        bool shouldShow = isRandomParasite ?
+            AreAllPlayersReady() :
+            characterSelectionManager.IsValidComposition();
+        UiManager.Instance.SetStartGameButtonActive(shouldShow);
+
     }
 
     #endregion

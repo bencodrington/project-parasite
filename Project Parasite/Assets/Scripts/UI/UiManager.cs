@@ -45,6 +45,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	GameObject lobby;
 	GameObject startGameButton;
     GameObject readyToggleButton;
+    GameObject randomParasiteToggleButton;
 	GameObject selectParasiteButton;
 	GameObject selectHunterButton;
     
@@ -94,6 +95,8 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 		// Show the lobby
 		mainMenu.SetActive(false);
 		lobby.SetActive(true);
+		// Only show the Random Character Select toggle button if this is the Master Client
+		randomParasiteToggleButton.SetActive(PhotonNetwork.IsMasterClient);
 	}
 
 	public void SetStartGameButtonActive(bool isActive) {
@@ -130,6 +133,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 		lobby = GameObject.FindGameObjectWithTag("Lobby");
 		startGameButton = GameObject.FindObjectOfType<StartGameButton>().gameObject;
         readyToggleButton = FindObjectOfType<ReadyButton>().gameObject;
+        randomParasiteToggleButton = FindObjectOfType<RandomParasiteButton>().gameObject;
 		foreach (CharacterSelectButton selectButton in FindObjectsOfType<CharacterSelectButton>()) {
 			if (selectButton.characterType == CharacterType.Parasite) {
 				selectParasiteButton = selectButton.gameObject;
@@ -142,6 +146,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 		lobby.SetActive(false);
 		startGameButton.SetActive(false);
         readyToggleButton.SetActive(false);
+		randomParasiteToggleButton.SetActive(false);
     }
 
     void Start() {
