@@ -11,19 +11,33 @@ using ExitGames.Client.Photon;
 public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
     #region [Public Variables]
-    
-    // Prefabs for the various menu item sets this flow requires
-    public MenuItemSet searchingForPlayersMenuItemSet;
+
+    // Use the singleton pattern, as there should only ever
+    //  be one MatchManager per client
+    public static MatchManager Instance;
+
+    // Keeps track of which players have selected which characters
+    public CharacterSelectionManager characterSelectionManager {get; private set;}
+
     public GameObject playerObjectPrefab;
+    // If this is true, skip straight to game and don't connect to multiplayer
+    public bool DEBUG_MODE = false;
+	// If this is true, spawn all players at (0, 0)
+    public bool spawnPlayersAtZero = false;
+	// If this is true, spawn all players as hunters
+    public bool huntersOnlyMode = false;
+	// If this is true, only spawn one NPC rather than usual spawn patterns
+	public bool spawnOneNpcOnly = false;
     
     #endregion
 
     #region [Private Variables]
-    
+
     GameObject roundManagerPrefab;
     RoundManager roundManager;
     const int MAX_PLAYERS_PER_ROOM = 4;
     Dictionary<int, bool> playersReady;
+    bool isRandomParasite = false;
 
     #endregion
 
@@ -39,7 +53,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         }
     }
 
-    public void StartGame() {
+    public void SendStartGameEvent() {
         byte eventCode = EventCodes.StartGame;
         EventCodes.RaiseEventAll(eventCode, null);
     }
@@ -48,9 +62,26 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
     #region [MonoBehaviour Callbacks]
 
-    public void Start() {
+    void Awake() {
+        if (Instance != null) {
+            Debug.LogError("MatchManager:Awake: Attempting to make a second MatchManager");
+            return;
+        }
+        Instance = this;
+    }
+
+    void Start() {
         playersReady = new Dictionary<int, bool>();
         roundManagerPrefab = Resources.Load("RoundManager") as GameObject;
+        characterSelectionManager = new CharacterSelectionManager();
+
+        if (DEBUG_MODE) {
+            // Start offline round
+            PhotonNetwork.OfflineMode = true;
+            SendStartGameEvent();
+        } else {
+            UiManager.Instance.ShowMainMenu();
+        }
     }
     
     #endregion
@@ -71,14 +102,17 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     }
 
     public override void OnJoinedRoom() {
-        TransitionToMenuItemSet(searchingForPlayersMenuItemSet);
+        if (!DEBUG_MODE) {
+            // We're not in debug mode, so the menu object has been created
+            //  and should transition now
+            UiManager.Instance.OnJoinedRoom();
+        }
         InstantiatePlayerObject();
     }
 
     #endregion
 
     public void OnEvent(EventData photonEvent) {
-        GameObject roundManagerGameObject;
         if (photonEvent.Code == EventCodes.SetReady) {
             // Deconstruct event
             object[] content = (object[])photonEvent.CustomData;
@@ -88,32 +122,14 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
             SetActorReady(actorNumber, isReady);
         } else if (photonEvent.Code == EventCodes.StartGame) {
             if (PhotonNetwork.IsMasterClient) {
-                // If roundmanager exists, end round
-                if (roundManager != null) {
-                    roundManager.EndRound();
-                }
-                // Create new roundmanager
-                if (roundManagerPrefab == null) {
-                    Debug.LogError("MatchManager: OnEvent: roundManagerPrefab not set.");
-                    return;
-                }
-                roundManagerGameObject = PhotonNetwork.Instantiate(roundManagerPrefab.name, Vector3.zero, Quaternion.identity, 0);
-                roundManager = roundManagerGameObject.GetComponent<RoundManager>();
-
+                StartGame();
             }
+        } else if (photonEvent.Code == EventCodes.ToggleRandomParasite) {
+            SetIsRandomParasite((bool)EventCodes.GetFirstEventContent(photonEvent));
         }
     }
 
     #region [Private Methods]
-
-    void TransitionToMenuItemSet(MenuItemSet menuItemSet) {
-        Menu menu = FindObjectOfType<Menu>();
-        if (menu == null) {
-            Debug.LogError("MatchManager: TransitionToMenuItemSet: Menu not found");
-            return;
-        }
-        menu.TransitionToNewMenuItemSet(menuItemSet);
-    }
 
     void StoreClientName(string defaultName) {
         PhotonNetwork.LocalPlayer.NickName = GetClientName(defaultName);
@@ -134,28 +150,65 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
     void SetActorReady(int actorNumber, bool isReady) {
         playersReady[actorNumber] = isReady;
-        CheckIfAllPlayersReady();
+        HandleShouldShowStartGameButton();
     }
 
-    void CheckIfAllPlayersReady() {
+    bool AreAllPlayersReady() {
         int playerNumber;
         foreach (Player player in PhotonNetwork.PlayerList) {
             playerNumber = player.ActorNumber;
             if (!playersReady.ContainsKey(playerNumber) || !playersReady[playerNumber]) {
-                // Return if we haven't received a ready message from one of the players
+                // Return false if we haven't received a ready message from one of the players
                 //  or if the most recent message we've received from them is that they're
                 //  not ready
-                return;
+                return false;
             }
         }
         // If we got here, all connected players are ready
-        if (PhotonNetwork.IsMasterClient) {
-            StartGame();
-        }
+        return true;
     }
 
     void InstantiatePlayerObject() {
         Instantiate(playerObjectPrefab, Vector3.zero, Quaternion.identity);
+    }
+
+    void StartGame() {
+        GameObject roundManagerGameObject;
+        // If roundmanager exists, end round
+        if (roundManager != null) {
+            roundManager.EndRound();
+        }
+        // Create new roundmanager
+        if (roundManagerPrefab == null) {
+            Debug.LogError("MatchManager: OnEvent: roundManagerPrefab not set.");
+            return;
+        }
+        roundManagerGameObject = PhotonNetwork.Instantiate(roundManagerPrefab.name, Vector3.zero, Quaternion.identity, 0);
+        roundManager = roundManagerGameObject.GetComponent<RoundManager>();
+        roundManager.SetSpawnPlayersAtZero(spawnPlayersAtZero);
+        roundManager.SetHuntersOnlyMode(huntersOnlyMode);
+        roundManagerGameObject.GetComponent<NpcManager>().SetSpawnOneNpcOnly(spawnOneNpcOnly);
+        roundManager.SetSelectParasiteRandomly(isRandomParasite);
+        roundManager.SetCharacterSelections(characterSelectionManager.GetCharacterSelections());
+    }
+
+    void SetIsRandomParasite(bool isRandom) {
+        isRandomParasite = isRandom;
+        // Let characterSelectionManager know if it should be active
+        characterSelectionManager.SetEnabled(!isRandom);
+        // Let UiManager know which controls to show
+        UiManager.Instance.OnIsRandomParasiteChanged(isRandom);
+        HandleShouldShowStartGameButton();
+    }
+
+    void HandleShouldShowStartGameButton() {
+        // Should only ever show the start game button if we are the master client
+        if (!PhotonNetwork.IsMasterClient) { return; }
+        bool shouldShow = isRandomParasite ?
+            AreAllPlayersReady() :
+            characterSelectionManager.IsValidComposition();
+        UiManager.Instance.SetStartGameButtonActive(shouldShow);
+
     }
 
     #endregion

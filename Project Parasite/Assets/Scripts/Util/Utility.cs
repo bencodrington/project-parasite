@@ -69,6 +69,17 @@ public static class Utility {
 		Null
 	}
 
+	public static float DirectionToAngle(Directions direction) {
+		switch (direction) {
+			case Directions.Up: return 180;
+			case Directions.Down:
+			case Directions.Null: return 0;
+			case Directions.Left: return 270;
+			case Directions.Right: return 90;
+		}
+		return 0;
+	}
+
 	public static bool MouseIsWithinBounds(Vector2 bottomLeft, Vector2 topRight) {
 		return WithinBounds(bottomLeft, GetMousePos(), topRight);
 	}
@@ -76,5 +87,17 @@ public static class Utility {
 	public static bool WithinBounds(Vector2 bottomLeft, Vector2 point, Vector2 topRight) {
 		return (bottomLeft.x <= point.x && point.x <= topRight.x &&
 				bottomLeft.y <= point.y && point.y <= topRight.y);
+	}
+
+	public static AudioSource AddAudioSource(GameObject gameObject, AudioClip clip, float volume = 1f) {
+		AudioSource newSource;
+		newSource = gameObject.AddComponent<AudioSource>();
+		newSource.clip = clip;
+		newSource.volume = volume;
+		return newSource;
+	}
+
+	public static Character GetCharacterFromCollider(Collider2D collider) {
+		return collider.GetComponentInParent<Character>();
 	}
 }

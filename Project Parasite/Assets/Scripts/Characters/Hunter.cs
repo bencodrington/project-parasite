@@ -6,28 +6,26 @@ using Photon.Pun;
 
 public class Hunter : Character {
 
-	private float jumpVelocity = 30f;
+	private float jumpVelocity = 15f;
 	// The maximum number of orbs that this hunter can have spawned at any given time 
 	const int MAX_ORB_COUNT = 4;
 
 	// The size of the box around newly-placed orbs, inside of which
 	// 	NPCs will be alerted to run away
-	Vector2 NPC_ALERT_RANGE = new Vector2(6, 4);
+	Vector2 NPC_ALERT_RANGE = new Vector2(12, 4);
 
 	// Used when getting user input to determine if key was down last frame
 	private bool oldUp = false;
 
-	bool isSuitActivated = true;
-
-	Color SuitActivatedColour = new Color(0, 1f, 1f, 1);
-	Color SuitDeactivatedColour = new Color(0, .5f, 0.6f, 1);
-
+	public AudioClip cantPlaceOrbSound;
+	public AudioClip placeOrbSound;
 	public GameObject orbPrefab;
 	public GameObject orbBeamPrefab;
 	public GameObject orbUiManagerPrefab;
 	OrbUiManager orbUiManager;
 	OrbBeamRangeManager orbBeamRangeManager;
-	AudioSource orbAudioSource;
+	AudioSource cantPlaceOrbAudioSource;
+	AudioSource placeOrbAudioSource;
 
 	Queue<Orb> orbs;
 
@@ -46,10 +44,14 @@ public class Hunter : Character {
 			// Initialize it with the maximum orbs to spawn
 			orbUiManager.setMaxOrbCount(MAX_ORB_COUNT);
 
-			orbAudioSource = GetComponent<AudioSource>();
+			cantPlaceOrbAudioSource = Utility.AddAudioSource(gameObject, cantPlaceOrbSound);
+
 		} else {
 			orbBeamRangeManager.shouldShowMarkers = false;
 		}
+		
+		GetComponentInChildren<SpriteTransform>().SetTargetTransform(transform);
+		placeOrbAudioSource = Utility.AddAudioSource(gameObject, placeOrbSound);
 	}
 
 	protected override void HandleInput()  {
@@ -86,15 +88,11 @@ public class Hunter : Character {
 		if (Input.GetMouseButtonDown(1)) {
 			AttemptToRecallOrb();
 		}
-		// De-activate suit
-		isSuitActivated = !Input.GetKey(KeyCode.LeftShift);
-		spriteRenderer.color = isSuitActivated ? SuitActivatedColour : SuitDeactivatedColour;
 	}
 
 	#region [Public Methods]
 	
 	public void Repel(Vector2 forceDirection, float force) {
-		if (!isSuitActivated) return;
 		// Distribute the force between the x and y coordinates
 		forceDirection.Normalize();
 		forceDirection *= force;
@@ -127,7 +125,8 @@ public class Hunter : Character {
 
 	void OrbSpawnFailed() {
 		orbUiManager.FlashPlaceholders();
-		orbAudioSource.Play();
+		orbUiManager.ShowRecallAlert();
+		cantPlaceOrbAudioSource.Play();
 	}
 
 	void AttemptToRecallOrb() {
@@ -174,6 +173,7 @@ public class Hunter : Character {
 		// Create orb game object
 		GameObject orbGameObject = Instantiate(orbPrefab, atPosition, Quaternion.identity);
 		Orb orb = orbGameObject.GetComponent<Orb>();
+		placeOrbAudioSource.Play();
 
 		AlertNpcsInRange(atPosition);
 

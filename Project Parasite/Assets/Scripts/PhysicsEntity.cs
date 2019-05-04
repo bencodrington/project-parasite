@@ -14,7 +14,7 @@ public class PhysicsEntity {
 
 	#region [Private Variables]
 	/// Constants ///
-	const float DEFAULT_GRAVITY = -2f;
+	const float DEFAULT_GRAVITY = -1f;
 	// While on the ground, horizontal velocity is divided by this constant
 	// 	a value of 1 indicates no friction
 	//  a value of 2 indicates that horizontal velocity should be halved each physics update
@@ -128,8 +128,6 @@ public class PhysicsEntity {
 		transformPosition = newPosition;
 		CacheSensorPixels(newPosition);
 	}
-
-	public float GravityAcceleration() { return gravityAcceleration; }
 
 	public void AddVelocity(float x, float y) {
 		velocityX += x;

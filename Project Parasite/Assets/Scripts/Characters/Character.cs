@@ -5,7 +5,8 @@ using UnityEngine;
 
 public abstract class Character : MonoBehaviourPun {
 
-	protected SpriteRenderer spriteRenderer;
+	protected SpriteRenderer[] spriteRenderers;
+	protected Animator animator;
 	protected PhysicsEntity physicsEntity;
 
 	protected List<InteractableObject> objectsInRange = new List<InteractableObject>();
@@ -54,14 +55,12 @@ public abstract class Character : MonoBehaviourPun {
 	#region [MonoBehaviour Callbacks]
 
 	void Start() {
-		spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+		spriteRenderers = GetSpriteRenderers();
+		animator = GetComponentInChildren<Animator>();
 		GeneratePhysicsEntity();
 		OnStart();
-
+		// Only continue if this client owns this gameObject
 		if (!HasAuthority()) { return; }
-    	//  Set character as new target of camera
-    	SetCameraFollow();
-    	SetRenderLayer();
 		SendPositionUpdate(true);
 		timeBetweenPositionUpdates = 1f / POSITION_UPDATES_PER_SECOND;
 	}
@@ -72,6 +71,9 @@ public abstract class Character : MonoBehaviourPun {
 			// This character belongs to this client
 			HandleInput();
 			HandlePositionAndInputUpdates();
+		}
+		if (animator) {
+			animator.SetBool("isRunning", (isMovingLeft || isMovingRight));
 		}
 	}
 	
@@ -131,8 +133,8 @@ public abstract class Character : MonoBehaviourPun {
 		}
 	}
 
-	public void SetCameraFollow() {
-		FindObjectOfType<CameraFollow>().SetTarget(transform);
+	public void SetCameraFollow(bool forceSnapToTarget) {
+		FindObjectOfType<CameraFollow>().SetTarget(transform, forceSnapToTarget);
 	}
 
 	public void RegisterInteractableObject(InteractableObject netId) {
@@ -142,8 +144,14 @@ public abstract class Character : MonoBehaviourPun {
 		objectsInRange.Remove(netId);
 	}
 
-	public void SetRenderLayer() {
-		spriteRenderer.sortingLayerName = "ClientCharacter";
+	public void SetRenderLayer(string renderLayerName = "ClientCharacter") {
+		// CLEANUP: This can be neater
+		if (spriteRenderers == null) {
+			spriteRenderers = GetSpriteRenderers();
+		}
+		foreach (SpriteRenderer sR in spriteRenderers) {
+			sR.sortingLayerName = renderLayerName;
+		}
 	}
 
 	public void SetStartingVelocity(Vector2 velocity) {
@@ -153,6 +161,10 @@ public abstract class Character : MonoBehaviourPun {
 			GeneratePhysicsEntity();
 		}
 		physicsEntity.AddVelocity(velocity.x, velocity.y);
+	}
+
+	public virtual bool IsUninfectedNpc() {
+		return false;
 	}
 	
 	#endregion
@@ -179,7 +191,7 @@ public abstract class Character : MonoBehaviourPun {
 	protected virtual void OnCharacterDestroy() {}
 	
 	protected bool HasAuthority() {
-		return (photonView.IsMine || !PhotonNetwork.IsConnected);
+		return photonView.IsMine;
 	}
 
 	protected void HandlePositionAndInputUpdates() {
@@ -191,9 +203,26 @@ public abstract class Character : MonoBehaviourPun {
 		}
 	}
 
+	protected void SetSpriteRenderersColour(Color color) {
+		foreach (SpriteRenderer sR in spriteRenderers) {
+			sR.color = color;
+		}
+	}
+
 	#endregion
 
 	#region [Private Methods]
+
+	SpriteRenderer[] GetSpriteRenderers() {
+		List<SpriteRenderer> renderers = new List<SpriteRenderer>();
+		foreach (SpriteRenderer sR in GetComponentsInChildren<SpriteRenderer>()) {
+			// Exclude renderers that shouldn't be controlled by this code (e.g. arrow indicator for parasite)
+			if (!sR.gameObject.CompareTag("IgnoreComponent")) {
+				renderers.Add(sR);
+			}
+		}
+		return renderers.ToArray();
+	}
 	
 	void GeneratePhysicsEntity() {
 		if (physicsEntity != null) {

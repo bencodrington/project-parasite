@@ -14,6 +14,9 @@ public class OrbUiManager : MonoBehaviour {
 	Image[] orbSpritePlaceholders;
 	Color PLACEHOLDER_DEFAULT_COLOUR = new Color(0, 1, 1, 0.25f);
 	Color PLACEHOLDER_FLASH_COLOUR = Color.red;
+	// The "Press Right Click to Recall Orb" alert that shows when
+	// 	the player attempts to place an orb when they have none left
+	public GameObject recallOrbAlertPrefab;
 
 	const float DISTANCE_BETWEEN_ORB_SPRITES = 10;
 	const float ORB_SPRITE_WIDTH = 100;
@@ -68,12 +71,12 @@ public class OrbUiManager : MonoBehaviour {
 		return orbSpritePlaceholder;
 	}
 
-	public void OnOrbCountChange(int numberOfOrbsPlaced) {
-		UpdateOrbSpriteCount(numberOfOrbsPlaced);
-	}
-
 	void UpdateOrbSpriteCount(int numberOfOrbsPlaced) {
 		int numOrbsRemaining = maxOrbCount - numberOfOrbsPlaced;
+		if (flashing != null) {
+			// Must have recalled an orb while flashing placeholders
+			StopCoroutine(flashing);
+		}
 		while (numOrbSpritesEnabled < numOrbsRemaining) {
 			// Enable sprite
 			EnableOrbSprite();
@@ -101,6 +104,8 @@ public class OrbUiManager : MonoBehaviour {
 		float x = (-(DISTANCE_BETWEEN_ORB_SPRITES + ORB_SPRITE_WIDTH) * index) - ORB_SPRITE_WIDTH / 2;
 		return new Vector2(x, ORB_SPRITE_HEIGHT / 2);
 	}
+	
+	#region [Public Methods]
 
 	public void FlashPlaceholders() {
 		if (flashing != null) {
@@ -108,6 +113,19 @@ public class OrbUiManager : MonoBehaviour {
 		}
 		flashing = StartCoroutine(Flash());
 	}
+
+	public void ShowRecallAlert() {
+		// Spawn alert at mouse position
+		Instantiate(recallOrbAlertPrefab,
+					Utility.GetMousePos(),
+					Quaternion.identity);
+	}
+
+	public void OnOrbCountChange(int numberOfOrbsPlaced) {
+		UpdateOrbSpriteCount(numberOfOrbsPlaced);
+	}
+	
+	#endregion
 
 	IEnumerator Flash() {
 		int numFlashesCompleted = 0;

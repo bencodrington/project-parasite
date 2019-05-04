@@ -16,18 +16,36 @@ public class NonPlayerCharacter : Character {
 
 	#region [Private Variables]
 	
-	private const float PARASITE_LAUNCH_VELOCITY = 30f;
+	const float PARASITE_LAUNCH_VELOCITY = 20f;
+	// The amount of time Action 2 must be held before the NPC can be burst
+	//	upon ejecting
+	const float MIN_BURST_TIME = 1f;
+
+	// The range of distances that NPCs will randomly select from
+	// 	when choosing a new point to travel to
+	const float MAX_TARGET_DISTANCE = 5f;
+	const float MIN_TARGET_DISTANCE = 2f;
+
+	// The farthest that NPCs will try to move when running away
+	const float FLEE_DISTANCE = 8f;
+
+	BurstIndicator burstIndicator;
 
 	// Pathfinding
-	private float validDistanceFromTarget = .5f;
+	float validDistanceFromTarget = .5f;
 	// Note that target is currently only used to move horizontally,
 	//	and as a result is only the x coordinate of the target location
-	private float targetX;
-	private float minTimeUntilNewPath = 2f;
-	private float maxTimeUntilNewPath = 5f;
-	private bool hasTarget = false;
-	private float maxTargetDistance = 5f;
-	private float minTargetDistance = 2f;
+	float targetX;
+	float minTimeUntilNewPath = 2f;
+	float maxTimeUntilNewPath = 5f;
+	bool hasTarget = false;
+
+	// The amount of time Action 2 has been held down since it was pressed
+	float timeChargingForBurst = 0f;
+	bool isChargingForBurst = false;
+
+	// Whether or not right click was being pressed last frame
+	bool oldAction2;
 
 	// How far from the npc's center to display the icon
 	Vector2 ALERT_ICON_OFFSET = new Vector2(0, 1);
@@ -38,11 +56,22 @@ public class NonPlayerCharacter : Character {
 		// This function is only called when this NPC is infected,
 		// 	and is only called on the Parasite player's client
 		// Movement
-		HandleHorizontalMovement();
-		// Self Destruct
-		if (Input.GetMouseButtonDown(1)) {
-			BurstMeatSuit();
+		if (isChargingForBurst) {
+			isMovingLeft = false;
+			isMovingRight = false;
+		} else {
+			// Only allow movement if we're not charging
+			HandleHorizontalMovement();
 		}
+
+		// Self Destruct
+		bool action2 = Input.GetMouseButton(1);
+		if (action2 && !oldAction2) {
+			OnAction2Down();
+		} else if (oldAction2 && !action2) {
+			OnAction2Up();
+		}
+		oldAction2 = action2;
 
 		if (Input.GetKeyDown(KeyCode.E)) {
 			InteractWithObjectsInRange();
@@ -68,8 +97,10 @@ public class NonPlayerCharacter : Character {
 
 	public void Infect() {
 		isInfected = true;
+		// Right click was pressed last frame on the parasite player's client
+		oldAction2 = true;
 		// Only update sprite if on the Parasite player's client
-		spriteRenderer.color = Color.magenta;
+		SetSpriteRenderersColour(Color.magenta);
 	}
 
 	public void NearbyOrbAlert(Vector2 atPosition) {
@@ -86,6 +117,11 @@ public class NonPlayerCharacter : Character {
 	}
 	
 	#endregion
+	
+	protected override void OnStart() {
+		burstIndicator = GetComponentInChildren<BurstIndicator>();
+		burstIndicator.SetTimeToFill(MIN_BURST_TIME);
+	}
 
 	#region [MonoBehaviour Callbacks]
 	
@@ -94,6 +130,7 @@ public class NonPlayerCharacter : Character {
 			// NPC is infected and this client is the Parasite player's client
 			HandleInput();
 			HandlePositionAndInputUpdates();
+			HandleBurstCharging();
 		} else if (!isInfected && HasAuthority()) {
 			// NPC still belongs to the server
 			TraversePath();
@@ -103,7 +140,32 @@ public class NonPlayerCharacter : Character {
 	
 	#endregion
 
+	public override bool IsUninfectedNpc() {
+		return !isInfected;
+	}
+
 	#region [Private Methods]
+
+	void OnAction2Down() {
+		timeChargingForBurst = 0f;
+		isChargingForBurst = true;
+		burstIndicator.StartFilling();
+	}
+
+	void OnAction2Up() {
+		if (!isChargingForBurst) {
+			// When Action 2 was pressed, it was used to infect this NPC
+			// Require another press of Action 2 to eject/burst
+			return;
+		}
+		isChargingForBurst = false;
+		burstIndicator.StopFilling();
+		if (timeChargingForBurst > MIN_BURST_TIME) {
+			BurstMeatSuit();
+		} else {
+			EjectMeatSuit();
+		}
+	}
 
 	void TraversePath() {
 		isMovingLeft = false;
@@ -126,9 +188,9 @@ public class NonPlayerCharacter : Character {
 
 	void FindNewPath() {
 		// Randomly select offset that is +/-[minTargetDistance, maxTargetDistance]
-		float rangeDifference = maxTargetDistance - minTargetDistance;
+		float rangeDifference = MAX_TARGET_DISTANCE - MIN_TARGET_DISTANCE;
 		float offset = Random.Range(-rangeDifference, rangeDifference);
-		offset += (offset >= 0) ? minTargetDistance : -minTargetDistance;
+		offset += (offset >= 0) ? MIN_TARGET_DISTANCE : -MIN_TARGET_DISTANCE;
 		// Set target relative to current location
 		targetX = transform.position.x + offset;
 		// If there is a wall/ beam in the way, don't move to new target
@@ -138,7 +200,8 @@ public class NonPlayerCharacter : Character {
 	}
 
 	float ModifyTargetToAvoidObstacles(float target) {
-		Vector2 pathHitboxSize = new Vector2(target - transform.position.x, spriteRenderer.transform.localScale.y);
+		// TODO: fix following line
+		Vector2 pathHitboxSize = new Vector2(target - transform.position.x, spriteRenderers[0].transform.localScale.y);
 		// TODO: the below can cause npcs to walk into beams at head height,
 		//  but also stops the hitbox from being triggered by the floor
 		pathHitboxSize.y -= 0.1f;
@@ -154,7 +217,7 @@ public class NonPlayerCharacter : Character {
 
 	void FleeOrbInDirection(Utility.Directions direction) {
 		// Target a location that is the maximum movement unit away from the current position
-		float offset = direction == Utility.Directions.Right ? maxTargetDistance : -maxTargetDistance;
+		float offset = direction == Utility.Directions.Right ? FLEE_DISTANCE : -FLEE_DISTANCE;
 		// Without running into obstacles (walls/beams)
 		targetX = FindTargetBeforeObstacle(transform.position.x + offset);
 		hasTarget = true;
@@ -162,7 +225,7 @@ public class NonPlayerCharacter : Character {
 
 	float FindTargetBeforeObstacle(float target) {
 		// Size of box that will be cast to look for obstacles
-		Vector2 size = new Vector2(spriteRenderer.transform.localScale.x, spriteRenderer.transform.localScale.y);
+		Vector2 size = new Vector2(spriteRenderers[0].transform.localScale.x, spriteRenderers[0].transform.localScale.y);
 		// TODO: the below can cause npcs to walk into beams at head height,
 		//  but also stops the hitbox from being triggered by the floor
 		size.y -= 0.1f;
@@ -186,6 +249,19 @@ public class NonPlayerCharacter : Character {
 		SpawnParasite();
 	}
 
+	void EjectMeatSuit() {
+		SpawnParasite();
+		Uninfect();
+	}
+
+	void Uninfect() {
+		isInfected = false;
+		// Only update sprite if on the Parasite player's client
+		SetSpriteRenderersColour(Color.white);
+		// Return npc to the same render layer as the other NPCs
+		SetRenderLayer("Characters");
+	}
+
 	void DespawnSelf() {
 		// Send out an event to decrement counter
 		EventCodes.RaiseEventAll(EventCodes.NpcDespawned, null);
@@ -193,7 +269,13 @@ public class NonPlayerCharacter : Character {
 	}
 
 	void SpawnParasite() {
-		PlayerObject.SpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY));
+		PlayerObject.SpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY), false);
+	}
+
+	void HandleBurstCharging() {
+		if (isChargingForBurst) {
+			timeChargingForBurst += Time.deltaTime;
+		}
 	}
 	
 	#endregion

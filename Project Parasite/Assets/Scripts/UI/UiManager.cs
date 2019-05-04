@@ -40,6 +40,14 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	Color LOSS_COLOUR = Color.red;
 
 	const int UI_PADDING_DISTANCE = 9;
+
+	GameObject mainMenu;
+	GameObject lobby;
+	GameObject startGameButton;
+    GameObject readyToggleButton;
+    GameObject randomParasiteToggleButton;
+	GameObject selectParasiteButton;
+	GameObject selectHunterButton;
     
     #endregion
 
@@ -78,6 +86,34 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	public Transform GetCanvas() {
 		return canvas;
 	}
+
+	public void ShowMainMenu() {
+		mainMenu.SetActive(true);
+	}
+
+	public void OnJoinedRoom() {
+		// Show the lobby
+		mainMenu.SetActive(false);
+		lobby.SetActive(true);
+		// Only show the Random Character Select toggle button if this is the Master Client
+		randomParasiteToggleButton.SetActive(PhotonNetwork.IsMasterClient);
+	}
+
+	public void SetStartGameButtonActive(bool isActive) {
+		startGameButton.SetActive(isActive);
+	}
+
+	public void UpdateHealthObject(int newValue) {
+		topRightUiText.text = newValue.ToString();
+	}
+
+	public void OnIsRandomParasiteChanged(bool isRandomParasite) {
+        // Only need to show ready button if parasite is randomly selected
+        readyToggleButton.SetActive(isRandomParasite);
+		// Only need to show character select buttons if it isn't
+		selectHunterButton.SetActive(!isRandomParasite);
+		selectParasiteButton.SetActive(!isRandomParasite);
+	}
     
     #endregion
 
@@ -93,6 +129,24 @@ public class UiManager : MonoBehaviour, IOnEventCallback
             return;
         }
         Instance = this;
+		mainMenu = GameObject.FindGameObjectWithTag("Main Menu");
+		lobby = GameObject.FindGameObjectWithTag("Lobby");
+		startGameButton = GameObject.FindObjectOfType<StartGameButton>().gameObject;
+        readyToggleButton = FindObjectOfType<ReadyButton>().gameObject;
+        randomParasiteToggleButton = FindObjectOfType<RandomParasiteButton>().gameObject;
+		foreach (CharacterSelectButton selectButton in FindObjectsOfType<CharacterSelectButton>()) {
+			if (selectButton.characterType == CharacterType.Parasite) {
+				selectParasiteButton = selectButton.gameObject;
+			} else if (selectButton.characterType == CharacterType.Hunter) {
+				selectHunterButton = selectButton.gameObject;
+			}
+		}
+
+		mainMenu.SetActive(false);
+		lobby.SetActive(false);
+		startGameButton.SetActive(false);
+        readyToggleButton.SetActive(false);
+		randomParasiteToggleButton.SetActive(false);
     }
 
     void Start() {
@@ -109,21 +163,13 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 
     #region [Private Methods]
 
-	public void UpdateHealthObject(int newValue) {
-		topRightUiText.text = newValue.ToString();
-	}
-
     void DestroyTitleScreen() {
         Destroy(GameObject.FindWithTag("TitleScreen"));
     }
 
     void HideMenu() {
-        Menu menu = FindObjectOfType<Menu>();
-        if (menu == null) {
-            Debug.LogError("UiManager: HideMenu: Menu not found");
-            return;
-        }
-        menu.DeleteMenuItems();
+		mainMenu.SetActive(false);
+		lobby.SetActive(false);
     }
 
     void ShowGameOverScreen(CharacterType victorType) {

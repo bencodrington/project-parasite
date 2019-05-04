@@ -17,9 +17,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 	#endregion
 
 	#region [Private Variables]
-	
-	GameObject HunterPrefab;
-	GameObject ParasitePrefab;
 
 	GameObject characterGameObject;
 	RoundManager roundManager;
@@ -32,10 +29,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 	int ParasiteHealth {
 		get { return _parasiteHealth; }
 		set {
-			if (value < _parasiteHealth) {
-				// Notify parasite that it is taking damage
-				characterGameObject.GetComponent<Parasite>().OnTakingDamage();
-			}
 			_parasiteHealth = Mathf.Clamp(value, 0, STARTING_PARASITE_HEALTH);
 			UiManager.Instance.UpdateHealthObject(_parasiteHealth);
 			if (value <= 0 && !hasSentGameOver) {
@@ -71,8 +64,9 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 
 	#region [Public Methods]
 	
-	public void SpawnPlayerCharacter(CharacterType assignedCharacterType, Vector3 atPosition, Vector2 velocity) {
-		GameObject characterPrefab = assignedCharacterType == CharacterType.Parasite ? ParasitePrefab : HunterPrefab;
+	public void SpawnPlayerCharacter(CharacterType assignedCharacterType, Vector3 atPosition, Vector2 velocity, bool forceCameraSnap = true) {
+		String characterPrefabName = assignedCharacterType == CharacterType.Parasite ? "Parasite" : "Hunter";
+		GameObject characterPrefab = Resources.Load(characterPrefabName) as GameObject;
     	// Create PlayerCharacter game object on the server
     	characterGameObject = PhotonNetwork.Instantiate(characterPrefab.name, atPosition, Quaternion.identity);
     	// Get PlayerCharacter script
@@ -80,6 +74,10 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
     	// Initialize each player's character on their own client
     	character.SetStartingVelocity(velocity);
     	character.PlayerObject = this;
+		// Make the camera follow this character
+    	character.SetCameraFollow(forceCameraSnap);
+		// Make the character draw in front of other characters
+    	character.SetRenderLayer();
 		hasSentGameOver = false;
 		if (assignedCharacterType == CharacterType.Parasite) {
 			ParasiteHealth = STARTING_PARASITE_HEALTH;
@@ -89,11 +87,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 	#endregion
 
 	#region [MonoBehaviour Callbacks]
-
-	void Start() {
-		ParasitePrefab = Resources.Load("Parasite") as GameObject;
-		HunterPrefab = Resources.Load("Hunter") as GameObject;
-	}
 	
 	public void OnEnable() {
 		PhotonNetwork.AddCallbackTarget(this);
@@ -115,12 +108,4 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 	
 	#endregion
 
-    // public void CmdAssignCharacterTypeAndSpawnPoint(CharacterType characterType, Vector2 spawnPoint) {
-    // 	// Spawn Character across clients
-    // 	CmdSpawnPlayerCharacter(characterType, spawnPoint, Vector2.zero);
-    // 	// Update grid entry to include new character type
-    // 	PlayerGrid.Instance.CmdSetCharacterType(netId, characterType);
-    // 	// Update HUD to show necessary information for this character type
-    // 	RpcUpdateHud();
-    // }
 }

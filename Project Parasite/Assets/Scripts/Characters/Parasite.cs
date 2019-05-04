@@ -6,20 +6,36 @@ using UnityEngine.Networking;
 
 public class Parasite : Character {
 
-	private float jumpVelocity = 30f;
-	private const float MAX_POUNCE_VELOCITY = 45f;
+	#region [Public Variables]
+	
+	public AudioClip screechSound;
+	
+	#endregion
+
+	#region [Private Variables]
+
+	// The distance from the parasite that it can infect NPCs
+	const float INFECT_RADIUS = 1f;
+
+	AudioSource screechAudioSource;
+	
+	Color IS_ATTEMPTING_INFECTION_COLOUR = new Color(1, 0, 0, 1);
+	Color RESTING_COLOUR = Color.white;
+
+	float jumpVelocity = 12f;
+	const float MAX_POUNCE_VELOCITY = 30f;
 	// Whether the directional keys were being pressed last frame
-	private bool oldUp = false;
-	private bool oldRight = false;
-	private bool oldLeft = false;
+	bool oldUp = false;
+	bool oldRight = false;
+	bool oldLeft = false;
 	// Whether the action1 key was being pressed last frame
-	private bool oldAction1 = false;
+	bool oldAction1 = false;
 
 	// How many seconds the parasite has been charging to pounce
-	private float timeSpentCharging = 0f;
+	float timeSpentCharging = 0f;
 	// The pounce speed will be capped off after this many seconds
-	private const float MAX_CHARGE_TIME = 1.5f;
-	private bool IsChargingPounce() {
+	const float MAX_CHARGE_TIME = 1.5f;
+	bool IsChargingPounce() {
 		return timeSpentCharging > 0f;
 	}
 
@@ -35,13 +51,12 @@ public class Parasite : Character {
 		}
 	}
 	void SetIsAttemptingInfectionSprite(bool isAttempting) {
-		spriteRenderer.color = new Color(1, isAttempting ? .5f : 0, 0, 1);
+		SetSpriteRenderersColour(isAttempting ? IS_ATTEMPTING_INFECTION_COLOUR : RESTING_COLOUR);
 	}
 
 	bool oldIsTryingToStickToCeiling;
 
 	PounceIndicator pounceIndicator;
-
 	PounceIndicator PounceIndicator {
 		get {
 			if (pounceIndicator == null) {
@@ -51,11 +66,13 @@ public class Parasite : Character {
 		}
 	}
 
+	SpriteTransform spriteTransform;
+
 	// The direction that the parasite is attached to (left wall, right wall, ceiling)
 	// 	when it began charging a pounce
 	private Utility.Directions attachedDirection = Utility.Directions.Null;
-	// The distance from the parasite that it can infect NPCs
-	const float INFECT_RADIUS = 1f;
+	
+	#endregion
 
 	protected override void HandleInput()  {
 		// Movement
@@ -117,6 +134,8 @@ public class Parasite : Character {
 			PounceIndicator.Show();
 			UpdateAttachedDirection();
 		}
+		// TODO:
+		UpdateAttachedDirection();
 		if (action1) {
 			// Action key is down
 			// Charge leap
@@ -159,13 +178,22 @@ public class Parasite : Character {
 	}
 
 	#region [Public Methods]
-	
-	public void OnTakingDamage() {
-		StartCoroutine(FlashColours());
+
+	public void TakeDamage(int damage) {
+		if (photonView.IsMine) {
+			PlayerObject.ParasiteTakeDamage(damage);
+		}
+		OnTakingDamage();
 	}
 	
 	#endregion
 	
+	protected override void OnStart() {
+		spriteTransform = GetComponentInChildren<SpriteTransform>();
+		spriteTransform.SetTargetTransform(transform);
+		screechAudioSource = Utility.AddAudioSource(gameObject, screechSound, .2f);
+	}
+
 	#region [Private Methods]
 	
 	void UpdateAttachedDirection() {
@@ -177,6 +205,7 @@ public class Parasite : Character {
 		} else if (physicsEntity.IsOnRightWall()) {
 			attachedDirection = Utility.Directions.Right;
 		}
+		spriteTransform.SetRotateDirection(attachedDirection);
 	}
 
 	Vector2 CalculatePounceVelocity() {
@@ -198,11 +227,19 @@ public class Parasite : Character {
 	void ResetPounceCharge() {
 		timeSpentCharging = 0f;
 	}
+	
+	void OnTakingDamage() {
+		StartCoroutine(FlashColours());
+		if (!screechAudioSource.isPlaying) {
+			screechAudioSource.pitch = Random.Range(0.5f, 1.5f);
+			screechAudioSource.Play();
+		}
+	}
 
 	IEnumerator FlashColours() {
 		// How long to flash for
 		float timeRemaining = 0.5f;
-		Color currentColour = spriteRenderer.color;
+		Color currentColour = Color.red;
 		// Used for cycling colours
 		Dictionary<Color, Color> nextColour = new Dictionary<Color, Color>();
 		nextColour.Add(Color.red, Color.cyan);
@@ -213,11 +250,11 @@ public class Parasite : Character {
 			// Switch to next colour
 			nextColour.TryGetValue(currentColour, out currentColour);
 			// Update spriterenderer
-			spriteRenderer.color = currentColour;
+			SetSpriteRenderersColour(currentColour);
 			yield return null;
 		}
 		// Return to default colour
-		spriteRenderer.color = Color.red;
+		SetSpriteRenderersColour(RESTING_COLOUR);
 
 	}
 
@@ -237,7 +274,7 @@ public class Parasite : Character {
 		// Set isInfected to true/update sprite on new authority's client
 		npc.Infect();
 		// Update client's camera and render settings to reflect new character
-		npc.SetCameraFollow();
+		npc.SetCameraFollow(false);
 		npc.SetRenderLayer();
 	}
 	

@@ -14,6 +14,10 @@ public class OrbBeam : MonoBehaviour {
 	Ray2D hitboxRay;
 	Vector2 hitboxSize;
 	float hitboxAngle;
+	Color currentColour = Color.red;
+	// The opacity that the beam should be rendered at if
+	//	a hunter is blocking it
+	float blockedByHunterAlpha = 0.25f;
 
 	SpriteRenderer spriteRenderer;
 
@@ -35,31 +39,30 @@ public class OrbBeam : MonoBehaviour {
 		spriteRenderer.transform.Rotate(new Vector3(0, 0, hitboxAngle));
 	}
 
+	#region [MonoBehaviour Callbacks]
+
 	void FixedUpdate() {
-		Repel();
 		Fry();
 	}
 
-	void Repel() {
-		Vector2 projectionOntoOrbBeam, hunterPosition, forceDirection;
-		float distanceToHunter;
-		// Get the colliders of all hunters within range of the line
-		Collider2D[] energyCenterColliders = Physics2D.OverlapBoxAll(transform.position, hitboxSize, hitboxAngle, Utility.GetLayerMask("energyCenter"));
-		foreach (Collider2D energyCenterCollider in energyCenterColliders) {
-			Hunter hunter = energyCenterCollider.transform.parent.GetComponent<Hunter>();
-			hunterPosition = energyCenterCollider.transform.position;
-			// Find the point on the orb beam line that is nearest to the hunter
-			projectionOntoOrbBeam = Utility.ProjectOntoRay2D(hunterPosition, hitboxRay);
-			distanceToHunter = Vector2.Distance(projectionOntoOrbBeam, hunterPosition);
-			forceDirection = CalculateForceDirection(hunterPosition, projectionOntoOrbBeam);
-			// Default to launching hunters up
-			forceDirection = forceDirection == Vector2.zero ? Vector2.up : forceDirection;
-			// Repel hunter away from projected point with a force that is greater if the hunter is
-			//	close to the orb beam
-			hunter.Repel(forceDirection, CalculateForce(distanceToHunter));
-		}
+	void Update() {
+		// Flash colours
+		// Used for cycling colours
+		Dictionary<Color, Color> nextColour = new Dictionary<Color, Color>();
+		nextColour.Add(Color.red, Color.cyan);
+		nextColour.Add(Color.cyan, Color.yellow);
+		nextColour.Add(Color.yellow, Color.red);
+		// Switch to next colour
+		nextColour.TryGetValue(currentColour, out currentColour);
+		bool isOverlappingHunter = Physics2D.OverlapBox(transform.position, hitboxSize, hitboxAngle, Utility.GetLayerMask(CharacterType.Hunter));
+		// Update spriterenderer
+		SetColour(currentColour, isOverlappingHunter);
 	}
+	
+	#endregion
 
+	#region [Private Methods]
+	
 	void Fry() {
 		// Get the colliders of all NPCs that fall on the line
 		RaycastHit2D[] hits = Physics2D.LinecastAll(startPoint, endPoint, Utility.GetLayerMask(CharacterType.NPC));
@@ -77,9 +80,7 @@ public class OrbBeam : MonoBehaviour {
 		RaycastHit2D parasiteHit = Physics2D.Linecast(startPoint, endPoint, Utility.GetLayerMask(CharacterType.Parasite));
 		if (parasiteHit != false) {
 			parasite = parasiteHit.transform.parent.GetComponent<Parasite>();
-			if (parasite.photonView.IsMine) {
-				parasite.PlayerObject.ParasiteTakeDamage(1);
-			}
+			parasite.TakeDamage(1);
 		}
 	}
 
@@ -100,4 +101,16 @@ public class OrbBeam : MonoBehaviour {
 		float t = (distance - fullForceCutoff) / (energyRadius - fullForceCutoff);
 		return Mathf.Lerp(energyForce, 0, t);
 	}
+
+	void SetColour(Color colour, bool isOverlappingHunter) {
+		currentColour = colour;
+		// If hunter is blocking beam, fade the beam slightly
+		spriteRenderer.color = new Color(
+				colour.r, colour.g, colour.b,
+				isOverlappingHunter ? blockedByHunterAlpha : 1
+			);
+	}
+	
+	#endregion
+
 }

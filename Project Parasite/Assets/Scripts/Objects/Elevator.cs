@@ -10,6 +10,7 @@ public class Elevator : MonoBehaviourPun {
 	
 	public GameObject buttonPrefab;
 	public GameObject elevatorCallFieldPrefab;
+	public AudioClip elevatorArrivedSound;
 	
 	#endregion
 
@@ -33,6 +34,8 @@ public class Elevator : MonoBehaviourPun {
 	List<ElevatorCallField> callFields;
 
 	KinematicPhysicsEntity[] kinematicPhysicsEntities;
+
+	AudioSource elevatorArrivedSource;
 	
 	#endregion
 
@@ -70,6 +73,7 @@ public class Elevator : MonoBehaviourPun {
 	void Awake() {
 		kinematicPhysicsEntities = GetComponentsInChildren<KinematicPhysicsEntity>();
 		callFields = new List<ElevatorCallField>();
+		elevatorArrivedSource = Utility.AddAudioSource(gameObject, elevatorArrivedSound);
 	}
 
 	void OnDestroy() {
@@ -143,14 +147,18 @@ public class Elevator : MonoBehaviourPun {
 		passengers = Physics2D.OverlapAreaAll((Vector2)transform.position - halfSize,
 										(Vector2)transform.position + halfSize,
 										Utility.GetLayerMask("character"));
-		Debug.DrawLine((Vector2)transform.position - halfSize, (Vector2)transform.position + halfSize);
-		if (passengers.Length > 0) {
-			// Show buttons on client
-			SetAllButtonsActive(true);
-		} else {
-			// Hide buttons on client
-			SetAllButtonsActive(false);
+		// Only show elevator buttons if the client's character is in the elevator
+		Character character;
+		foreach (Collider2D collider in passengers) {
+			character = Utility.GetCharacterFromCollider(collider);
+			if (character.photonView.IsMine && !character.IsUninfectedNpc()) {
+				// Show buttons on client
+				SetAllButtonsActive(true);
+				return;
+			} 
 		}
+		// Client's character is not a passenger, so hide buttons
+		SetAllButtonsActive(false);
 	}
 
 	Vector2 GetPositionAfterOneMovementFrame(Vector2 currentPosition) {
@@ -158,10 +166,11 @@ public class Elevator : MonoBehaviourPun {
 		float potentialMovement = MOVEMENT_SPEED * Time.deltaTime;
 		targetPosition = new Vector2(transform.position.x, stopYCoordinates[targetStop]);
 		if (Vector3.Distance(transform.position, targetPosition) < potentialMovement) {
+			// Destination reached
 			isMoving = false;
+			elevatorArrivedSource.Play();
 			// Disable this floor's button
 			DisableButton(targetStop);
-			// Destination reached
 			return targetPosition;
 		} else {
 			return Vector3.MoveTowards(transform.position, targetPosition, potentialMovement);
