@@ -39,6 +39,10 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     Dictionary<int, bool> playersReady;
     bool isRandomParasite = false;
 
+    List<string> nicknames;
+    const char nicknameSeperator = "|";
+    const string nicknameKey = "NickNames";
+
     #endregion
 
     #region [Public Methods]
@@ -82,6 +86,8 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         } else {
             UiManager.Instance.ShowMainMenu();
         }
+        
+        fetchNicknames();
     }
     
     #endregion
@@ -121,6 +127,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
             // Update playersReady dictionary
             SetActorReady(actorNumber, isReady);
         } else if (photonEvent.Code == EventCodes.StartGame) {
+            storeNicknames();
             if (PhotonNetwork.IsMasterClient) {
                 StartGame();
             }
@@ -130,6 +137,33 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     }
 
     #region [Private Methods]
+
+    
+
+    void addNickname(string name){
+        nicknames.Add(name);
+    }
+    void deleteNickname(string name) {
+        nicknames.Remove(name) ? 
+            Debug.Log("Deleted Name:" + name) : 
+            Debug.Log("Name not found in nicknames: " + name);
+    }
+
+    void fetchNicknames(){
+        string nicknameString = PlayerPrefs.GetString(nicknameKey);
+        string[] arr = nicknameString.Split(nicknameSeperator);
+        for(int i = 0; i< arr.Length; i++){
+            nicknames.Add(arr[i]);
+        }
+    }
+
+    void storeNicknames(){
+        string str = "";
+        for (int i = 0; i ++; i<nicknames.Count){
+            str += nicknames[i] + nicknameSeperator;
+        }
+        PlayerPrefs.SetString(nicknameKey, str);
+    }
 
     void StoreClientName(string defaultName) {
         PhotonNetwork.LocalPlayer.NickName = GetClientName(defaultName);
