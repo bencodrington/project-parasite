@@ -37,6 +37,8 @@ public abstract class Character : MonoBehaviourPun {
 	// The higher this is, the snappier lag correction will be
 	// 	Should be in the range of (0..1]
 	const float LAG_LERP_FACTOR = 0.2f;
+	// The colour used when drawing debugging visuals
+	Color debugDrawColour = Color.magenta;
 	
 	#endregion
 
@@ -166,6 +168,36 @@ public abstract class Character : MonoBehaviourPun {
 	public virtual bool IsUninfectedNpc() {
 		return false;
 	}
+
+	public void DebugDrawBounds(bool drawPhysicsEntity = true, bool bottomOnly = false, float duration = 15) {
+		DebugDrawBounds(debugDrawColour, drawPhysicsEntity, bottomOnly, duration);
+		ModifyDebugDrawColour();
+	}
+
+	public void DebugDrawBounds(Color colour, bool drawPhysicsEntity = true, bool bottomOnly = false, float duration = 15) {
+		if (drawPhysicsEntity) {
+			physicsEntity.DebugDrawRayCastOrigins(duration);
+		}
+		BoxCollider2D collider = GetComponentInChildren<BoxCollider2D>();
+		float width = collider.size.x;
+		float height = collider.size.y;
+		Vector2 bottomLeft = (Vector2)transform.position + new Vector2(-width / 2, -height / 2);
+		Vector2 bottomRight = (Vector2)transform.position + new Vector2(width / 2, -height / 2);
+		Debug.DrawLine(bottomLeft, bottomRight, colour, duration);
+		if (!bottomOnly) {
+			Vector2 topLeft = (Vector2)transform.position + new Vector2(-width / 2, height / 2);
+			Vector2 topRight = (Vector2)transform.position + new Vector2(width / 2, height / 2);
+			Debug.DrawLine(topLeft, topRight, colour, duration);
+			Debug.DrawLine(topLeft, bottomLeft, colour, duration);
+			Debug.DrawLine(bottomRight, topRight, colour, duration);
+		}
+	}
+
+	public void Move(Vector2 displacement) {
+		// TODO: ensure that transform.position is always updated after physicsEntity's transformPosition is updated (update() and move()) ?
+		physicsEntity.Move(displacement);
+		transform.position = physicsEntity.transformPosition;
+	}
 	
 	#endregion
 
@@ -271,6 +303,20 @@ public abstract class Character : MonoBehaviourPun {
 		isMovingDown = ((byte) 2 & packedInputs) == 2;
 		isMovingLeft = ((byte) 4 & packedInputs) == 4;
 		isMovingRight = ((byte) 8 & packedInputs) == 8;
+	}
+
+	void ModifyDebugDrawColour() {
+		float rModifier = 1;
+		float gModifier = 1;
+		float bModifier = 1;
+		if (debugDrawColour.r >= 0.5) {
+			rModifier = 0.9f;
+		} else if (debugDrawColour.g >= 0.5) {
+			gModifier = 0.9f;
+		} else {
+			bModifier = 0.9f;
+		}
+		debugDrawColour = new Color(debugDrawColour.r * rModifier, debugDrawColour.g * gModifier, debugDrawColour.b * bModifier);
 	}
 	
 	#endregion

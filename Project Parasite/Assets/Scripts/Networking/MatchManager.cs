@@ -57,6 +57,22 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         byte eventCode = EventCodes.StartGame;
         EventCodes.RaiseEventAll(eventCode, null);
     }
+
+    public void DebugToggleTimeStop() {
+        roundManager.ToggleShouldRunPhysicsUpdate();
+    }
+
+    public void DebugSetShouldRunPhysicsUpdate(bool newValue) {
+        roundManager.SetShouldRunPhysicsUpdate(newValue);
+    }
+
+    public void AdvanceOnePhysicsUpdate() {
+        roundManager.AdvanceOnePhysicsUpdate();
+    }
+
+    public bool GetDebugMode() {
+        return DEBUG_MODE;
+    }
     
     #endregion
 
@@ -82,6 +98,12 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         } else {
             UiManager.Instance.ShowMainMenu();
         }
+    }
+
+    void Update() {
+		if (DEBUG_MODE && Input.GetKeyDown(KeyCode.T)) {
+			AdvanceOnePhysicsUpdate();
+		}
     }
     
     #endregion

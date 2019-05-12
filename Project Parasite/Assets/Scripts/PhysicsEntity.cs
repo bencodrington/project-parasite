@@ -1,19 +1,21 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-public class PhysicsEntity {
-	#region [Public Variables]
+public class PhysicsEntity : RaycastController {
 	
-	// The current in-world position of the physics entity
-	// 	Separate from the object's transform.position as this
-	// 	lets us accurately run the physics simulation while smoothly
-	// 	interpolating the visual representation to the correct position
-	public Vector2 transformPosition {get; private set;}
+	public struct CollisionInfo {
+		public bool above, below;
+		public bool left, right;
 	
-	#endregion
+		public void Reset() {
+			above = below = false;
+			left = right = false;
+		}
+	}
 
 	#region [Private Variables]
 	/// Constants ///
+	int OBSTACLE_MASK = Utility.GetLayerMask("obstacle");
 	const float DEFAULT_GRAVITY = -1f;
 	// While on the ground, horizontal velocity is divided by this constant
 	// 	a value of 1 indicates no friction
@@ -21,15 +23,12 @@ public class PhysicsEntity {
 	const float DEFAULT_FRICTION_DENOMINATOR = 1.25f;
 	// How far above and below to check for floor to see if we're outside the map
 	const float OUTSIDE_MAP_DISTANCE = 100f;
-	
 	// The (currently only vertical) velocity of kinematic objects affecting this entity
 	//	e.g. elevators, etc.
 	float movingObstacleVelocity;
 
-	// Hitbox dimensions: 2*height by 2*width
-	float height;
-	float width;
 	/// Velocity ///
+	// Speed in units / second
 	float velocityX = 0f;
 	float velocityY = 0f;
 
@@ -40,6 +39,7 @@ public class PhysicsEntity {
 	// 	this allows us to limit movement speed on its own
 	float inputVelocityX = 0f;
 	float inputVelocityY = 0f;
+	public CollisionInfo collisionInfo;
 
 	#endregion
 	/// Objects ///
@@ -55,15 +55,11 @@ public class PhysicsEntity {
 	private Vector2 oldPixelToTheLeft;
 	private Vector2 oldPixelToTheRight;
 	// Public-facing methods for determining the state of the entity
-	private bool _isOnGround = false;
-	public bool IsOnGround() { return _isOnGround; }
-	private bool _isOnCeiling = false;
-	public bool IsOnCeiling() { return _isOnCeiling; }
-	private bool _isOnLeftWall = false;
-	public bool IsOnLeftWall() { return _isOnLeftWall; }
-	private bool _isOnRightWall = false;
-	public bool IsOnRightWall() { return _isOnRightWall; }
-	public bool IsOnWall() { return _isOnLeftWall || _isOnRightWall; }
+	public bool IsOnGround()	{ return collisionInfo.below; }
+	public bool IsOnCeiling()	{ return collisionInfo.above; }
+	public bool IsOnLeftWall()	{ return collisionInfo.left;  }
+	public bool IsOnRightWall()	{ return collisionInfo.right; }
+	public bool IsOnWall() { return IsOnLeftWall() || IsOnRightWall(); }
 	public bool applyGravity = true;
 	bool _isTryingToStickToCeiling = false;
 	public void SetIsTryingToStickToCeiling(bool isTryingToStickToCeiling) {
@@ -75,58 +71,65 @@ public class PhysicsEntity {
 
 	#region [Public Methods]
 	
-	public PhysicsEntity(Transform transform, float height = 0.5f, float width = 0.5f) {
-		this.transformPosition = transform.position;
-		this.height = height;
-		this.width = width;
+	public PhysicsEntity(Transform transform, float height = 0.5f, float width = 0.5f) : base(transform, height, width) {
 		this.gravityAcceleration = DEFAULT_GRAVITY;
-		// Ensure that first collision check isn't from default positions (0, 0) to starting positions
-		CacheSensorPixels(transformPosition);
+	}
+
+	public void Move(Vector2 displacement) {
+		UpdateRayCastOrigins(transformPosition);
+		// Pass 'true' flag to indicate that this movement was caused by a platform
+		//  NOTE: if this function is ever updated to be more generic, that flag
+		// 		may not always be true
+		HandleVerticalCollisions(ref displacement, true);
+		HandleHorizontalCollisions(ref displacement);
+		SetTransformPosition(transformPosition + displacement);
+		UpdateRayCastOrigins(transformPosition);
 	}
 
 	// Called by the component that this entity simulates the physics for
 	// 	Should be called in the FixedUpdate() method of that MonoBehaviour
 	//	Therefore, should run every physics update, every ~0.02 seconds
 	public void Update () {
+
 		if (IsOutsideMap()) {
 			Debug.LogError("PLAYER OUTSIDE MAP");
 			transformPosition = Vector2.zero;
 			velocityX = 0;
 			velocityY = 0;
 			ResetInputVelocity();
-			CacheSensorPixels(transformPosition);
 			return;
 		}
-		HandleGravity();
-		ApplyFriction();
-		// Add velocity from moving obstacles nearby
-		// Note: movingObstacleVelocity is currently only in the y dimension as there do not currently exist
-		// 	any objects that can move the player horizontally
-		movingObstacleVelocity = GetMovingObstacleVelocity();
+
+		UpdateRayCastOrigins(transformPosition);
+		velocityY = HandleGravity(velocityY);
+		velocityY = HandleVerticalFriction(velocityY);
+		velocityX = HandleHorizontalFriction(velocityX);
+
 		Vector2 attemptedDisplacement = new Vector2(velocityX, velocityY) * Time.deltaTime;
-		// Don't multiply movingObstacleVelocity by Time.deltaTime
-		//	because it is calculated based on displacement since last frame
-		attemptedDisplacement += new Vector2(0, movingObstacleVelocity);
-		// Store scaled up version of movingObstacleVelocity in velocityY
-		// 	to incorporate it's changes in future frames
-		velocityY += movingObstacleVelocity / Time.deltaTime;
-		// Store attempted new position
-		Vector2 newPosition = (Vector2)transformPosition + attemptedDisplacement;
 		// Add velocity from character movement input
-		newPosition += new Vector2(inputVelocityX, inputVelocityY) * Time.deltaTime;
+		attemptedDisplacement += new Vector2(inputVelocityX, inputVelocityY) * Time.deltaTime;
+
+		collisionInfo.Reset();
 		// Check for and resolve collisions
-		newPosition = ResolveCollisionsAt(newPosition);
+		UpdateRayCastOrigins(transformPosition);
+		if (attemptedDisplacement.y != 0) {
+			HandleVerticalCollisions(ref attemptedDisplacement);
+		}
+		if (attemptedDisplacement.x != 0) {
+			HandleHorizontalCollisions(ref attemptedDisplacement);
+		}
 		// Set new position
-		transformPosition = newPosition;
-		// Cache the current sensor pixels for tracking movement next frame
-		CacheSensorPixels(newPosition);
+		transformPosition += attemptedDisplacement;
 		// Reset inputVelocity, as this should be manually controlled by the character each frame
 		ResetInputVelocity();
+		// Don't accumulate gravity if we're on the ground
+		if (collisionInfo.below) {
+			velocityY = 0;
+		}
 	}
 
 	public void SetTransformPosition(Vector2 newPosition) {
 		transformPosition = newPosition;
-		CacheSensorPixels(newPosition);
 	}
 
 	public void AddVelocity(float x, float y) {
@@ -134,8 +137,7 @@ public class PhysicsEntity {
 		velocityY += y;
 	}
 	public void AddVelocity(Vector2 velocity) {
-		velocityX += velocity.x;
-		velocityY += velocity.y;
+		AddVelocity(velocity.x, velocity.y);
 	}
 
 	public void AddInputVelocity(float velocityX, float velocityY) {
@@ -143,192 +145,162 @@ public class PhysicsEntity {
 		inputVelocityY += velocityY;
 	}
 
-	void ResetInputVelocity() {
-		inputVelocityX = 0;
-		inputVelocityY = 0;
+	public void DebugDrawRayCastOrigins(float duration = 15) {
+		Debug.DrawLine(rayCastOrigins.topLeft, rayCastOrigins.topRight, Color.yellow, duration);
+		Debug.DrawLine(rayCastOrigins.topLeft, rayCastOrigins.bottomLeft, Color.yellow, duration);
+		Debug.DrawLine(rayCastOrigins.topRight, rayCastOrigins.bottomRight, Color.yellow, duration);
+		Debug.DrawLine(rayCastOrigins.bottomLeft, rayCastOrigins.bottomRight, Color.yellow, duration);
 	}
+	
 	
 	#endregion
 
 	#region [Private Methods]
 	
+	void HandleVerticalCollisions(ref Vector2 attemptedDisplacement, bool isBeingMovedByPlatform = false) {
+		float directionY = Mathf.Sign(attemptedDisplacement.y);
+		float rayLength = Mathf.Abs(attemptedDisplacement.y) + SKIN_WIDTH;
+		Vector2 rayOrigin;
+		RaycastHit2D hit;
+		bool hasBeenShunted = false;
+		for (int i = 0; i < VERTICAL_RAY_COUNT; i++) {
+			// Check above if we're moving up, check below if we're moving down
+			rayOrigin = directionY == 1 ? rayCastOrigins.topLeft : rayCastOrigins.bottomLeft;
+			// Spread the rays out along the width of the entity
+			rayOrigin += Vector2.right * (i * verticalRaySpacing);
+			// Cast each ray
+			hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, OBSTACLE_MASK);
+			// Visuals for debugging
+			if (MatchManager.Instance.GetDebugMode()) {
+				// Draw ray origin
+				Debug.DrawLine(rayOrigin + Vector2.right * -0.01f, rayOrigin + Vector2.right * 0.01f, Color.blue);
+				// Draw ray we're actually firing
+				Debug.DrawRay(rayOrigin, Vector2.up * directionY * rayLength, Color.red);
+			}
+			if (hit) {
+				// Special case: we're being moved UP by a platform, colliding with a ceiling
+				// 	By design, this should never be a full ceiling, but rather a corner.
+				//	This means there should be a free space to one side of the entity.
+				if (!hasBeenShunted && isBeingMovedByPlatform && directionY == 1) {
+					attemptedDisplacement.x += GetShuntDistance(rayLength);
+					// Don't shunt for more than one ray
+					hasBeenShunted = true;
+				}
+				// Don't let entity move past the collision
+				attemptedDisplacement.y = (hit.distance - SKIN_WIDTH) * directionY;
+				// Don't bother checking farther than this collision for subsequent rays
+				rayLength = hit.distance;
+				// If we were travelling up, collision was above us
+				collisionInfo.above = directionY == 1;
+				collisionInfo.below = directionY == -1;
+				// If we've input a jump action while on a platform
+				// 	setting velocityY to 0 now will stop the jump from ever being applied
+				if (!isBeingMovedByPlatform) {
+					velocityY = 0;
+				}
+			}
+		}
+	}
+
+	float GetShuntDistance(float rayLength) {
+		Vector2 rayOrigin;
+		RaycastHit2D hit;
+		bool shuntRight = false;
+		int indexOfClearRay;
+		float shuntDistance = 0;
+		for (int i = 0; i < VERTICAL_RAY_COUNT; i++) {
+			rayOrigin = rayCastOrigins.topLeft + (Vector2.right * i * verticalRaySpacing);
+			hit = Physics2D.Raycast(rayOrigin, Vector2.up, rayLength, OBSTACLE_MASK);
+			if (i == 0) {
+				// If the first ray hits the ceiling, we'll be shunting in the other direction (RIGHT)
+				shuntRight = hit.collider != null;
+			} else if (!shuntRight && hit) {
+				// First ray didn't hit the ceiling, but a subsequent ray did
+				// 	Therefore the previous ray was the last ray that didn't hit the ceiling
+				// SHUNT LEFT
+				indexOfClearRay = i - 1;
+				shuntDistance = GetTopRayCastOriginAtIndex(indexOfClearRay).x - GetTopRayCastOriginAtIndex(VERTICAL_RAY_COUNT - 1).x - SKIN_WIDTH;
+				return shuntDistance;
+			} else if (shuntRight && !hit) {
+				// First ray hit the ceiling, but a subsequent ray didn't
+				// 	Therefore this ray is the first ray that didn't hit the ceiling
+				// SHUNT RIGHT
+				indexOfClearRay = i;
+				shuntDistance = GetTopRayCastOriginAtIndex(indexOfClearRay).x - GetTopRayCastOriginAtIndex(0).x + SKIN_WIDTH;
+				return shuntDistance;
+			}
+		}
+		Debug.LogError("PhysicsEntity: GetShuntDistance(): Unable to find clear space to shunt to.");
+		return 0;
+	}
+
+	void HandleHorizontalCollisions(ref Vector2 attemptedDisplacement) {
+		float directionX = Mathf.Sign(attemptedDisplacement.x);
+		float rayLength = Mathf.Abs(attemptedDisplacement.x) + SKIN_WIDTH;
+		Vector2 rayOrigin;
+		RaycastHit2D hit;
+		for (int i = 0; i < HORIZONTAL_RAY_COUNT; i++) {
+			// Check in the direction we're moving
+			rayOrigin = directionX == 1 ? rayCastOrigins.bottomRight : rayCastOrigins.bottomLeft;
+			// Spread the rays out along the height of the entity
+			rayOrigin += Vector2.up * (i * horizontalRaySpacing);
+			// Cast each ray
+			hit = Physics2D.Raycast(rayOrigin, Vector2.right * directionX, rayLength, OBSTACLE_MASK);
+			// Visuals for debugging
+			if (MatchManager.Instance.GetDebugMode()) {
+				// Draw ray origin
+				Debug.DrawLine(rayOrigin + Vector2.up * -0.01f, rayOrigin + Vector2.up * 0.01f, Color.blue);
+				// Draw ray we're actually firing
+				Debug.DrawRay(rayOrigin, Vector2.right * directionX * rayLength, Color.red);
+
+			}
+			if (hit) {
+				// Don't let entity move past the collision
+				attemptedDisplacement.x = (hit.distance - SKIN_WIDTH) * directionX;
+				// Don't bother checking farther than this collision for subsequent rays
+				rayLength = hit.distance;
+				// If we were travelling right, collision was to the right of us
+				collisionInfo.right = directionX == 1;
+				collisionInfo.left = directionX == -1;
+				velocityX = 0;
+			}
+		}
+	}
+	
 	bool IsOutsideMap() {
 		Vector3 pos = transformPosition;
+		// Check if there is an obstacle OUTSIDE_MAP_DISTANCE above or OUTSIDE_MAP_DISTANCE below us
 		RaycastHit2D hit = Physics2D.Raycast(new Vector2(pos.x, pos.y - OUTSIDE_MAP_DISTANCE), Vector2.up, OUTSIDE_MAP_DISTANCE * 2, Utility.GetLayerMask("obstacle"));
 		return !hit;
 	}
 
-	void HandleGravity() {
+	float HandleGravity(float _velocityY) {
 		if (applyGravity) {
-			// Apply Gravity
-			velocityY += IsStuckToCeiling() ? -gravityAcceleration : gravityAcceleration;
+			// CLEANUP:
+			_velocityY += IsStuckToCeiling() ? -gravityAcceleration : gravityAcceleration;
 		}
+		return _velocityY;
 	}
 
-	void ApplyFriction() {
-		// Apply horizontal friction
+	float HandleHorizontalFriction(float _velocityX) {
 		if (ShouldApplyHorizontalFriction()) {
-			velocityX /= DEFAULT_FRICTION_DENOMINATOR;
+			_velocityX /= DEFAULT_FRICTION_DENOMINATOR;
 		}
-		// Apply vertical friction
+		return _velocityX;
+	}
+
+	float HandleVerticalFriction(float _velocityY) {
 		if (IsMovingIntoWall()) {
-			velocityY /= DEFAULT_FRICTION_DENOMINATOR;
+			_velocityY /= DEFAULT_FRICTION_DENOMINATOR;
+			// Snap to 0
+			if (Mathf.Abs(_velocityY) < 0.001) { _velocityY = 0; }
 		}
+		return _velocityY;
 	}
 
-	float GetMovingObstacleVelocity() {
-		float relativeFloorVelocity = GetRelativeFloorVelocity();
-		float relativeCeilingVelocity = GetRelativeCeilingVelocity();
-		return relativeFloorVelocity + relativeCeilingVelocity;
-	}
-
-	float GetRelativeFloorVelocity() {
-		float relativeFloorVelocity = 0;
-		// Check if obstacle below has moved
-		// Note that obstacleBelow is leftover from last frame
-		if (obstacleBelow != null) {
-			relativeFloorVelocity = GetKinematicObstacleVelocity(obstacleBelow.gameObject) - getVerticalVelocity();
-			if (relativeFloorVelocity < 0) {
-				relativeFloorVelocity = 0;
-			}
-		}
-		return relativeFloorVelocity;
-	}
-
-	float GetRelativeCeilingVelocity() {
-		float relativeCeilingVelocity = 0;
-		// Check if obstacle above has moved
-		if (obstacleAbove != null) {
-			relativeCeilingVelocity = GetKinematicObstacleVelocity(obstacleAbove.gameObject) - getVerticalVelocity();
-			if (relativeCeilingVelocity > 0) {
-				relativeCeilingVelocity = 0;
-			}
-		}
-		return relativeCeilingVelocity;
-	}
-
-	float getVerticalVelocity() {
-		// Get the current velocity in the y dimension this frame
-		// 	Note that this value changes over the course of the update cycle as
-		//	additional factors are considered and added to velocityY
-		return (velocityY + inputVelocityY) * Time.deltaTime;
-	}
-
-	Vector2 ResolveCollisionsAt(Vector2 newPosition) {
-		// TODO: may be required to change the order of collision check and resolution
-		// TODO:	based off of velocity, as currently an entity travelling upward too fast
-		// TODO:	will check below first, which could result in a 'below' collision with the
-		// TODO:	ceiling, teleporting the entity outside the map.
-		// TODO:	Currently ordered this way because gravity can more easily surpass this limit
-		// Always check for relevant collisions at the most recent version of newPosition
-		CheckCollisionsBelow(newPosition);
-		newPosition = ResolveCollisionsBelow(newPosition);
-		CheckCollisionsAbove(newPosition);
-		newPosition = ResolveCollisionsAbove(newPosition);
-		CheckCollisionsLeftOf(newPosition);
-		newPosition = ResolveCollisionsLeftOf(newPosition);
-		CheckCollisionsRightOf(newPosition);
-		newPosition = ResolveCollisionsRightOf(newPosition);
-		return newPosition;
-	}
-
-	void CheckCollisionsAbove(Vector2 newPosition) {
-		Vector2 pixelAbove = GetPixelAbove(newPosition);
-		obstacleAbove = Physics2D.OverlapArea(oldPixelAbove, pixelAbove, Utility.GetLayerMask("obstacle"));
-	}
-	void CheckCollisionsBelow(Vector2 newPosition) {
-		Vector2 pixelBelow = GetPixelBelow(newPosition);
-		obstacleBelow = Physics2D.OverlapArea(oldPixelBelow, pixelBelow, Utility.GetLayerMask("obstacle"));
-	}
-	void CheckCollisionsLeftOf(Vector2 newPosition) {
-		Vector2 pixelToTheLeft 	= GetPixelToTheLeft(newPosition);
-		obstacleToTheLeft = Physics2D.OverlapArea(oldPixelToTheLeft, pixelToTheLeft, Utility.GetLayerMask("obstacle"));
-	}
-	void CheckCollisionsRightOf(Vector2 newPosition) {
-		Vector2 pixelToTheRight = GetPixelToTheRight(newPosition);
-		obstacleToTheRight = Physics2D.OverlapArea(oldPixelToTheRight, pixelToTheRight, Utility.GetLayerMask("obstacle"));
-	}
-	
-	Vector2 ResolveCollisionsAbove(Vector2 newPosition) {
-		float obstacleHeight;
-		// Set "is on ceiling" sensor to true whether we need to take it's velocity or not
-		// 	this lets us stick to a ceiling that's ascending faster than we are, for example
-		_isOnCeiling = obstacleAbove != null;
-		if (_isOnCeiling && ShouldCollideWithObstacleAbove()) {
-			// Set velocityY to the speed of the obstacle above
-			velocityY = GetKinematicObstacleVelocity(obstacleAbove.gameObject) / Time.deltaTime;
-			// Position self directly below the obstacle
-			obstacleHeight = obstacleAbove.transform.localScale.y / 2;
-			newPosition.y = obstacleAbove.transform.position.y - obstacleHeight - height;
-		}
-		return newPosition;
-	}
-	Vector2 ResolveCollisionsBelow(Vector2 newPosition) {
-		float obstacleHeight;
-		// Set "is on ground" sensor to true whether we need to take it's velocity or not
-		// 	this lets us jump off a platform that's descending faster than we are, for example
-		_isOnGround = obstacleBelow != null;
-		if (_isOnGround && ShouldCollideWithObstacleBelow()) {
-			// Set velocityY to the speed of the platform below
-			velocityY = GetKinematicObstacleVelocity(obstacleBelow.gameObject) / Time.deltaTime;
-			// Position self directly above the obstacle
-			obstacleHeight = obstacleBelow.transform.localScale.y / 2;
-			newPosition.y = obstacleBelow.transform.position.y + obstacleHeight + height;
-		}
-		return newPosition;
-	}
-	Vector2 ResolveCollisionsLeftOf(Vector2 newPosition) {
-		_isOnLeftWall = false;
-		float obstacleWidth;
-		if (obstacleToTheLeft != null && ShouldCollideWithObstacleToTheLeft()) {
-			// Stop moving
-			velocityX = 0;
-			// Align left edge of entity with right edge of obstacle
-			obstacleWidth = obstacleToTheLeft.transform.localScale.x / 2;
-			newPosition.x = obstacleToTheLeft.transform.position.x + obstacleWidth + width;
-			_isOnLeftWall = true;
-		}
-		return newPosition;
-	}
-	Vector2 ResolveCollisionsRightOf(Vector2 newPosition) {
-		_isOnRightWall = false;
-		float obstacleWidth;
-		if (obstacleToTheRight != null && ShouldCollideWithObstacleToTheRight()) {
-			// Stop moving
-			velocityX = 0;
-			// Align right edge of entity with left edge of obstacle
-			obstacleWidth = obstacleToTheRight.transform.localScale.x / 2;
-			newPosition.x = obstacleToTheRight.transform.position.x - obstacleWidth - width;
-			_isOnRightWall = true;
-		}
-		return newPosition;
-	}
-
-	bool ShouldCollideWithObstacleAbove() {
-		// Return true unless entity is moving down faster than ceiling is (e.g. falling away from it);
-		return getVerticalVelocity() >= GetKinematicObstacleVelocity(obstacleAbove.gameObject);
-	}
-	bool ShouldCollideWithObstacleBelow() {
-		// Return true unless our upward velocity is higher than the obstacle below's upward velocity
-		return GetKinematicObstacleVelocity(obstacleBelow.gameObject) >= getVerticalVelocity();
-	}
-	bool ShouldCollideWithObstacleToTheLeft() {
-		// Return true unless
-		bool shouldCollide = true;
-		// -- we're moving right
-		if (isMovingRight()) {
-			shouldCollide = false;
-		}
-		return shouldCollide;
-	}
-	bool ShouldCollideWithObstacleToTheRight() {
-		// Return true unless
-		bool shouldCollide = true;
-		// -- we're moving left
-		if (isMovingLeft()) {
-			shouldCollide = false;
-		}
-		return shouldCollide;
+	void ResetInputVelocity() {
+		inputVelocityX = 0;
+		inputVelocityY = 0;
 	}
 	bool isMovingLeft() {
 		return velocityX + inputVelocityX < 0;
@@ -342,34 +314,9 @@ public class PhysicsEntity {
 	}
 
 	bool ShouldApplyHorizontalFriction() {
-		return (applyGravity && _isOnGround) || IsStuckToCeiling();
+		return (applyGravity && IsOnGround()) || IsStuckToCeiling();
 	}
 
-	void CacheSensorPixels(Vector2 newPosition) {
-		oldPixelAbove = GetPixelAbove(newPosition);
-		oldPixelBelow = GetPixelBelow(newPosition);
-		oldPixelToTheLeft = GetPixelToTheLeft(newPosition);
-		oldPixelToTheRight = GetPixelToTheRight(newPosition);
-	}
-
-	float GetKinematicObstacleVelocity(GameObject obstacle) {
-		KinematicPhysicsEntity obstaclePhysicsEntity = obstacle.GetComponent<KinematicPhysicsEntity>();
-		return obstaclePhysicsEntity == null ? 0 : obstaclePhysicsEntity.GetVelocity().y;
-	}
-
-	Vector2 GetPixelBelow(Vector2 position) {
-		return position + new Vector2(0, -height);
-	}
-	Vector2 GetPixelAbove(Vector2 position) {
-		return position + new Vector2(0, height);
-	}
-	Vector2 GetPixelToTheLeft(Vector2 position) {
-		return position + new Vector2(-width, 0);
-	}
-	Vector2 GetPixelToTheRight(Vector2 position) {
-		return position + new Vector2(width, 0);
-	}
-	
 	#endregion
 
 	
