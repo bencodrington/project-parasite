@@ -55,16 +55,11 @@ public class PhysicsEntity : RaycastController {
 	private Vector2 oldPixelToTheLeft;
 	private Vector2 oldPixelToTheRight;
 	// Public-facing methods for determining the state of the entity
-	private bool _isOnGround = false;
-	// TODO:
-	public bool IsOnGround() { return collisionInfo.below; }//return _isOnGround; }
-	private bool _isOnCeiling = false;
-	public bool IsOnCeiling() { return _isOnCeiling; }
-	private bool _isOnLeftWall = false;
-	public bool IsOnLeftWall() { return _isOnLeftWall; }
-	private bool _isOnRightWall = false;
-	public bool IsOnRightWall() { return _isOnRightWall; }
-	public bool IsOnWall() { return _isOnLeftWall || _isOnRightWall; }
+	public bool IsOnGround()	{ return collisionInfo.below; }
+	public bool IsOnCeiling()	{ return collisionInfo.above; }
+	public bool IsOnLeftWall()	{ return collisionInfo.left;  }
+	public bool IsOnRightWall()	{ return collisionInfo.right; }
+	public bool IsOnWall() { return IsOnLeftWall() || IsOnRightWall(); }
 	public bool applyGravity = true;
 	bool _isTryingToStickToCeiling = false;
 	public void SetIsTryingToStickToCeiling(bool isTryingToStickToCeiling) {
@@ -186,6 +181,7 @@ public class PhysicsEntity : RaycastController {
 				// If we were travelling up, collision was above us
 				collisionInfo.above = directionY == 1;
 				collisionInfo.below = directionY == -1;
+				velocityY = 0;
 			}
 		}
 	}
@@ -218,6 +214,7 @@ public class PhysicsEntity : RaycastController {
 				// If we were travelling right, collision was to the right of us
 				collisionInfo.right = directionX == 1;
 				collisionInfo.left = directionX == -1;
+				velocityX = 0;
 			}
 		}
 	}
