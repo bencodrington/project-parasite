@@ -45,7 +45,7 @@ public class Elevator : MonoBehaviourPun {
 	public void PhysicsUpdate() {
 		float velocityY;
 		HandlePassengers();
-		if (PhotonNetwork.IsMasterClient && isMoving) {
+		if (isMoving) {//FIXME: deterministic physics (PhotonNetwork.IsMasterClient && isMoving) {
 			// Calculate how much we should move this frame
 			velocityY = GetPositionAfterOneMovementFrame(transform.position).y - transform.position.y;
 			// Move physics entity and move passengers
