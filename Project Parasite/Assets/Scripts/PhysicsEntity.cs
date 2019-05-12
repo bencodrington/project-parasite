@@ -137,8 +137,7 @@ public class PhysicsEntity : RaycastController {
 		velocityY += y;
 	}
 	public void AddVelocity(Vector2 velocity) {
-		velocityX += velocity.x;
-		velocityY += velocity.y;
+		AddVelocity(velocity.x, velocity.y);
 	}
 
 	public void AddInputVelocity(float velocityX, float velocityY) {
@@ -194,7 +193,11 @@ public class PhysicsEntity : RaycastController {
 				// If we were travelling up, collision was above us
 				collisionInfo.above = directionY == 1;
 				collisionInfo.below = directionY == -1;
-				velocityY = 0;
+				// If we've input a jump action while on a platform
+				// 	setting velocityY to 0 now will stop the jump from ever being applied
+				if (!isBeingMovedByPlatform) {
+					velocityY = 0;
+				}
 			}
 		}
 	}

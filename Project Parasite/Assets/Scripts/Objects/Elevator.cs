@@ -52,6 +52,8 @@ public class Elevator : MonoBehaviourPun {
 			physicsEntity.Update(velocityY);
 			// Update gameObject to match position
         	transform.Translate(Vector2.up * velocityY);
+			// PlatformPhysicsEntity needs to move some passengers after the platform gameObject's transform has been moved
+			physicsEntity.AfterUpdate();
 			// Notify remote clients
 			photonView.RPC("RpcUpdateServerPosition", RpcTarget.All, transform.position);
 		} else if (isMoving) {
