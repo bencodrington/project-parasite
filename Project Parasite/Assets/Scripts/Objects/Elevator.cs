@@ -32,8 +32,8 @@ public class Elevator : MonoBehaviourPun {
 	Collider2D[] passengers;
 	ElevatorButton[] buttons;
 	List<ElevatorCallField> callFields;
-
-	KinematicPhysicsEntity[] kinematicPhysicsEntities;
+    
+    PlatformPhysicsEntity physicsEntity;
 
 	AudioSource elevatorArrivedSource;
 	
@@ -43,18 +43,27 @@ public class Elevator : MonoBehaviourPun {
 	#region [Public Methods]
 	
 	public void PhysicsUpdate() {
+		float velocityY;
 		HandlePassengers();
 		if (PhotonNetwork.IsMasterClient && isMoving) {
-			transform.position = GetPositionAfterOneMovementFrame(transform.position);
+			// Calculate how much we should move this frame
+			velocityY = GetPositionAfterOneMovementFrame(transform.position).y - transform.position.y;
+			// Move physics entity and move passengers
+			physicsEntity.Update(velocityY);
+			// Update gameObject to match position
+        	transform.Translate(Vector2.up * velocityY);
+			// Notify remote clients
 			photonView.RPC("RpcUpdateServerPosition", RpcTarget.All, transform.position);
 		} else if (isMoving) {
 			// Remote client, so update our estimated position
-			estimatedServerPosition = GetPositionAfterOneMovementFrame(estimatedServerPosition);
+			velocityY = GetPositionAfterOneMovementFrame(estimatedServerPosition).y - transform.position.y;
+			// Move physics entity and move passengers
+			physicsEntity.Update(velocityY);
+			// Calculate where the gameObject should be
+			estimatedServerPosition += Vector3.up * velocityY;
+			// Lerp actual gameObject position towards estimated server position
+			// TODO: this is currently snapping the platform to the estimated server position
 			transform.position = Vector3.Lerp(transform.position, estimatedServerPosition, 1);
-		}
-		// Update each kinematicPhysicsEntity in this component's children (floor/ceiling)
-		foreach(KinematicPhysicsEntity entity in kinematicPhysicsEntities) {
-			entity.PhysicsUpdate();
 		}
 		// Update each callfield (a.k.a. stop) that belongs to this elevator
 		foreach(ElevatorCallField callField in callFields) {
@@ -71,9 +80,10 @@ public class Elevator : MonoBehaviourPun {
 	#region [MonoBehaviour Callbacks]
 	
 	void Awake() {
-		kinematicPhysicsEntities = GetComponentsInChildren<KinematicPhysicsEntity>();
 		callFields = new List<ElevatorCallField>();
 		elevatorArrivedSource = Utility.AddAudioSource(gameObject, elevatorArrivedSound);
+		Transform floorTransform = GetComponentInChildren<BoxCollider2D>().transform;
+        physicsEntity = new PlatformPhysicsEntity(floorTransform, .05f, 1f);
 	}
 
 	void OnDestroy() {

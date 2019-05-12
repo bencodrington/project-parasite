@@ -34,6 +34,9 @@ public class RoundManager : MonoBehaviourPun {
 	// If this is true, randomly select one of the connected
 	// 	players to be the parasite
 	bool shouldSelectParasiteRandomly = false;
+	// If this is false, physics updates won't run, though
+	// 	animations, input, etc. will still happen
+	bool shouldRunPhysicsUpdate = true;
 	
 	#endregion
 
@@ -61,6 +64,23 @@ public class RoundManager : MonoBehaviourPun {
 		characterSelections = selections;
 	}
 
+	public void SetShouldRunPhysicsUpdate(bool newValue) {
+		shouldRunPhysicsUpdate = newValue;
+	}
+
+	public void ToggleShouldRunPhysicsUpdate() {
+		shouldRunPhysicsUpdate = !shouldRunPhysicsUpdate;
+		Debug.Log(shouldRunPhysicsUpdate);
+	}
+
+	public void AdvanceOnePhysicsUpdate() {
+		if (shouldRunPhysicsUpdate) {
+			SetShouldRunPhysicsUpdate(false);
+			return;
+		}
+		PhysicsUpdate();
+	}
+
 	#endregion
 	
 	#region [MonoBehaviour Callbacks]
@@ -75,15 +95,8 @@ public class RoundManager : MonoBehaviourPun {
 	}
 
 	void FixedUpdate() {
-		if (objectManager != null) {
-			// Update all objects in the scene
-			objectManager.PhysicsUpdate();
-		}
-		// Update all characters in the scene
-		// OPTIMIZE: (maybe by going through the cached players and calling PhysicsUpdate for them?)
-		foreach(Character character in FindObjectsOfType<Character>()) {
-			character.PhysicsUpdate();
-		}
+		if (!shouldRunPhysicsUpdate) { return; }
+		PhysicsUpdate();
 	}
 	
 	#endregion
@@ -142,9 +155,9 @@ public class RoundManager : MonoBehaviourPun {
 	}
 	
 	int GetActorNumberOfParasitePlayer() {
+		// Ensure that if we're in huntersOnlyMode, no parasite player is chosen	
+		if (huntersOnlyMode) { return -1; }
 		if (shouldSelectParasiteRandomly) {
-			// Ensure that if we're in huntersOnlyMode, no parasite player is chosen	
-			if (huntersOnlyMode) { return -1; }
 			// Randomly select one of the players to be parasite, the rest are hunters
 			int indexOfParasite = Random.Range(0, PhotonNetwork.PlayerList.Length);
 			return PhotonNetwork.PlayerList[indexOfParasite].ActorNumber;
@@ -156,6 +169,18 @@ public class RoundManager : MonoBehaviourPun {
 		}
 		Debug.LogError("RoundManager:GetActorNumberOfParasitePlayer: No entry with parasite selected found.");
 		return PhotonNetwork.PlayerList[0].ActorNumber;
+	}
+
+	void PhysicsUpdate() {
+		if (objectManager != null) {
+			// Update all objects in the scene
+			objectManager.PhysicsUpdate();
+		}
+		// Update all characters in the scene
+		// OPTIMIZE: (maybe by going through the cached players and calling PhysicsUpdate for them?)
+		foreach(Character character in FindObjectsOfType<Character>()) {
+			character.PhysicsUpdate();
+		}
 	}
 
 	#endregion
