@@ -43,11 +43,11 @@ public abstract class Character : MonoBehaviourPun {
 	#endregion
 
 	// Only initialized for Character objects on the server
-	private PlayerObject _playerObject;
-	public PlayerObject PlayerObject {
-		get { return _playerObject; }
+	private CharacterSpawner _characterSpawner;
+	public CharacterSpawner CharacterSpawner {
+		get { return _characterSpawner; }
 		set {
-			_playerObject = value;
+			_characterSpawner = value;
 		}
 	}
 

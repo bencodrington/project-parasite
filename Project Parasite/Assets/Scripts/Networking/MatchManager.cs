@@ -38,6 +38,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     const int MAX_PLAYERS_PER_ROOM = 4;
     Dictionary<int, bool> playersReady;
     bool isRandomParasite = false;
+    TutorialManager tutorialManager;
 
     #endregion
 
@@ -72,6 +73,11 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
     public bool GetDebugMode() {
         return DEBUG_MODE;
+    }
+
+    public void StartTutorial(CharacterType type) {
+        UiManager.Instance.HideMenu();
+        tutorialManager = new TutorialManager(type);
     }
     
     #endregion

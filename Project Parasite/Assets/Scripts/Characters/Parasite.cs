@@ -181,7 +181,7 @@ public class Parasite : Character {
 
 	public void TakeDamage(int damage) {
 		if (photonView.IsMine) {
-			PlayerObject.ParasiteTakeDamage(damage);
+			CharacterSpawner.parasiteData.ParasiteTakeDamage(damage);
 		}
 		OnTakingDamage();
 	}
@@ -270,7 +270,7 @@ public class Parasite : Character {
 		// Let the npc know it will be controlled by this player from now on
 		npc.photonView.RequestOwnership();
 		// Store playerObject for eventual transfer back to parasite
-		npc.PlayerObject = PlayerObject;
+		npc.CharacterSpawner = CharacterSpawner;
 		// Set isInfected to true/update sprite on new authority's client
 		npc.Infect();
 		// Update client's camera and render settings to reflect new character

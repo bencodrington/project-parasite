@@ -55,7 +55,6 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     {
         switch (photonEvent.Code) {
             case EventCodes.StartGame:
-                DestroyTitleScreen();
                 HideMenu();
 				DestroyGameOverScreen();
 				RemoveHud();
@@ -114,6 +113,12 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 		selectHunterButton.SetActive(!isRandomParasite);
 		selectParasiteButton.SetActive(!isRandomParasite);
 	}
+
+    public void HideMenu() {
+		DestroyTitleScreen();
+		mainMenu.SetActive(false);
+		lobby.SetActive(false);
+    }
     
     #endregion
 
@@ -167,11 +172,6 @@ public class UiManager : MonoBehaviour, IOnEventCallback
         Destroy(GameObject.FindWithTag("TitleScreen"));
     }
 
-    void HideMenu() {
-		mainMenu.SetActive(false);
-		lobby.SetActive(false);
-    }
-
     void ShowGameOverScreen(CharacterType victorType) {
 		// Don't spawn another gameover screen if one already exists
 		if (gameOverScreen != null) { return; }
@@ -204,7 +204,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     			break;
     		case CharacterType.Parasite:
     			topRightUiText.enabled = true;
-    			UpdateHealthObject(PlayerObject.STARTING_PARASITE_HEALTH);
+    			UpdateHealthObject(ParasiteData.STARTING_HEALTH);
     			controlsObject = Instantiate(ParasiteControlsPrefab, Vector3.zero, Quaternion.identity, canvas);
     			break;
     		default:
