@@ -77,7 +77,11 @@ public class PhysicsEntity : RaycastController {
 
 	public void Move(Vector2 displacement) {
 		UpdateRayCastOrigins(transformPosition);
-		// TODO: collision checks
+		// Pass 'true' flag to indicate that this movement was caused by a platform
+		//  NOTE: if this function is ever updated to be more generic, that flag
+		// 		may not always be true
+		HandleVerticalCollisions(ref displacement, true);
+		HandleHorizontalCollisions(ref displacement);
 		SetTransformPosition(transformPosition + displacement);
 		UpdateRayCastOrigins(transformPosition);
 	}
@@ -154,11 +158,12 @@ public class PhysicsEntity : RaycastController {
 
 	#region [Private Methods]
 	
-	void HandleVerticalCollisions(ref Vector2 attemptedDisplacement) {
+	void HandleVerticalCollisions(ref Vector2 attemptedDisplacement, bool isBeingMovedByPlatform = false) {
 		float directionY = Mathf.Sign(attemptedDisplacement.y);
 		float rayLength = Mathf.Abs(attemptedDisplacement.y) + SKIN_WIDTH;
 		Vector2 rayOrigin;
 		RaycastHit2D hit;
+		bool hasBeenShunted = false;
 		for (int i = 0; i < VERTICAL_RAY_COUNT; i++) {
 			// Check above if we're moving up, check below if we're moving down
 			rayOrigin = directionY == 1 ? rayCastOrigins.topLeft : rayCastOrigins.bottomLeft;
@@ -174,6 +179,14 @@ public class PhysicsEntity : RaycastController {
 				Debug.DrawRay(rayOrigin, Vector2.up * directionY * rayLength, Color.red);
 			}
 			if (hit) {
+				// Special case: we're being moved UP by a platform, colliding with a ceiling
+				// 	By design, this should never be a full ceiling, but rather a corner.
+				//	This means there should be a free space to one side of the entity.
+				if (!hasBeenShunted && isBeingMovedByPlatform && directionY == 1) {
+					attemptedDisplacement.x += GetShuntDistance(rayLength);
+					// Don't shunt for more than one ray
+					hasBeenShunted = true;
+				}
 				// Don't let entity move past the collision
 				attemptedDisplacement.y = (hit.distance - SKIN_WIDTH) * directionY;
 				// Don't bother checking farther than this collision for subsequent rays
@@ -184,6 +197,38 @@ public class PhysicsEntity : RaycastController {
 				velocityY = 0;
 			}
 		}
+	}
+
+	float GetShuntDistance(float rayLength) {
+		Vector2 rayOrigin;
+		RaycastHit2D hit;
+		bool shuntRight = false;
+		int indexOfClearRay;
+		float shuntDistance = 0;
+		for (int i = 0; i < VERTICAL_RAY_COUNT; i++) {
+			rayOrigin = rayCastOrigins.topLeft + (Vector2.right * i * verticalRaySpacing);
+			hit = Physics2D.Raycast(rayOrigin, Vector2.up, rayLength, OBSTACLE_MASK);
+			if (i == 0) {
+				// If the first ray hits the ceiling, we'll be shunting in the other direction (RIGHT)
+				shuntRight = hit.collider != null;
+			} else if (!shuntRight && hit) {
+				// First ray didn't hit the ceiling, but a subsequent ray did
+				// 	Therefore the previous ray was the last ray that didn't hit the ceiling
+				// SHUNT LEFT
+				indexOfClearRay = i - 1;
+				shuntDistance = GetTopRayCastOriginAtIndex(indexOfClearRay).x - GetTopRayCastOriginAtIndex(VERTICAL_RAY_COUNT - 1).x - SKIN_WIDTH;
+				return shuntDistance;
+			} else if (shuntRight && !hit) {
+				// First ray hit the ceiling, but a subsequent ray didn't
+				// 	Therefore this ray is the first ray that didn't hit the ceiling
+				// SHUNT RIGHT
+				indexOfClearRay = i;
+				shuntDistance = GetTopRayCastOriginAtIndex(indexOfClearRay).x - GetTopRayCastOriginAtIndex(0).x + SKIN_WIDTH;
+				return shuntDistance;
+			}
+		}
+		Debug.LogError("PhysicsEntity: GetShuntDistance(): Unable to find clear space to shunt to.");
+		return 0;
 	}
 
 	void HandleHorizontalCollisions(ref Vector2 attemptedDisplacement) {

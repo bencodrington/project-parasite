@@ -47,6 +47,10 @@ public class RaycastController
         this.height = height;
 		CalculateRaySpacing();
     }
+
+	public Vector2 GetTopRayCastOriginAtIndex(int i) {
+		return rayCastOrigins.topLeft + (Vector2.right * i * verticalRaySpacing);
+	}
     
     #endregion
 
