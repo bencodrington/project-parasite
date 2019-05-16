@@ -11,15 +11,19 @@ public class TutorialManager
     Vector2 HUNTER_SPAWN_COORDINATES = new Vector2(-191, -5.5f);
 
     CharacterSpawner characterSpawner;
+    NpcManager npcManager;
     
     #endregion
 
     #region [Public Methods]
 
-    public TutorialManager(CharacterType type) {
+    public TutorialManager(CharacterType type, NpcSpawnData spawnData = null) {
         characterSpawner = new CharacterSpawner();
         Vector2 spawnCoords = type == CharacterType.Parasite ? PARASITE_SPAWN_COORDINATES : HUNTER_SPAWN_COORDINATES;
         characterSpawner.SpawnPlayerCharacter(type, spawnCoords, Vector2.zero, true);
+        if (spawnData != null) {
+            npcManager = new NpcManager(spawnData);
+        }
     }
 
 	public void PhysicsUpdate() {

@@ -19,6 +19,10 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     // Keeps track of which players have selected which characters
     public CharacterSelectionManager characterSelectionManager {get; private set;}
 
+    public NpcSpawnData standardSpawnData;
+    public NpcSpawnData oneNpcOnlySpawnData;
+    public NpcSpawnData parasiteTutorialNpcSpawnData;
+
     public GameObject playerObjectPrefab;
     // If this is true, skip straight to game and don't connect to multiplayer
     public bool DEBUG_MODE = false;
@@ -81,7 +85,8 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         //  the lobby
         PhotonNetwork.OfflineMode = true;
         UiManager.Instance.HideMenu();
-        tutorialManager = new TutorialManager(type);
+        NpcSpawnData spawnData = type == CharacterType.Parasite ? parasiteTutorialNpcSpawnData : null;
+        tutorialManager = new TutorialManager(type, spawnData);
     }
     
     #endregion
@@ -223,9 +228,9 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         }
         roundManagerGameObject = PhotonNetwork.Instantiate(roundManagerPrefab.name, Vector3.zero, Quaternion.identity, 0);
         roundManager = roundManagerGameObject.GetComponent<RoundManager>();
+        roundManager.SetNpcSpawnData(spawnOneNpcOnly ? oneNpcOnlySpawnData : standardSpawnData);
         roundManager.SetSpawnPlayersAtZero(spawnPlayersAtZero);
         roundManager.SetHuntersOnlyMode(huntersOnlyMode);
-        roundManagerGameObject.GetComponent<NpcManager>().SetSpawnOneNpcOnly(spawnOneNpcOnly);
         roundManager.SetSelectParasiteRandomly(isRandomParasite);
         roundManager.SetCharacterSelections(characterSelectionManager.GetCharacterSelections());
     }

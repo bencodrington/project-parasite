@@ -9,7 +9,7 @@ public class RoundManager : MonoBehaviourPun {
 
 	#region [Public Variables]
 
-	public Vector2[] spawnPoints;
+	NpcSpawnData spawnPointData;
 
 	public bool isGameOver = false;
 	
@@ -19,6 +19,7 @@ public class RoundManager : MonoBehaviourPun {
 
 	GameObject objectManagerPrefab;
 	ObjectManager objectManager;
+	NpcManager npcManager;
 
 	Vector2 parasiteSpawnPoint;
 	Vector2 hunterSpawnPoint;
@@ -66,6 +67,11 @@ public class RoundManager : MonoBehaviourPun {
 
 	public void SetShouldRunPhysicsUpdate(bool newValue) {
 		shouldRunPhysicsUpdate = newValue;
+	}
+
+	public void SetNpcSpawnData(NpcSpawnData spawnData) {
+		spawnPointData = spawnData;
+		npcManager = new NpcManager(spawnData);
 	}
 
 	public void ToggleShouldRunPhysicsUpdate() {
@@ -123,7 +129,7 @@ public class RoundManager : MonoBehaviourPun {
 	}
 
 	void SelectSpawnPoints() {
-		int n = spawnPoints.Length;
+		int n = spawnPointData.spawnPoints.Length;
 		int parasiteSpawnPointIndex, hunterSpawnPointIndex;
 		// Randomly select one of the points for the parasite
 		parasiteSpawnPointIndex = Random.Range(0, n);
@@ -133,8 +139,8 @@ public class RoundManager : MonoBehaviourPun {
 			// Ensure the hunterSpawnPoint is different from the parasite's
 			hunterSpawnPointIndex = n - 1;
 		}
-		parasiteSpawnPoint = spawnPoints[parasiteSpawnPointIndex];
-		hunterSpawnPoint = spawnPoints[hunterSpawnPointIndex];
+		parasiteSpawnPoint = spawnPointData.spawnPoints[parasiteSpawnPointIndex].coordinates;
+		hunterSpawnPoint = spawnPointData.spawnPoints[hunterSpawnPointIndex].coordinates;
 
 		if (spawnPlayersAtZero) {
 			parasiteSpawnPoint = Vector2.zero;

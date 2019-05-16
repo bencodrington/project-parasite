@@ -80,11 +80,8 @@ public class NonPlayerCharacter : Character {
 
 	#region [Public Methods]
 
-	public IEnumerator Idle() {
-		yield return new WaitForSeconds(Random.Range(minTimeUntilNewPath, maxTimeUntilNewPath));
-		// Check that we are still uninfected and still exist
-		if (this != null && !isInfected) { FindNewPath(); }
-		
+	public void StartIdling() {
+		StartCoroutine(Idle());
 	}
 
 	public void OnGotFried() {
@@ -173,7 +170,7 @@ public class NonPlayerCharacter : Character {
 		if (!hasTarget) { return; }
 		if (Mathf.Abs(this.transform.position.x - targetX) < validDistanceFromTarget) {
 			// Reached target
-			StartCoroutine(Idle());
+			StartIdling();
 			// Stop traversing path
 			hasTarget = false;
 		} else {
@@ -276,6 +273,12 @@ public class NonPlayerCharacter : Character {
 		if (isChargingForBurst) {
 			timeChargingForBurst += Time.deltaTime;
 		}
+	}
+
+	IEnumerator Idle() {
+		yield return new WaitForSeconds(Random.Range(minTimeUntilNewPath, maxTimeUntilNewPath));
+		// Check that we are still uninfected and still exist
+		if (this != null && !isInfected) { FindNewPath(); }
 	}
 	
 	#endregion

@@ -3,20 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class NpcManager : MonoBehaviour {
-
-	#region [Public Variables]
-	
-	// The points around which groups of NPCs will be spawned
-	public Vector2[] spawnCenters;
-
-	#endregion
+public class NpcManager {
 
 	#region [Private Variables]
 	
 	GameObject NpcPrefab;
 
 	List<NonPlayerCharacter> NpcList;
+
+	// The points around which groups of NPCs will be spawned
+	NpcSpawnData spawnData;
 
 	// How many NPCs are being spawned each round
 	const int MIN_NPC_COUNT = 3;
@@ -27,23 +23,13 @@ public class NpcManager : MonoBehaviour {
 	// 	around its spawn center
 	const float SPAWN_RANGE_X = 6;
 	const float SPAWN_RANGE_Y = 2;
-
-	// If this is true, spawn only one npc, at (0, 0)
-	bool spawnOneNpcOnly = false;
 	
 	#endregion
 
 	#region [Public Methods]
-	
-	public void SetSpawnOneNpcOnly(bool value) {
-		spawnOneNpcOnly = value;
-	}
-	
-	#endregion
 
-	#region [MonoBehaviour Callbacks]
-	
-	void Start () {
+	public NpcManager(NpcSpawnData spawnData) {
+		this.spawnData = spawnData;
 		NpcList = new List<NonPlayerCharacter>();
 		if (!PhotonNetwork.IsMasterClient) { return; }
 		NpcPrefab = (GameObject)Resources.Load("NonPlayerCharacter");
@@ -55,11 +41,13 @@ public class NpcManager : MonoBehaviour {
 	#region [Private Methods]
 	
 	void SpawnNPCs() {
-		if (spawnOneNpcOnly) { 
-			SpawnNpcAtPosition(Vector2.zero);
+		if (spawnData.shouldSpawnClusters) {
+			foreach (NpcSpawnData.spawnPoint spawnPoint in spawnData.spawnPoints) {
+				SpawnNpcGroup(spawnPoint.coordinates);
+			}
 		} else {
-			foreach (Vector2 spawnCenter in spawnCenters) {
-				SpawnNpcGroup(spawnCenter);
+			foreach (NpcSpawnData.spawnPoint spawnPoint in spawnData.spawnPoints) {
+				SpawnNpcAtPosition(spawnPoint.coordinates);
 			}
 		}
 		object[] content = { NpcList.Count };
@@ -80,7 +68,7 @@ public class NpcManager : MonoBehaviour {
 		NonPlayerCharacter npc;
 		npc = PhotonNetwork.Instantiate(NpcPrefab.name, position, Quaternion.identity)
 				.GetComponentInChildren<NonPlayerCharacter>();
-		StartCoroutine(npc.Idle());
+		npc.StartIdling();
 		NpcList.Add(npc);
 	}
 
