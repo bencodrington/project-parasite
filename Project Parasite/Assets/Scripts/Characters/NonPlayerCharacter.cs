@@ -49,6 +49,8 @@ public class NonPlayerCharacter : Character {
 
 	// How far from the npc's center to display the icon
 	Vector2 ALERT_ICON_OFFSET = new Vector2(0, 1);
+
+	bool shouldMove = true;
 	
 	#endregion
 
@@ -81,6 +83,7 @@ public class NonPlayerCharacter : Character {
 	#region [Public Methods]
 
 	public void StartIdling() {
+		if (!shouldMove) { return; }
 		StartCoroutine(Idle());
 	}
 
@@ -111,6 +114,10 @@ public class NonPlayerCharacter : Character {
 			Utility.Directions.Right :
 			Utility.Directions.Left;
 		FleeOrbInDirection(fleeDirection);
+	}
+
+	public void SetShouldntMove() {
+		shouldMove = false;
 	}
 	
 	#endregion
@@ -257,6 +264,7 @@ public class NonPlayerCharacter : Character {
 		SetSpriteRenderersColour(Color.white);
 		// Return npc to the same render layer as the other NPCs
 		SetRenderLayer("Characters");
+		StartIdling();
 	}
 
 	void DespawnSelf() {

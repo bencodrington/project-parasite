@@ -43,31 +43,38 @@ public class NpcManager {
 	void SpawnNPCs() {
 		if (spawnData.shouldSpawnClusters) {
 			foreach (NpcSpawnData.spawnPoint spawnPoint in spawnData.spawnPoints) {
-				SpawnNpcGroup(spawnPoint.coordinates);
+				SpawnNpcGroup(spawnPoint);
 			}
 		} else {
 			foreach (NpcSpawnData.spawnPoint spawnPoint in spawnData.spawnPoints) {
-				SpawnNpcAtPosition(spawnPoint.coordinates);
+				SpawnNpcAtPosition(spawnPoint);
 			}
 		}
 		object[] content = { NpcList.Count };
 		EventCodes.RaiseEventAll(EventCodes.SetNpcCount, content);
 	}
 	
-	void SpawnNpcGroup(Vector2 spawnCenter) {
+	void SpawnNpcGroup(NpcSpawnData.spawnPoint spawnCenter) {
 		// This should only ever run on the Master Client
 		int npcCount = SelectNpcGroupSize();
 		Vector2 spawnPosition;
 		for (int i = 0; i < npcCount; i++) {
-			spawnPosition = SelectSpawnPosition(spawnCenter);
+			spawnPosition = SelectSpawnPosition(spawnCenter.coordinates);
 			SpawnNpcAtPosition(spawnPosition);
 		}
 	}
 
-	void SpawnNpcAtPosition(Vector2 position) {
+	void SpawnNpcAtPosition(Vector2 coordinates, bool isStationary = false) {
+		SpawnNpcAtPosition(new NpcSpawnData.spawnPoint(isStationary, coordinates));
+	}
+
+	void SpawnNpcAtPosition(NpcSpawnData.spawnPoint spawnPoint) {
 		NonPlayerCharacter npc;
-		npc = PhotonNetwork.Instantiate(NpcPrefab.name, position, Quaternion.identity)
+		npc = PhotonNetwork.Instantiate(NpcPrefab.name, spawnPoint.coordinates, Quaternion.identity)
 				.GetComponentInChildren<NonPlayerCharacter>();
+		if (spawnPoint.isStationary) {
+			npc.SetShouldntMove();
+		}
 		npc.StartIdling();
 		NpcList.Add(npc);
 	}
