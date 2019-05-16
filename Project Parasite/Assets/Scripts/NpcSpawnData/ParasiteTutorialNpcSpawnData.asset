@@ -13,4 +13,6 @@ MonoBehaviour:
   m_Name: ParasiteTutorialNpcSpawnData
   m_EditorClassIdentifier: 
   shouldSpawnClusters: 0
-  spawnPoints: []
+  spawnPoints:
+  - isStationary: 1
+    coordinates: {x: 117, y: -56}

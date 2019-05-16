@@ -44,11 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f82651a65d980144e9fff0278f28ae79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnPoints:
-  - {x: -35, y: 35}
-  - {x: -35, y: -9}
-  - {x: 35, y: 35}
-  - {x: 35, y: -9}
   isGameOver: 0
 --- !u!114 &326
 MonoBehaviour:

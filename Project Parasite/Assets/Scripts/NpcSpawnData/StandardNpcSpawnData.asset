@@ -12,5 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29dd0d2c1f5f628458b777eda1f60158, type: 3}
   m_Name: StandardNpcSpawnData
   m_EditorClassIdentifier: 
-  shouldSpawnClusters: 0
-  spawnPoints: []
+  shouldSpawnClusters: 1
+  spawnPoints:
+  - isStationary: 0
+    coordinates: {x: 0, y: 0}
+  - isStationary: 0
+    coordinates: {x: 0, y: 12}
+  - isStationary: 0
+    coordinates: {x: 0, y: 24}
+  - isStationary: 0
+    coordinates: {x: -30, y: -8}
+  - isStationary: 0
+    coordinates: {x: -30, y: 36}
+  - isStationary: 0
+    coordinates: {x: 30, y: -8}
+  - isStationary: 0
+    coordinates: {x: 30, y: 36}

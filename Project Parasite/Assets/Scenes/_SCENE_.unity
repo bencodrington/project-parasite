@@ -3216,6 +3216,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 737581ac7914eb4448de2dcabc640efb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  standardSpawnData: {fileID: 11400000, guid: 9c4f916c86f4b3b4b943baf65e3a6381, type: 2}
+  oneNpcOnlySpawnData: {fileID: 11400000, guid: df36c64f2ad699a468dbf4929feddaf4,
+    type: 2}
+  parasiteTutorialNpcSpawnData: {fileID: 11400000, guid: 4ac2259297c50004584313ddfc6a4c25,
+    type: 2}
   playerObjectPrefab: {fileID: 1820297792491458, guid: c3d12b587d0975b4787bf47335c8913f,
     type: 3}
   DEBUG_MODE: 0
