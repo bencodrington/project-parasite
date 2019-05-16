@@ -34,7 +34,7 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 						// TODO: destroy characterspawner
 						Debug.LogError("TODO: destroy existing characterSpawner");
 					}
-					characterSpawner = new CharacterSpawner(true);
+					characterSpawner = new CharacterSpawner();
 					// Spawn Character of type `assignedCharacterType` across clients
 					characterSpawner.SpawnPlayerCharacter(assignedCharacterType, spawnPoint, Vector2.zero);
 				}

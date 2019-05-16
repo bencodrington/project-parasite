@@ -76,6 +76,10 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     }
 
     public void StartTutorial(CharacterType type) {
+        // NOTE: photon network must be set to offline mode BEFORE hiding
+        //  the menu, as doing so counts as 'joining a room' which will show
+        //  the lobby
+        PhotonNetwork.OfflineMode = true;
         UiManager.Instance.HideMenu();
         tutorialManager = new TutorialManager(type);
     }
@@ -110,6 +114,12 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 		if (DEBUG_MODE && Input.GetKeyDown(KeyCode.T)) {
 			AdvanceOnePhysicsUpdate();
 		}
+    }
+
+    void FixedUpdate() {
+        if (tutorialManager != null) {
+            tutorialManager.PhysicsUpdate();
+        }
     }
     
     #endregion

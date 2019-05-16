@@ -13,26 +13,16 @@ public class CharacterSpawner
     #region [Private Variables]
 
 	GameObject characterGameObject;
-    bool isNetworked;
     
     #endregion
 
     #region [Public Methods]
-
-    public CharacterSpawner(bool isNetworked) {
-        this.isNetworked = isNetworked;
-    }
     
 	public void SpawnPlayerCharacter(CharacterType assignedCharacterType, Vector3 atPosition, Vector2 velocity, bool forceCameraSnap = true) {
 		String characterPrefabName = assignedCharacterType == CharacterType.Parasite ? "Parasite" : "Hunter";
 		GameObject characterPrefab = Resources.Load(characterPrefabName) as GameObject;
-        if (isNetworked) {
-            // Create PlayerCharacter game object on the server
-            characterGameObject = PhotonNetwork.Instantiate(characterPrefab.name, atPosition, Quaternion.identity);
-        } else {
-            // Create it offline
-            characterGameObject = GameObject.Instantiate(characterPrefab, atPosition, Quaternion.identity);
-        }
+        // Create PlayerCharacter game object on the server
+        characterGameObject = PhotonNetwork.Instantiate(characterPrefab.name, atPosition, Quaternion.identity);
     	// Get PlayerCharacter script
     	Character character = characterGameObject.GetComponentInChildren<Character>();
     	// Initialize each player's character on their own client
@@ -49,11 +39,7 @@ public class CharacterSpawner
 
 	public void DestroyCharacter() {
     	if (characterGameObject != null) {
-            if (isNetworked) {
-                PhotonNetwork.Destroy(characterGameObject);
-            } else {
-                GameObject.Destroy(characterGameObject);
-            }
+            PhotonNetwork.Destroy(characterGameObject);
     	}
     }
     
