@@ -20,7 +20,6 @@ public class Orb : MonoBehaviour {
 
 	#region [MonoBehaviour Callbacks]
 	
-	
 	void Start() {
 		intensityCoroutine = StartCoroutine(FadeIntensity());
 	}

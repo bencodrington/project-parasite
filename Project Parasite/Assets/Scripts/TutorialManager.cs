@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class TutorialManager
@@ -23,6 +24,11 @@ public class TutorialManager
         characterSpawner.SpawnPlayerCharacter(type, spawnCoords, Vector2.zero, true);
         if (spawnData != null) {
             npcManager = new NpcManager(spawnData);
+        }
+        if (type == CharacterType.Parasite) {
+            // Spawn static orbs
+            GameObject orbManagerPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/Objects/OrbManager.prefab", typeof(GameObject)) as GameObject;;
+            GameObject.Instantiate(orbManagerPrefab);
         }
     }
 

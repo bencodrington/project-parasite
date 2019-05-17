@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d1526d99a4fe464cb3ef48aafb7f679, type: 3}
+  m_Name: ParasiteTutorialOrbSetData
+  m_EditorClassIdentifier: 
+  orbChains:
+  - positions:
+    - {x: 119.5, y: -57.25}
+    - {x: 122, y: -57.25}
+    - {x: 122, y: -57.75}
+    - {x: 119.5, y: -57.75}
+  - positions:
+    - {x: 133, y: -57.25}
+    - {x: 140.5, y: -57.25}
+    - {x: 140.5, y: -57.75}
+    - {x: 133, y: -57.75}
+  - positions:
+    - {x: 143.75, y: -57.25}
+    - {x: 143.75, y: -47.75}
+    - {x: 152.25, y: -47.75}
+    - {x: 152.25, y: -57.25}
+  - positions:
+    - {x: 157, y: -57.25}
+    - {x: 157, y: -52.25}
