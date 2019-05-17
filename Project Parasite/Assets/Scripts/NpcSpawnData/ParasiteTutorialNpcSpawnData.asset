@@ -15,4 +15,8 @@ MonoBehaviour:
   shouldSpawnClusters: 0
   spawnPoints:
   - isStationary: 1
-    coordinates: {x: 117, y: -56}
+    coordinates: {x: 155, y: -56}
+  - isStationary: 1
+    coordinates: {x: 160, y: -56}
+  - isStationary: 1
+    coordinates: {x: 170, y: -56}
