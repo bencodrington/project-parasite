@@ -75,6 +75,9 @@ public class Parasite : Character {
 	#endregion
 
 	protected override void HandleInput()  {
+		// If this parasite is stationary, like in a tutorial, don't take player input
+		if (isStationary) { return; }
+
 		// Movement
 		bool right = Input.GetKey(KeyCode.D);
 		bool left = Input.GetKey(KeyCode.A);

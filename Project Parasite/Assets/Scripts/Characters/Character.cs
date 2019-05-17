@@ -19,6 +19,8 @@ public abstract class Character : MonoBehaviourPun {
 	protected bool isMovingUp;
 	protected bool isMovingDown;
 
+	protected bool isStationary = false;
+
 	#region [Private Variables]
 	
 	// Horizontal movement is divided by this each physics update
@@ -163,6 +165,10 @@ public abstract class Character : MonoBehaviourPun {
 			GeneratePhysicsEntity();
 		}
 		physicsEntity.AddVelocity(velocity.x, velocity.y);
+	}
+
+	public void SetStationary() {
+		isStationary = true;
 	}
 
 	public virtual bool IsUninfectedNpc() {

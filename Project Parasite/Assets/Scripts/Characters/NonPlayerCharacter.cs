@@ -49,8 +49,6 @@ public class NonPlayerCharacter : Character {
 
 	// How far from the npc's center to display the icon
 	Vector2 ALERT_ICON_OFFSET = new Vector2(0, 1);
-
-	bool shouldMove = true;
 	
 	#endregion
 
@@ -83,7 +81,7 @@ public class NonPlayerCharacter : Character {
 	#region [Public Methods]
 
 	public void StartIdling() {
-		if (!shouldMove) { return; }
+		if (isStationary) { return; }
 		StartCoroutine(Idle());
 	}
 
@@ -117,7 +115,7 @@ public class NonPlayerCharacter : Character {
 	}
 
 	public void SetShouldntMove() {
-		shouldMove = false;
+		isStationary = true;
 	}
 	
 	#endregion

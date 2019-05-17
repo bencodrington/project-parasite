@@ -22,6 +22,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     public NpcSpawnData standardSpawnData;
     public NpcSpawnData oneNpcOnlySpawnData;
     public NpcSpawnData parasiteTutorialNpcSpawnData;
+    public NpcSpawnData hunterTutorialNpcSpawnData;
 
     public GameObject playerObjectPrefab;
     // If this is true, skip straight to game and don't connect to multiplayer
@@ -85,7 +86,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         //  the lobby
         PhotonNetwork.OfflineMode = true;
         UiManager.Instance.HideMenu();
-        NpcSpawnData spawnData = type == CharacterType.Parasite ? parasiteTutorialNpcSpawnData : null;
+        NpcSpawnData spawnData = type == CharacterType.Parasite ? parasiteTutorialNpcSpawnData : hunterTutorialNpcSpawnData;
         tutorialManager = new TutorialManager(type, spawnData);
     }
     

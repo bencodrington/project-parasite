@@ -55,6 +55,8 @@ public class Hunter : Character {
 	}
 
 	protected override void HandleInput()  {
+		// If this hunter is stationary, like in a tutorial, don't take player input
+		if (isStationary) { return; }
 
 		if (orbBeamRangeManager.mostRecentOrb != null) {
 			// Debug.DrawLine(mostRecentOrb.transform.position, transform.position, Color.cyan);

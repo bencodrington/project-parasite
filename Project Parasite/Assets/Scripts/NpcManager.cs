@@ -7,7 +7,9 @@ public class NpcManager {
 
 	#region [Private Variables]
 	
-	GameObject NpcPrefab;
+	GameObject npcPrefab;
+	GameObject parasitePrefab;
+	GameObject hunterPrefab;
 
 	List<NonPlayerCharacter> NpcList;
 
@@ -32,8 +34,11 @@ public class NpcManager {
 		this.spawnData = spawnData;
 		NpcList = new List<NonPlayerCharacter>();
 		if (!PhotonNetwork.IsMasterClient) { return; }
-		NpcPrefab = (GameObject)Resources.Load("NonPlayerCharacter");
+		npcPrefab = (GameObject)Resources.Load("NonPlayerCharacter");
+		parasitePrefab = (GameObject)Resources.Load("Parasite");
+		hunterPrefab = (GameObject)Resources.Load("Hunter");
 		SpawnNPCs();
+		SpawnPlayableCharacters();
 	}
 	
 	#endregion
@@ -70,7 +75,7 @@ public class NpcManager {
 
 	void SpawnNpcAtPosition(NpcSpawnData.spawnPoint spawnPoint) {
 		NonPlayerCharacter npc;
-		npc = PhotonNetwork.Instantiate(NpcPrefab.name, spawnPoint.coordinates, Quaternion.identity)
+		npc = PhotonNetwork.Instantiate(npcPrefab.name, spawnPoint.coordinates, Quaternion.identity)
 				.GetComponentInChildren<NonPlayerCharacter>();
 		if (spawnPoint.isStationary) {
 			npc.SetShouldntMove();
@@ -88,6 +93,17 @@ public class NpcManager {
 				Random.Range(-SPAWN_RANGE_X, SPAWN_RANGE_X),
 				Random.Range(-SPAWN_RANGE_Y, SPAWN_RANGE_Y)
 			);
+	}
+
+	void SpawnPlayableCharacters() {
+		GameObject playableCharacterPrefab;
+		Character character;
+		foreach (NpcSpawnData.playableCharacterSpawnPoint spawnPoint in spawnData.playableCharacterSpawnPoints) {
+			playableCharacterPrefab = spawnPoint.isParasite ? parasitePrefab : hunterPrefab;
+			character = PhotonNetwork.Instantiate(playableCharacterPrefab.name, spawnPoint.coordinates, Quaternion.identity)
+					.GetComponentInChildren<Character>();
+			character.SetStationary();
+		}
 	}
 	
 	#endregion
