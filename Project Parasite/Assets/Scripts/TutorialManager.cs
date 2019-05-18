@@ -27,7 +27,7 @@ public class TutorialManager
         }
         if (type == CharacterType.Parasite) {
             // Spawn static orbs
-            GameObject orbManagerPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/Objects/OrbManager.prefab", typeof(GameObject)) as GameObject;;
+            GameObject orbManagerPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/Objects/OrbManager.prefab", typeof(GameObject)) as GameObject;
             GameObject.Instantiate(orbManagerPrefab);
         }
     }

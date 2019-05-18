@@ -80,6 +80,12 @@ public class NpcManager {
 		if (spawnPoint.isStationary) {
 			npc.SetShouldntMove();
 		}
+		if(spawnPoint.isInfected) {
+			npc.Infect(true);
+			// Instantiate new dummy CharacterSpawner so that the npc can spawn a parasite when it
+			//	gets fried
+			npc.CharacterSpawner = new CharacterSpawner(); 
+		}
 		npc.StartIdling();
 		NpcList.Add(npc);
 	}

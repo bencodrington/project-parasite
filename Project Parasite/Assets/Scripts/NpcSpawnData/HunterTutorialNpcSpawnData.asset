@@ -15,8 +15,10 @@ MonoBehaviour:
   shouldSpawnClusters: 0
   spawnPoints:
   - isStationary: 1
+    isInfected: 1
     coordinates: {x: -131, y: 4.5}
   - isStationary: 1
+    isInfected: 0
     coordinates: {x: -135, y: 4.5}
   playableCharacterSpawnPoints:
   - isParasite: 1

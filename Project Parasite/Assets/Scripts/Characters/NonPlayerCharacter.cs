@@ -47,6 +47,11 @@ public class NonPlayerCharacter : Character {
 	// Whether or not right click was being pressed last frame
 	bool oldAction2;
 
+	// CLEANUP: this should be extracted to an input manager
+	//  but for now it's used in the hunter tutorial exclusively
+	// 	to make sure the dummy infected npc isn't controlled by player input
+	bool isNpcControlled = false;
+
 	// How far from the npc's center to display the icon
 	Vector2 ALERT_ICON_OFFSET = new Vector2(0, 1);
 	
@@ -93,10 +98,13 @@ public class NonPlayerCharacter : Character {
 		}
 	}
 
-	public void Infect() {
+	public void Infect(bool isNpcControlledParasite = false) {
 		isInfected = true;
 		// Right click was pressed last frame on the parasite player's client
 		oldAction2 = true;
+		// CLEANUP: isNpcControlledParasite should be extracted to an input manager class
+		isNpcControlled = isNpcControlledParasite;
+		if (isNpcControlledParasite) { return; }
 		// Only update sprite if on the Parasite player's client
 		SetSpriteRenderersColour(Color.magenta);
 	}
@@ -128,8 +136,9 @@ public class NonPlayerCharacter : Character {
 	#region [MonoBehaviour Callbacks]
 	
 	public override void Update() {
-		if (isInfected && HasAuthority()) {
+		if (isInfected && HasAuthority() && !isNpcControlled) {
 			// NPC is infected and this client is the Parasite player's client
+			// CLEANUP: && not controlled by the computer (i.e. hunter tutorial)
 			HandleInput();
 			HandlePositionAndInputUpdates();
 			HandleBurstCharging();
@@ -272,7 +281,12 @@ public class NonPlayerCharacter : Character {
 	}
 
 	void SpawnParasite() {
-		CharacterSpawner.SpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY), false);
+		if (isStationary) {
+			Character parasite = CharacterSpawner.SpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY), false, false);
+			parasite.SetStationary();
+		} else {
+			CharacterSpawner.SpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY), false);
+		}
 	}
 
 	void HandleBurstCharging() {
