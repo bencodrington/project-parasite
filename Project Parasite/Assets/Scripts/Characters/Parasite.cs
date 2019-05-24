@@ -24,12 +24,6 @@ public class Parasite : Character {
 
 	float jumpVelocity = 12f;
 	const float MAX_POUNCE_VELOCITY = 30f;
-	// Whether the directional keys were being pressed last frame
-	bool oldUp = false;
-	bool oldRight = false;
-	bool oldLeft = false;
-	// Whether the action1 key was being pressed last frame
-	bool oldAction1 = false;
 
 	// How many seconds the parasite has been charging to pounce
 	float timeSpentCharging = 0f;
@@ -70,17 +64,20 @@ public class Parasite : Character {
 
 	// The direction that the parasite is attached to (left wall, right wall, ceiling)
 	// 	when it began charging a pounce
-	private Utility.Directions attachedDirection = Utility.Directions.Null;
+	Utility.Directions attachedDirection = Utility.Directions.Null;
+
+    PlayerInput input;
 	
 	#endregion
 
 	protected override void HandleInput()  {
+		input.UpdateInputState();
+
+		// TODO: extract isStationary
 		// If this parasite is stationary, like in a tutorial, don't take player input
 		if (isStationary) { return; }
+		// TODO: /isStationary
 
-		// Movement
-		bool right = Input.GetKey(KeyCode.D);
-		bool left = Input.GetKey(KeyCode.A);
 		isMovingLeft = false;
 		isMovingRight = false;
 		bool isTryingToStickToCeiling = false;
@@ -98,53 +95,43 @@ public class Parasite : Character {
 				}
 			}
 		} else {
-			if (right && !left) {
+			if (input.isDown(PlayerInput.InputKey.right) && !input.isDown(PlayerInput.InputKey.left)) {
 				physicsEntity.applyGravity = !physicsEntity.IsOnRightWall();
 				isMovingRight = true;
-			} else if (left && !right) {
+			} else if (input.isDown(PlayerInput.InputKey.left) && !input.isDown(PlayerInput.InputKey.right)) {
 				physicsEntity.applyGravity = !physicsEntity.IsOnLeftWall();
 				isMovingLeft = true;
 			} else {
 				physicsEntity.applyGravity = true;
 			}
 		}
-		oldRight = right;
-		oldLeft = left;
-
-		bool up = Input.GetKey(KeyCode.W);
-		bool down = Input.GetKey(KeyCode.S);
 		isMovingUp = false;
 		isMovingDown = false;
-		if (up && !oldUp && physicsEntity.IsOnGround() && !IsChargingPounce()) {
+		if (input.isJustPressed(PlayerInput.InputKey.up) && physicsEntity.IsOnGround() && !IsChargingPounce()) {
 			// Jump
 			photonView.RPC("RpcJump", RpcTarget.All);
-		}  else if (up && physicsEntity.IsOnWall() && !IsChargingPounce()) {
+		}  else if (input.isDown(PlayerInput.InputKey.up) && physicsEntity.IsOnWall() && !IsChargingPounce()) {
 			// Climb Up
 			isMovingUp = true;
-		} else if (down && physicsEntity.IsOnWall() && !IsChargingPounce()) {
+		} else if (input.isDown(PlayerInput.InputKey.down) && physicsEntity.IsOnWall() && !IsChargingPounce()) {
 			// Climb Down
 			isMovingDown = true;
 		}
-		if (up) {
+		if (input.isDown(PlayerInput.InputKey.up)) {
 			// Attempt to stick to ceiling
 			isTryingToStickToCeiling = true;
 		}
-		oldUp = up;
-
-		bool action1 = Input.GetMouseButton(0);
-		if (action1 && !oldAction1) {
+		if (input.isJustPressed(PlayerInput.InputKey.action1)) {
 			// Action key just pressed
 			PounceIndicator.Show();
-			UpdateAttachedDirection();
 		}
-		// TODO:
 		UpdateAttachedDirection();
-		if (action1) {
+		if (input.isDown(PlayerInput.InputKey.action1)) {
 			// Action key is down
 			// Charge leap
 			timeSpentCharging += Time.deltaTime;
 			PounceIndicator.SetPercentage(PounceChargePercentage());
-		} else if (oldAction1 && !action1) {
+		} else if (input.isJustReleased(PlayerInput.InputKey.action1)) {
 			// On action button release
 			if (CanPounce()) {
 				// Pounce
@@ -154,8 +141,6 @@ public class Parasite : Character {
 			ResetPounceCharge();
 			PounceIndicator.Hide();
 		}
-		oldAction1 = action1;
-		
 		
 		if (oldIsTryingToStickToCeiling != isTryingToStickToCeiling) {
 			// Only send updates
@@ -164,7 +149,7 @@ public class Parasite : Character {
 		}
 
 		// Infect
-		if (Input.GetMouseButton(1)) {
+		if (input.isDown(PlayerInput.InputKey.action2)) {
 			IsAttemptingInfection = true;
 			Collider2D npc = Physics2D.OverlapCircle(transform.position, INFECT_RADIUS, Utility.GetLayerMask(CharacterType.NPC));
 			if (npc != null) {
@@ -175,7 +160,7 @@ public class Parasite : Character {
 			IsAttemptingInfection = false;
 		}
 
-		if (Input.GetKeyDown(KeyCode.E)) {
+		if (input.isJustPressed(PlayerInput.InputKey.interact)) {
 			InteractWithObjectsInRange();
 		}
 	}
@@ -195,6 +180,7 @@ public class Parasite : Character {
 		spriteTransform = GetComponentInChildren<SpriteTransform>();
 		spriteTransform.SetTargetTransform(transform);
 		screechAudioSource = Utility.AddAudioSource(gameObject, screechSound, .2f);
+		input = new PlayerInput();
 	}
 
 	#region [Private Methods]
