@@ -14,6 +14,7 @@ public class NpcManager : IOnEventCallback {
 	GameObject hunterPrefab;
 
 	List<NonPlayerCharacter> NpcList;
+	CharacterSpawner[] characterSpawners;
 
 	// The points around which groups of NPCs will be spawned
 	NpcSpawnData spawnData;
@@ -116,13 +117,14 @@ public class NpcManager : IOnEventCallback {
 	}
 
 	void SpawnPlayableCharacters() {
-		GameObject playableCharacterPrefab;
+		CharacterType type;
 		Character character;
-		foreach (NpcSpawnData.playableCharacterSpawnPoint spawnPoint in spawnData.playableCharacterSpawnPoints) {
-			playableCharacterPrefab = spawnPoint.isParasite ? parasitePrefab : hunterPrefab;
-			character = PhotonNetwork.Instantiate(playableCharacterPrefab.name, spawnPoint.coordinates, Quaternion.identity)
-					.GetComponentInChildren<Character>();
-			character.SetInputSource(new EmptyInputSource());
+		characterSpawners = new CharacterSpawner[spawnData.playableCharacterSpawnPoints.Length];
+		for (int i = 0; i < spawnData.playableCharacterSpawnPoints.Length; i++) {
+			NpcSpawnData.playableCharacterSpawnPoint spawnPoint = spawnData.playableCharacterSpawnPoints[i];
+			type = spawnPoint.isParasite ? CharacterType.Parasite : CharacterType.Hunter;
+			characterSpawners[i] = new CharacterSpawner();
+			character = characterSpawners[i].SpawnPlayerCharacter(type, spawnPoint.coordinates, Vector2.zero, false, false, new EmptyInputSource());
 		}
 	}
 	
@@ -136,6 +138,11 @@ public class NpcManager : IOnEventCallback {
 			}
 		}
 		NpcList.Clear();
+		// Remove NPC-controlled playable characters
+		for (int i = 0; i < characterSpawners.Length; i++) {
+			characterSpawners[i].DestroyCharacter();
+		}
+		characterSpawners = null;
         PhotonNetwork.RemoveCallbackTarget(this);
 	}
 

@@ -18,7 +18,10 @@ public class CharacterSpawner
 
     #region [Public Methods]
     
-	public Character SpawnPlayerCharacter(CharacterType assignedCharacterType, Vector3 atPosition, Vector2 velocity, bool forceCameraSnap = true, bool shouldCameraFollow = true) {
+	public Character SpawnPlayerCharacter(CharacterType assignedCharacterType, Vector3 atPosition, Vector2 velocity, bool forceCameraSnap = true, bool shouldCameraFollow = true, InputSource inputSource = null) {
+		if (inputSource == null) {
+			inputSource = new PlayerInput();
+		}
 		String characterPrefabName = assignedCharacterType == CharacterType.Parasite ? "Parasite" : "Hunter";
 		GameObject characterPrefab = Resources.Load(characterPrefabName) as GameObject;
         // Create PlayerCharacter game object on the server
@@ -37,7 +40,7 @@ public class CharacterSpawner
 		if (assignedCharacterType == CharacterType.Parasite) {
             parasiteData = new ParasiteData();
 		}
-		character.SetInputSource(new PlayerInput());
+		character.SetInputSource(inputSource);
 		return character;
 	}
 
