@@ -89,6 +89,18 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         NpcSpawnData spawnData = type == CharacterType.Parasite ? parasiteTutorialNpcSpawnData : hunterTutorialNpcSpawnData;
         tutorialManager = new TutorialManager(type, spawnData);
     }
+
+    public void EndTutorial() {
+        if (tutorialManager == null) {
+            Debug.LogError("MatchManager:EndTutorial(): tutorialManager not set");
+            return;
+        }
+        tutorialManager.End();
+        tutorialManager = null;
+        PhotonNetwork.OfflineMode = false;
+        UiManager.Instance.ShowMainMenu();
+        UiManager.Instance.SetReturnToMenuPanelActive(false);
+    }
     
     #endregion
 

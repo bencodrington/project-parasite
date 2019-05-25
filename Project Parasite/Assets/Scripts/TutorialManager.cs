@@ -13,6 +13,9 @@ public class TutorialManager
 
     CharacterSpawner characterSpawner;
     NpcManager npcManager;
+    // Used for spawning and keeping track of static orbs,
+    //  not associated with any given hunter
+    OrbManager orbManager;
     
     #endregion
 
@@ -28,8 +31,10 @@ public class TutorialManager
         if (type == CharacterType.Parasite) {
             // Spawn static orbs
             GameObject orbManagerPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/Objects/OrbManager.prefab", typeof(GameObject)) as GameObject;
-            GameObject.Instantiate(orbManagerPrefab);
+            orbManager = GameObject.Instantiate(orbManagerPrefab).GetComponent<OrbManager>();
         }
+        // TODO: don't show yet
+        UiManager.Instance.SetReturnToMenuPanelActive(true);
     }
 
 	public void PhysicsUpdate() {
@@ -39,6 +44,16 @@ public class TutorialManager
 			character.PhysicsUpdate();
 		}
 	}
+
+    public void End() {
+        characterSpawner.DestroyCharacter();
+        characterSpawner = null;
+        npcManager.DespawnNPCs();
+        npcManager = null;
+        if (orbManager == null) { return; }
+        orbManager.DestroyOrbs();
+        orbManager = null;
+    }
     
     #endregion
 }

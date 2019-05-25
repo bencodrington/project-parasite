@@ -41,6 +41,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 
 	const int UI_PADDING_DISTANCE = 9;
 
+	GameObject titleScreen;
 	GameObject mainMenu;
 	GameObject lobby;
 	GameObject startGameButton;
@@ -48,6 +49,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     GameObject randomParasiteToggleButton;
 	GameObject selectParasiteButton;
 	GameObject selectHunterButton;
+	GameObject returnToMenuPanel;
     
     #endregion
 
@@ -87,6 +89,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	}
 
 	public void ShowMainMenu() {
+		SetTitleScreenActive(true);
 		mainMenu.SetActive(true);
 	}
 
@@ -115,10 +118,14 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	}
 
     public void HideMenu() {
-		DestroyTitleScreen();
+		SetTitleScreenActive(false);
 		mainMenu.SetActive(false);
 		lobby.SetActive(false);
     }
+
+	public void SetReturnToMenuPanelActive(bool isActive) {
+		returnToMenuPanel.SetActive(isActive);
+	}
     
     #endregion
 
@@ -134,11 +141,13 @@ public class UiManager : MonoBehaviour, IOnEventCallback
             return;
         }
         Instance = this;
+		titleScreen = GameObject.FindWithTag("TitleScreen");
 		mainMenu = GameObject.FindGameObjectWithTag("Main Menu");
 		lobby = GameObject.FindGameObjectWithTag("Lobby");
 		startGameButton = GameObject.FindObjectOfType<StartGameButton>().gameObject;
         readyToggleButton = FindObjectOfType<ReadyButton>().gameObject;
         randomParasiteToggleButton = FindObjectOfType<RandomParasiteButton>().gameObject;
+		returnToMenuPanel = FindObjectOfType<ReturnToMenuButton>().transform.parent.gameObject;
 		foreach (CharacterSelectButton selectButton in FindObjectsOfType<CharacterSelectButton>()) {
 			if (selectButton.characterType == CharacterType.Parasite) {
 				selectParasiteButton = selectButton.gameObject;
@@ -146,12 +155,12 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 				selectHunterButton = selectButton.gameObject;
 			}
 		}
-
 		mainMenu.SetActive(false);
 		lobby.SetActive(false);
 		startGameButton.SetActive(false);
         readyToggleButton.SetActive(false);
 		randomParasiteToggleButton.SetActive(false);
+		returnToMenuPanel.SetActive(false);
     }
 
     void Start() {
@@ -168,8 +177,8 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 
     #region [Private Methods]
 
-    void DestroyTitleScreen() {
-        Destroy(GameObject.FindWithTag("TitleScreen"));
+    void SetTitleScreenActive(bool isActive) {
+        titleScreen.SetActive(isActive);
     }
 
     void ShowGameOverScreen(CharacterType victorType) {

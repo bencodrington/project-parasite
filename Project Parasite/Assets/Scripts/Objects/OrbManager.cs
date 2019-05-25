@@ -19,6 +19,17 @@ public class OrbManager : MonoBehaviour
     
     #endregion
 
+    #region [Public Methods]
+    
+    public void DestroyOrbs() {
+        foreach(Orb orb in orbs) {
+            Destroy(orb.gameObject);
+        }
+        Destroy(gameObject);
+    }
+    
+    #endregion
+
     #region [MonoBehaviour Callbacks]
 
     void Awake() {
@@ -60,7 +71,6 @@ public class OrbManager : MonoBehaviour
 		// Update reference to most recent orb for connecting the next orb
 		mostRecentOrb = orb;
     }
-    // TODO: destroy orbs
     
     #endregion
 
