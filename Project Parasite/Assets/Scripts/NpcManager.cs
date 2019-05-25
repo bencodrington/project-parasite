@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using Photon.Realtime;
+using ExitGames.Client.Photon;
 
-public class NpcManager {
+public class NpcManager : IOnEventCallback {
 
 	#region [Private Variables]
 	
@@ -31,6 +33,7 @@ public class NpcManager {
 	#region [Public Methods]
 
 	public NpcManager(NpcSpawnData spawnData) {
+		PhotonNetwork.AddCallbackTarget(this);
 		this.spawnData = spawnData;
 		NpcList = new List<NonPlayerCharacter>();
 		if (!PhotonNetwork.IsMasterClient) { return; }
@@ -40,6 +43,16 @@ public class NpcManager {
 		SpawnNPCs();
 		SpawnPlayableCharacters();
 	}
+
+    public void OnEvent(EventData photonEvent) {
+        if (photonEvent.Code == EventCodes.RequestNpcCount) {
+            if (PhotonNetwork.IsMasterClient) {
+                // Resend the current NPC count
+                object[] content = { NpcList.Count };
+                EventCodes.RaiseEventAll(EventCodes.SetNpcCount, content);
+            }
+		}
+    }
 	
 	#endregion
 

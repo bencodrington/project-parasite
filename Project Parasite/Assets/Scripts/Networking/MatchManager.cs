@@ -241,11 +241,9 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         }
         roundManagerGameObject = PhotonNetwork.Instantiate(roundManagerPrefab.name, Vector3.zero, Quaternion.identity, 0);
         roundManager = roundManagerGameObject.GetComponent<RoundManager>();
-        roundManager.SetNpcSpawnData(spawnOneNpcOnly ? oneNpcOnlySpawnData : standardSpawnData);
-        roundManager.SetSpawnPlayersAtZero(spawnPlayersAtZero);
-        roundManager.SetHuntersOnlyMode(huntersOnlyMode);
-        roundManager.SetSelectParasiteRandomly(isRandomParasite);
-        roundManager.SetCharacterSelections(characterSelectionManager.GetCharacterSelections());
+        NpcSpawnData spawnData = spawnOneNpcOnly ? oneNpcOnlySpawnData : standardSpawnData;
+        Dictionary<int, CharacterType> characterSelections = characterSelectionManager.GetCharacterSelections();
+        roundManager.Initialize(spawnData, spawnPlayersAtZero, huntersOnlyMode, isRandomParasite, characterSelections);
     }
 
     void SetIsRandomParasite(bool isRandom) {

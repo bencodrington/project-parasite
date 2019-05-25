@@ -73,6 +73,9 @@ public class UiManager : MonoBehaviour, IOnEventCallback
                 CharacterType victorType = (CharacterType)EventCodes.GetFirstEventContent(photonEvent);
                 ShowGameOverScreen(victorType);
                 break;
+			case EventCodes.SetNpcCount:
+				SetRemainingNpcCount((int)EventCodes.GetFirstEventContent(photonEvent));
+				break;
         }
     }
 
@@ -81,7 +84,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     public void SetRemainingNpcCount(int remainingNpcCount) {
         if (npcCountText != null) {
             npcCountText.text = remainingNpcCount.ToString();
-        };
+        }
     }
 
 	public Transform GetCanvas() {
@@ -225,6 +228,9 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     	GameObject npcCountObject = Instantiate(NpcCountPrefab, Vector3.zero, Quaternion.identity, canvas);
     	npcCountObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(UI_PADDING_DISTANCE, -UI_PADDING_DISTANCE);
         npcCountText = npcCountObject.GetComponentInChildren<Text>();
+        // The original SetNpcCount event has likely already happened, so request
+        //  the value be resent
+        EventCodes.RaiseEventAll(EventCodes.RequestNpcCount, null);
     }
 
     void RemoveHud() {

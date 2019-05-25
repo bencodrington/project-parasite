@@ -9,8 +9,6 @@ public class RoundManager : MonoBehaviourPun {
 
 	#region [Public Variables]
 
-	NpcSpawnData spawnPointData;
-
 	public bool isGameOver = false;
 	
 	#endregion
@@ -23,6 +21,8 @@ public class RoundManager : MonoBehaviourPun {
 
 	Vector2 parasiteSpawnPoint;
 	Vector2 hunterSpawnPoint;
+
+	NpcSpawnData spawnPointData;
 
 	NoMoreNPCsWinCondition noMoreNPCs;
 
@@ -43,35 +43,23 @@ public class RoundManager : MonoBehaviourPun {
 
 	#region [Public Methods]
 
+	public void Initialize(NpcSpawnData spawnData, bool spawnPlayersAtZero, bool huntersOnlyMode, bool isRandomParasite, Dictionary<int, CharacterType> characterSelections) {
+        // This method is only called on the master client, and runs before the Start() callback is called
+		SetNpcSpawnData(spawnData);
+        this.spawnPlayersAtZero = spawnPlayersAtZero;
+		this.huntersOnlyMode = huntersOnlyMode;
+        shouldSelectParasiteRandomly = isRandomParasite;
+        this.characterSelections = characterSelections;
+	}
+
 	public void EndRound() {
 		transform.GetComponentInChildren<NpcManager>().DespawnNPCs();
 		objectManager.OnRoundEnd();
 		PhotonNetwork.Destroy(photonView);
 	}
 
-	public void SetHuntersOnlyMode(bool value) {
-		huntersOnlyMode = value;
-	}
-
-	public void SetSpawnPlayersAtZero(bool value) {
-		spawnPlayersAtZero = value;
-	}
-
-	public void SetSelectParasiteRandomly(bool isRandom) {
-		shouldSelectParasiteRandomly = isRandom;
-	}
-
-	public void SetCharacterSelections(Dictionary<int, CharacterType> selections) {
-		characterSelections = selections;
-	}
-
 	public void SetShouldRunPhysicsUpdate(bool newValue) {
 		shouldRunPhysicsUpdate = newValue;
-	}
-
-	public void SetNpcSpawnData(NpcSpawnData spawnData) {
-		spawnPointData = spawnData;
-		npcManager = new NpcManager(spawnData);
 	}
 
 	public void ToggleShouldRunPhysicsUpdate() {
@@ -109,6 +97,11 @@ public class RoundManager : MonoBehaviourPun {
 
 
 	#region [Private Methods]
+
+	void SetNpcSpawnData(NpcSpawnData spawnData) {
+		spawnPointData = spawnData;
+		npcManager = new NpcManager(spawnData);
+	}
 
 	void SelectParasite() {
 		Vector2 spawnPoint;

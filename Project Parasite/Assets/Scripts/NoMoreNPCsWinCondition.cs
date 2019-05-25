@@ -17,11 +17,9 @@ public class NoMoreNPCsWinCondition : IOnEventCallback
 
     public NoMoreNPCsWinCondition() {
 		PhotonNetwork.AddCallbackTarget(this);
-        if (!PhotonNetwork.IsMasterClient) {
-            // The original SetNpcCount event has likely already happened, so request
-            //  the value be resent
-            EventCodes.RaiseEventAll(EventCodes.RequestNpcCount, null);
-        }
+        // The original SetNpcCount event has already happened, so request
+        //  the value be resent
+        EventCodes.RaiseEventAll(EventCodes.RequestNpcCount, null);
     }
 
     public void OnEvent(EventData photonEvent) {
@@ -32,17 +30,7 @@ public class NoMoreNPCsWinCondition : IOnEventCallback
         case EventCodes.NpcDespawned:
             SetNpcCount(npcCount - 1);
             if (PhotonNetwork.IsMasterClient && npcCount == 0) {
-                // Parasites Win
-                Debug.Log("Parasite Wins!");
-                EventCodes.RaiseGameOverEvent(CharacterType.Parasite);
-                PhotonNetwork.RemoveCallbackTarget(this);
-            }
-            break;
-        case EventCodes.RequestNpcCount:
-            if (PhotonNetwork.IsMasterClient) {
-                // Resend the current NPC count
-                object[] content = { npcCount };
-                EventCodes.RaiseEventAll(EventCodes.SetNpcCount, content);
+                OnLastNpcKilled();
             }
             break;
         }
@@ -50,11 +38,17 @@ public class NoMoreNPCsWinCondition : IOnEventCallback
     
     #endregion
 
+    protected virtual void OnLastNpcKilled() {
+        // Parasites Win
+        Debug.Log("Parasite Wins!");
+        EventCodes.RaiseGameOverEvent(CharacterType.Parasite);
+        PhotonNetwork.RemoveCallbackTarget(this);
+    }
+
     #region [Private Methods]
     
     void SetNpcCount(int newNpcCount) {
         npcCount = newNpcCount;
-        UiManager.Instance.SetRemainingNpcCount(npcCount);
     }
     
     #endregion
