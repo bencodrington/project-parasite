@@ -173,8 +173,6 @@ public class Parasite : Character {
 		spriteTransform = GetComponentInChildren<SpriteTransform>();
 		spriteTransform.SetTargetTransform(transform);
 		screechAudioSource = Utility.AddAudioSource(gameObject, screechSound, .2f);
-		// TODO: not necessarily
-		input = new PlayerInput();
 	}
 
 	#region [Private Methods]
