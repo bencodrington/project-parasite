@@ -32,9 +32,8 @@ public class TutorialManager
             // Spawn static orbs
             GameObject orbManagerPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/Objects/OrbManager.prefab", typeof(GameObject)) as GameObject;
             orbManager = GameObject.Instantiate(orbManagerPrefab).GetComponent<OrbManager>();
+            new ParasiteTutorialWinCondition();
         }
-        // TODO: don't show yet
-        UiManager.Instance.SetReturnToMenuPanelActive(true);
     }
 
 	public void PhysicsUpdate() {

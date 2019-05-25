@@ -136,6 +136,7 @@ public class NpcManager : IOnEventCallback {
 			}
 		}
 		NpcList.Clear();
+        PhotonNetwork.RemoveCallbackTarget(this);
 	}
 
 }

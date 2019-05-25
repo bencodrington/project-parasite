@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29dd0d2c1f5f628458b777eda1f60158, type: 3}
   m_Name: DebugNpcSpawnData
   m_EditorClassIdentifier: 
-  shouldSpawnClusters: 1
+  shouldSpawnClusters: 0
   spawnPoints:
   - isStationary: 0
+    isInfected: 0
     coordinates: {x: 0, y: 0}
+  playableCharacterSpawnPoints: []
