@@ -82,7 +82,6 @@ public class NpcManager {
 		} else {
 			npc.SetInputSource(new DefaultNpcInput());
 		}
-		// TODO: FIX INFECT, shouldn't have to overwrite input source
 		if(spawnPoint.isInfected) {
 			npc.Infect();
 			// Instantiate new dummy CharacterSpawner so that the npc can spawn a parasite when it
