@@ -78,7 +78,7 @@ public class NpcManager {
 		npc = PhotonNetwork.Instantiate(npcPrefab.name, spawnPoint.coordinates, Quaternion.identity)
 				.GetComponentInChildren<NonPlayerCharacter>();
 		if (spawnPoint.isStationary) {
-			npc.SetInputSource(new EmptyInputSource());
+			npc.SetInputSource(new StationaryNpcInput());
 		} else {
 			npc.SetInputSource(new DefaultNpcInput());
 		}

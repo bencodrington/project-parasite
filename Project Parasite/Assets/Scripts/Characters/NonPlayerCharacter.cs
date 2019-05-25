@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Photon.Pun;
 using UnityEngine;
@@ -29,6 +30,8 @@ public class NonPlayerCharacter : Character {
 
 	// How far from the npc's center to display the icon
 	Vector2 ALERT_ICON_OFFSET = new Vector2(0, 1);
+
+	Action<Vector2> OnNearbyOrbAlert;
 	
 	#endregion
 
@@ -70,7 +73,6 @@ public class NonPlayerCharacter : Character {
 			// We're on the parasite's client, so update sprite
 			SetSpriteRenderersColour(Color.magenta);
 		}
-		SetInputSource(parasiteInputSource);
 		isInfected = true;
 	}
 
@@ -81,11 +83,13 @@ public class NonPlayerCharacter : Character {
 		if (!HasAuthority() || isInfected) { return; }
 		// Only uninfected NPCs should flee, and the calculations
 		// 	should only be done on the server
-		Utility.Directions fleeDirection = atPosition.x < transform.position.x ?
-			Utility.Directions.Right :
-			Utility.Directions.Left;
-		// TODO:
-		// FleeOrbInDirection(fleeDirection);
+		if (OnNearbyOrbAlert != null) {
+			OnNearbyOrbAlert(atPosition);
+		}
+	}
+
+	public void RegisterOnNearbyOrbAlertCallback(Action<Vector2> cb) {
+		OnNearbyOrbAlert += cb;
 	}
 	
 	#endregion

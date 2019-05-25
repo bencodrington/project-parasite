@@ -56,7 +56,7 @@ public abstract class InputSource
         return shouldCameraFollowOwner;
     }
 
-    public void SetOwner(Character owner) {
+    public virtual void SetOwner(Character owner) {
         this.owner = owner;
     }
     

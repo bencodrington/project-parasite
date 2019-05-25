@@ -36,11 +36,17 @@ public class DefaultNpcInput : InputSource
         TraversePath();
     }
 
-	public void StartIdling() {
+	public virtual void StartIdling() {
 		if (idle != null) {
 			MatchManager.Instance.StopCoroutine(idle);
 		}
 		idle = MatchManager.Instance.StartCoroutine(Idle());
+	}
+
+	public override void SetOwner(Character owner) {
+		base.SetOwner(owner);
+		((NonPlayerCharacter)owner).RegisterOnNearbyOrbAlertCallback(FleeOrbAtPosition);
+		// TODO: Unregister when this is replaced by another input
 	}
     
     #endregion
@@ -92,7 +98,14 @@ public class DefaultNpcInput : InputSource
 		return target;
 	}
 
-	void FleeOrbInDirection(Utility.Directions direction) {
+	void FleeOrbAtPosition(Vector2 position) {
+		Utility.Directions fleeDirection = position.x < owner.transform.position.x ?
+			Utility.Directions.Right :
+			Utility.Directions.Left;
+		FleeInDirection(fleeDirection);
+	}
+
+	void FleeInDirection(Utility.Directions direction) {
 		// Target a location that is the maximum movement unit away from the current position
 		float offset = direction == Utility.Directions.Right ? FLEE_DISTANCE : -FLEE_DISTANCE;
 		// Without running into obstacles (walls/beams)
