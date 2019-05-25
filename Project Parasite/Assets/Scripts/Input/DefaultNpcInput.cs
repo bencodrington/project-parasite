@@ -20,6 +20,8 @@ public class DefaultNpcInput : InputSource
 	float minTimeUntilNewPath = 2f;
 	float maxTimeUntilNewPath = 5f;
 	bool hasTarget = false;
+
+	Coroutine idle;
 	
 	#endregion
 
@@ -35,7 +37,10 @@ public class DefaultNpcInput : InputSource
     }
 
 	public void StartIdling() {
-		MatchManager.Instance.StartCoroutine(Idle());
+		if (idle != null) {
+			MatchManager.Instance.StopCoroutine(idle);
+		}
+		idle = MatchManager.Instance.StartCoroutine(Idle());
 	}
     
     #endregion
@@ -118,7 +123,10 @@ public class DefaultNpcInput : InputSource
 
 	IEnumerator Idle() {
 		yield return new WaitForSeconds(Random.Range(minTimeUntilNewPath, maxTimeUntilNewPath));
-		FindNewPath();
+		// CLEANUP: StopCoroutine() should be called when the NPC is destroyed
+		if (owner != null && owner.IsUninfectedNpc()) { 
+			FindNewPath();
+		}
 	}
     
     #endregion

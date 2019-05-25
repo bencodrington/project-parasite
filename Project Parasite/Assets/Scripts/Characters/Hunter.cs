@@ -49,13 +49,10 @@ public class Hunter : Character {
 		
 		GetComponentInChildren<SpriteTransform>().SetTargetTransform(transform);
 		placeOrbAudioSource = Utility.AddAudioSource(gameObject, placeOrbSound);
-		// TODO: not necessarily
-		input = new PlayerInput();
 	}
 
 	protected override void HandleInput()  {
-		// If this hunter is stationary, like in a tutorial, don't take player input
-
+		input.UpdateInputState();
 		if (orbBeamRangeManager.mostRecentOrb != null) {
 			// Debug.DrawLine(mostRecentOrb.transform.position, transform.position, Color.cyan);
 			// Debug.DrawLine(mostRecentOrb.transform.position, (Vector2)mostRecentOrb.transform.position + new Vector2(0, 6f), Color.black);
