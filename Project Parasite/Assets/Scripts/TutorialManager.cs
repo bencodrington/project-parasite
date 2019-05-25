@@ -25,6 +25,7 @@ public class TutorialManager
         characterSpawner = new CharacterSpawner();
         Vector2 spawnCoords = type == CharacterType.Parasite ? PARASITE_SPAWN_COORDINATES : HUNTER_SPAWN_COORDINATES;
         characterSpawner.SpawnPlayerCharacter(type, spawnCoords, Vector2.zero, true);
+        UiManager.Instance.SetCharacterType(type);
         if (spawnData != null) {
             npcManager = new NpcManager(spawnData);
         }

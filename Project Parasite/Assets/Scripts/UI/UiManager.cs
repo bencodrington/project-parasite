@@ -15,7 +15,6 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     public static UiManager Instance;
 	public GameObject GameOverScreenPrefab;
 	public GameObject GameOverScreenServerPrefab;
-    public CharacterType characterType;
     
 	public GameObject ParasiteControlsPrefab;
 	public GameObject HunterControlsPrefab;
@@ -31,6 +30,8 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	GameObject gameOverScreen;
 	Text topRightUiText;
     Transform canvas;
+
+	CharacterType characterType;
 
 	// The text shown on the game over screen
 	const string HUNTERS_WIN = "HUNTERS WIN!";
@@ -63,9 +64,8 @@ public class UiManager : MonoBehaviour, IOnEventCallback
                 break;
 			case EventCodes.AssignPlayerTypeAndSpawnPoint:
 				int actorNumber = (int)EventCodes.GetEventContentAtPosition(photonEvent, 0);
-				characterType = (CharacterType)EventCodes.GetEventContentAtPosition(photonEvent, 1);
 				if (actorNumber == PhotonNetwork.LocalPlayer.ActorNumber) {
-					UpdateHud();
+					SetCharacterType((CharacterType)EventCodes.GetEventContentAtPosition(photonEvent, 1));
 				}
                 break;
             case EventCodes.GameOver: 
@@ -87,6 +87,11 @@ public class UiManager : MonoBehaviour, IOnEventCallback
         }
     }
 
+	public void SetCharacterType(CharacterType type) {
+		characterType = type;
+		UpdateHud();
+	}
+
 	public Transform GetCanvas() {
 		return canvas;
 	}
@@ -94,6 +99,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	public void ShowMainMenu() {
 		SetTitleScreenActive(true);
 		mainMenu.SetActive(true);
+		RemoveHud();
 	}
 
 	public void OnJoinedRoom() {
