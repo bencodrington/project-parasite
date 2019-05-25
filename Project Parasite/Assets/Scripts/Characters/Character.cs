@@ -19,7 +19,7 @@ public abstract class Character : MonoBehaviourPun {
 	protected bool isMovingUp;
 	protected bool isMovingDown;
 
-	protected bool isStationary = false;
+    protected InputSource input;
 
 	#region [Private Variables]
 	
@@ -167,8 +167,11 @@ public abstract class Character : MonoBehaviourPun {
 		physicsEntity.AddVelocity(velocity.x, velocity.y);
 	}
 
-	public void SetStationary() {
-		isStationary = true;
+	public void SetInputSource(InputSource newInputSource, bool shouldCameraFollowSnap = false) {
+		input = newInputSource;
+		if (newInputSource.ShouldCameraFollowOwner()) {
+			SetCameraFollow(shouldCameraFollowSnap);
+		}
 	}
 
 	public virtual bool IsUninfectedNpc() {
@@ -217,11 +220,9 @@ public abstract class Character : MonoBehaviourPun {
 	protected void HandleHorizontalMovement() {
 		isMovingLeft = false;
 		isMovingRight = false;
-		bool right = Input.GetKey(KeyCode.D);
-		bool left = Input.GetKey(KeyCode.A);
-		if (right && !left) {
+		if (input.isDown(PlayerInput.Key.right) && !input.isDown(PlayerInput.Key.left)) {
 			isMovingRight = true;
-		} else if (left && !right) {
+		} else if (input.isDown(PlayerInput.Key.left) && !input.isDown(PlayerInput.Key.right)) {
 			isMovingLeft = true;
 		}
 	}

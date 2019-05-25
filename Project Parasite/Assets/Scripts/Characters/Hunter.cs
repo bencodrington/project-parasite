@@ -14,9 +14,6 @@ public class Hunter : Character {
 	// 	NPCs will be alerted to run away
 	Vector2 NPC_ALERT_RANGE = new Vector2(12, 4);
 
-	// Used when getting user input to determine if key was down last frame
-	private bool oldUp = false;
-
 	public AudioClip cantPlaceOrbSound;
 	public AudioClip placeOrbSound;
 	public GameObject orbPrefab;
@@ -52,11 +49,12 @@ public class Hunter : Character {
 		
 		GetComponentInChildren<SpriteTransform>().SetTargetTransform(transform);
 		placeOrbAudioSource = Utility.AddAudioSource(gameObject, placeOrbSound);
+		// TODO: not necessarily
+		input = new PlayerInput();
 	}
 
 	protected override void HandleInput()  {
 		// If this hunter is stationary, like in a tutorial, don't take player input
-		if (isStationary) { return; }
 
 		if (orbBeamRangeManager.mostRecentOrb != null) {
 			// Debug.DrawLine(mostRecentOrb.transform.position, transform.position, Color.cyan);
@@ -66,20 +64,18 @@ public class Hunter : Character {
 		// Movement
 		HandleHorizontalMovement();
 
-		bool up = Input.GetKey(KeyCode.W);
 		// If up was pressed this frame for the first time and the player is on the ground
-		if (up && !oldUp && physicsEntity.IsOnGround()) {
+		if (input.isJustPressed(PlayerInput.Key.up) && physicsEntity.IsOnGround()) {
 			// Jump
 			photonView.RPC("RpcJump", RpcTarget.All);
 		}
-		oldUp = up;
 
-		if (Input.GetKeyDown(KeyCode.E)) {
+		if (input.isJustPressed(PlayerInput.Key.interact)) {
 			InteractWithObjectsInRange();
 		}
 
 		// Place orb
-		if (Input.GetMouseButtonDown(0)) {
+		if (input.isJustPressed(PlayerInput.Key.action1)) {
 			// CLEANUP: this can be cleaner, once InputManager is implemented
 			// Don't spawn orb if clicking elevator button
 			if (Physics2D.OverlapPoint(Utility.GetMousePos(), Utility.GetLayerMask("clickable")) == null) {
@@ -87,7 +83,7 @@ public class Hunter : Character {
 			}
 		}
 		// Recall orb
-		if (Input.GetMouseButtonDown(1)) {
+		if (input.isJustPressed(PlayerInput.Key.action2)) {
 			AttemptToRecallOrb();
 		}
 	}

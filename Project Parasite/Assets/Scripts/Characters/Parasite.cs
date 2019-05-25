@@ -65,18 +65,11 @@ public class Parasite : Character {
 	// The direction that the parasite is attached to (left wall, right wall, ceiling)
 	// 	when it began charging a pounce
 	Utility.Directions attachedDirection = Utility.Directions.Null;
-
-    PlayerInput input;
 	
 	#endregion
 
 	protected override void HandleInput()  {
 		input.UpdateInputState();
-
-		// TODO: extract isStationary
-		// If this parasite is stationary, like in a tutorial, don't take player input
-		if (isStationary) { return; }
-		// TODO: /isStationary
 
 		isMovingLeft = false;
 		isMovingRight = false;
@@ -95,10 +88,10 @@ public class Parasite : Character {
 				}
 			}
 		} else {
-			if (input.isDown(PlayerInput.InputKey.right) && !input.isDown(PlayerInput.InputKey.left)) {
+			if (input.isDown(PlayerInput.Key.right) && !input.isDown(PlayerInput.Key.left)) {
 				physicsEntity.applyGravity = !physicsEntity.IsOnRightWall();
 				isMovingRight = true;
-			} else if (input.isDown(PlayerInput.InputKey.left) && !input.isDown(PlayerInput.InputKey.right)) {
+			} else if (input.isDown(PlayerInput.Key.left) && !input.isDown(PlayerInput.Key.right)) {
 				physicsEntity.applyGravity = !physicsEntity.IsOnLeftWall();
 				isMovingLeft = true;
 			} else {
@@ -107,31 +100,31 @@ public class Parasite : Character {
 		}
 		isMovingUp = false;
 		isMovingDown = false;
-		if (input.isJustPressed(PlayerInput.InputKey.up) && physicsEntity.IsOnGround() && !IsChargingPounce()) {
+		if (input.isJustPressed(PlayerInput.Key.up) && physicsEntity.IsOnGround() && !IsChargingPounce()) {
 			// Jump
 			photonView.RPC("RpcJump", RpcTarget.All);
-		}  else if (input.isDown(PlayerInput.InputKey.up) && physicsEntity.IsOnWall() && !IsChargingPounce()) {
+		}  else if (input.isDown(PlayerInput.Key.up) && physicsEntity.IsOnWall() && !IsChargingPounce()) {
 			// Climb Up
 			isMovingUp = true;
-		} else if (input.isDown(PlayerInput.InputKey.down) && physicsEntity.IsOnWall() && !IsChargingPounce()) {
+		} else if (input.isDown(PlayerInput.Key.down) && physicsEntity.IsOnWall() && !IsChargingPounce()) {
 			// Climb Down
 			isMovingDown = true;
 		}
-		if (input.isDown(PlayerInput.InputKey.up)) {
+		if (input.isDown(PlayerInput.Key.up)) {
 			// Attempt to stick to ceiling
 			isTryingToStickToCeiling = true;
 		}
-		if (input.isJustPressed(PlayerInput.InputKey.action1)) {
+		if (input.isJustPressed(PlayerInput.Key.action1)) {
 			// Action key just pressed
 			PounceIndicator.Show();
 		}
 		UpdateAttachedDirection();
-		if (input.isDown(PlayerInput.InputKey.action1)) {
+		if (input.isDown(PlayerInput.Key.action1)) {
 			// Action key is down
 			// Charge leap
 			timeSpentCharging += Time.deltaTime;
 			PounceIndicator.SetPercentage(PounceChargePercentage());
-		} else if (input.isJustReleased(PlayerInput.InputKey.action1)) {
+		} else if (input.isJustReleased(PlayerInput.Key.action1)) {
 			// On action button release
 			if (CanPounce()) {
 				// Pounce
@@ -149,7 +142,7 @@ public class Parasite : Character {
 		}
 
 		// Infect
-		if (input.isDown(PlayerInput.InputKey.action2)) {
+		if (input.isDown(PlayerInput.Key.action2)) {
 			IsAttemptingInfection = true;
 			Collider2D npc = Physics2D.OverlapCircle(transform.position, INFECT_RADIUS, Utility.GetLayerMask(CharacterType.NPC));
 			if (npc != null) {
@@ -160,7 +153,7 @@ public class Parasite : Character {
 			IsAttemptingInfection = false;
 		}
 
-		if (input.isJustPressed(PlayerInput.InputKey.interact)) {
+		if (input.isJustPressed(PlayerInput.Key.interact)) {
 			InteractWithObjectsInRange();
 		}
 	}
@@ -180,6 +173,7 @@ public class Parasite : Character {
 		spriteTransform = GetComponentInChildren<SpriteTransform>();
 		spriteTransform.SetTargetTransform(transform);
 		screechAudioSource = Utility.AddAudioSource(gameObject, screechSound, .2f);
+		// TODO: not necessarily
 		input = new PlayerInput();
 	}
 
@@ -261,7 +255,7 @@ public class Parasite : Character {
 		// Store playerObject for eventual transfer back to parasite
 		npc.CharacterSpawner = CharacterSpawner;
 		// Set isInfected to true/update sprite on new authority's client
-		npc.Infect();
+		npc.Infect(input);
 		// Update client's camera and render settings to reflect new character
 		npc.SetCameraFollow(false);
 		npc.SetRenderLayer();

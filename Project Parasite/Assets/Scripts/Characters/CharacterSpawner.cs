@@ -37,6 +37,7 @@ public class CharacterSpawner
 		if (assignedCharacterType == CharacterType.Parasite) {
             parasiteData = new ParasiteData();
 		}
+		character.SetInputSource(new PlayerInput());
 		return character;
 	}
 

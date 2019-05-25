@@ -78,15 +78,19 @@ public class NpcManager {
 		npc = PhotonNetwork.Instantiate(npcPrefab.name, spawnPoint.coordinates, Quaternion.identity)
 				.GetComponentInChildren<NonPlayerCharacter>();
 		if (spawnPoint.isStationary) {
-			npc.SetShouldntMove();
+			npc.SetInputSource(new EmptyInputSource());
+		} else {
+			npc.SetInputSource(new DefaultNpcInput());
 		}
+		// TODO: FIX INFECT, shouldn't have to overwrite input source
 		if(spawnPoint.isInfected) {
-			npc.Infect(true);
+			npc.Infect(new EmptyInputSource(), false);
 			// Instantiate new dummy CharacterSpawner so that the npc can spawn a parasite when it
 			//	gets fried
 			npc.CharacterSpawner = new CharacterSpawner(); 
 		}
-		npc.StartIdling();
+		// TODO:
+		// npc.StartIdling();
 		NpcList.Add(npc);
 	}
 
@@ -108,7 +112,7 @@ public class NpcManager {
 			playableCharacterPrefab = spawnPoint.isParasite ? parasitePrefab : hunterPrefab;
 			character = PhotonNetwork.Instantiate(playableCharacterPrefab.name, spawnPoint.coordinates, Quaternion.identity)
 					.GetComponentInChildren<Character>();
-			character.SetStationary();
+			character.SetInputSource(new EmptyInputSource());
 		}
 	}
 	
