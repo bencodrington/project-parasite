@@ -24,6 +24,8 @@ public abstract class InputSource
 
     protected bool shouldCameraFollowOwner = false;
 
+    protected Character owner;
+
     #region [Public Methods]
 
     public InputSource() {
@@ -52,6 +54,10 @@ public abstract class InputSource
 
     public bool ShouldCameraFollowOwner() {
         return shouldCameraFollowOwner;
+    }
+
+    public void SetOwner(Character owner) {
+        this.owner = owner;
     }
     
     #endregion

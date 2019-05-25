@@ -58,10 +58,13 @@ public abstract class Character : MonoBehaviourPun {
 
 	#region [MonoBehaviour Callbacks]
 
+	void Awake() {
+		GeneratePhysicsEntity();
+	}
+
 	void Start() {
 		spriteRenderers = GetSpriteRenderers();
 		animator = GetComponentInChildren<Animator>();
-		GeneratePhysicsEntity();
 		OnStart();
 		// Only continue if this client owns this gameObject
 		if (!HasAuthority()) { return; }
@@ -172,6 +175,7 @@ public abstract class Character : MonoBehaviourPun {
 		if (newInputSource.ShouldCameraFollowOwner()) {
 			SetCameraFollow(shouldCameraFollowSnap);
 		}
+		input.SetOwner(this);
 	}
 
 	public virtual bool IsUninfectedNpc() {

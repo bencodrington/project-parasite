@@ -21,24 +21,7 @@ public class NonPlayerCharacter : Character {
 	//	upon ejecting
 	const float MIN_BURST_TIME = 1f;
 
-	// The range of distances that NPCs will randomly select from
-	// 	when choosing a new point to travel to
-	const float MAX_TARGET_DISTANCE = 5f;
-	const float MIN_TARGET_DISTANCE = 2f;
-
-	// The farthest that NPCs will try to move when running away
-	const float FLEE_DISTANCE = 8f;
-
 	BurstIndicator burstIndicator;
-
-	// Pathfinding
-	float validDistanceFromTarget = .5f;
-	// Note that target is currently only used to move horizontally,
-	//	and as a result is only the x coordinate of the target location
-	float targetX;
-	float minTimeUntilNewPath = 2f;
-	float maxTimeUntilNewPath = 5f;
-	bool hasTarget = false;
 
 	// The amount of time Action 2 has been held down since it was pressed
 	float timeChargingForBurst = 0f;
@@ -51,7 +34,6 @@ public class NonPlayerCharacter : Character {
 
 	protected override void HandleInput() {
 		input.UpdateInputState();
-		if (!isInfected) { return; } //TODO: should actually have a branch for uninfected, feed the input state into the AI
 		// Movement
 		if (isChargingForBurst) {
 			isMovingLeft = false;
@@ -60,7 +42,6 @@ public class NonPlayerCharacter : Character {
 			// Only allow movement if we're not charging
 			HandleHorizontalMovement();
 		}
-
 		// Self Destruct
 		if (input.isJustPressed(InputSource.Key.action2)) {
 			OnAction2Down();
