@@ -84,13 +84,11 @@ public class NpcManager {
 		}
 		// TODO: FIX INFECT, shouldn't have to overwrite input source
 		if(spawnPoint.isInfected) {
-			npc.Infect(new EmptyInputSource(), false);
+			npc.Infect();
 			// Instantiate new dummy CharacterSpawner so that the npc can spawn a parasite when it
 			//	gets fried
 			npc.CharacterSpawner = new CharacterSpawner(); 
 		}
-		// TODO:
-		// npc.StartIdling();
 		NpcList.Add(npc);
 	}
 

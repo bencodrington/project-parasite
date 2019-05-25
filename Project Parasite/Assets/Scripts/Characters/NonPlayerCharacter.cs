@@ -64,12 +64,14 @@ public class NonPlayerCharacter : Character {
 		}
 	}
 
-	public void Infect(InputSource parasiteInputSource, bool shouldUpdateNpcAppearance = true) {
+	public void Infect(InputSource parasiteInputSource = null) {
+		if (parasiteInputSource != null) {
+			SetInputSource(parasiteInputSource);
+			// We're on the parasite's client, so update sprite
+			SetSpriteRenderersColour(Color.magenta);
+		}
 		SetInputSource(parasiteInputSource);
 		isInfected = true;
-		if (!shouldUpdateNpcAppearance) { return; }
-		// Only update sprite if on the Parasite player's client
-		SetSpriteRenderersColour(Color.magenta);
 	}
 
 	public void NearbyOrbAlert(Vector2 atPosition) {
