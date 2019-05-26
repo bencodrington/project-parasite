@@ -32,6 +32,8 @@ public class NonPlayerCharacter : Character {
 	Vector2 ALERT_ICON_OFFSET = new Vector2(0, 1);
 
 	Action<Vector2> OnNearbyOrbAlert;
+
+	InputSource originalInputSource;
 	
 	#endregion
 
@@ -68,7 +70,14 @@ public class NonPlayerCharacter : Character {
 	}
 
 	public void Infect(InputSource parasiteInputSource = null) {
+		// Remember what our input source was before being infected, so that we can go back to
+		// 	it
+		originalInputSource = input;
+		// If parasiteInputSource is null, that means that this is an NPC-controlled infected NPC
+		// 	not one controlled by the player. So don't overwrite the input source and don't update
+		// 	visuals
 		if (parasiteInputSource != null) {
+			// We're being infected by a player parasite
 			SetInputSource(parasiteInputSource);
 			// We're on the parasite's client, so update sprite
 			SetSpriteRenderersColour(Color.magenta);
@@ -154,7 +163,7 @@ public class NonPlayerCharacter : Character {
 		SetSpriteRenderersColour(Color.white);
 		// Return npc to the same render layer as the other NPCs
 		SetRenderLayer("Characters");
-		SetInputSource(new DefaultNpcInput());
+		SetInputSource(originalInputSource != null ? originalInputSource : input);
 	}
 
 	void DespawnSelf() {
@@ -164,8 +173,7 @@ public class NonPlayerCharacter : Character {
 	}
 
 	void SpawnParasite() {
-		Character parasite = CharacterSpawner.SpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY), false, false);
-		parasite.SetInputSource(input);
+		Character parasite = CharacterSpawner.SpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY), false, false, originalInputSource != null ? originalInputSource : input);
 	}
 
 	void HandleBurstCharging() {

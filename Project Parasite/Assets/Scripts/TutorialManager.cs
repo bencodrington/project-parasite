@@ -6,6 +6,12 @@ using UnityEngine;
 public class TutorialManager
 {
 
+    #region [Public Variables]
+
+    public static int parasitesStillAlive;
+    
+    #endregion
+
     #region [Private Variables]
     
     Vector2 PARASITE_SPAWN_COORDINATES = new Vector2(113, -56.4f);
@@ -24,7 +30,7 @@ public class TutorialManager
     #region [Public Methods]
 
     public TutorialManager(CharacterType type, NpcSpawnData spawnData = null) {
-        characterSpawner = new CharacterSpawner();
+        characterSpawner = type == CharacterType.Parasite ? new CharacterSpawner(Restart) : new CharacterSpawner();
         characterType = type;
         SpawnPlayer();
         UiManager.Instance.SetCharacterType(type);
@@ -57,12 +63,21 @@ public class TutorialManager
         orbManager = null;
     }
 
-    public void Restart() {
+    public void Restart(CharacterSpawner spawner) {
         // Respawn player
-        characterSpawner.DestroyCharacter();
+        spawner.DestroyCharacter();
         SpawnPlayer();
         // Respawn NPCs
         npcManager.Restart();
+    }
+
+    // CLEANUP: this and its associated variables should probably be extracted
+    //  to a separate class
+    public static void OnParasiteKilled(CharacterSpawner spawner) {
+        spawner.DestroyCharacter();
+        if (parasitesStillAlive == 0) {
+            UiManager.Instance.SetReturnToMenuPanelActive(true);
+        }
     }
     
     #endregion
@@ -71,7 +86,7 @@ public class TutorialManager
     
     void SpawnPlayer() {
         Vector2 spawnCoords = characterType == CharacterType.Parasite ? PARASITE_SPAWN_COORDINATES : HUNTER_SPAWN_COORDINATES;
-        characterSpawner.SpawnPlayerCharacter(characterType, spawnCoords, Vector2.zero, true, true, null, Restart);
+        characterSpawner.SpawnPlayerCharacter(characterType, spawnCoords, Vector2.zero);
     }
     
     #endregion

@@ -45,8 +45,13 @@ public class DefaultNpcInput : InputSource
 
 	public override void SetOwner(Character owner) {
 		base.SetOwner(owner);
-		((NonPlayerCharacter)owner).RegisterOnNearbyOrbAlertCallback(FleeOrbAtPosition);
-		// TODO: Unregister when this is replaced by another input
+		if (owner is NonPlayerCharacter ) {
+			// Owner might not be of type NonPlayerCharacter if it is spawned as an AI-controlled
+			// 	infected NPC. Then when it spawns its parasite, the parasite will be the new owner of
+			// 	this input.
+			((NonPlayerCharacter)owner).RegisterOnNearbyOrbAlertCallback(FleeOrbAtPosition);
+		}
+		// TODO: Unregister when this is replaced by another input (NOTE: stationary never registers)
 	}
     
     #endregion

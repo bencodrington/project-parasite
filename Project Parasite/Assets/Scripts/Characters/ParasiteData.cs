@@ -13,7 +13,7 @@ public class ParasiteData
 			_parasiteHealth = Mathf.Clamp(value, 0, STARTING_HEALTH);
 			UiManager.Instance.UpdateHealthObject(_parasiteHealth);
 			if (value <= 0 && !hasHandledDeath) {
-				deathHandler();
+				deathHandler(owner);
 				hasHandledDeath = true;
 			}
 		}
@@ -25,13 +25,15 @@ public class ParasiteData
     
     bool hasHandledDeath;
 
+	CharacterSpawner owner;
 	DeathHandler deathHandler;
     
     #endregion
 
     #region [Public Methods]
 
-    public ParasiteData(DeathHandler deathHandler = null) {
+    public ParasiteData(CharacterSpawner owner, DeathHandler deathHandler = null) {
+		this.owner = owner;
 		if (deathHandler == null) {
 			deathHandler = DefaultDeathHandler;
 		}
@@ -40,7 +42,7 @@ public class ParasiteData
         ParasiteHealth = STARTING_HEALTH;
     }
 	
-	public delegate void DeathHandler();
+	public delegate void DeathHandler(CharacterSpawner spawner);
     
 	public void ParasiteTakeDamage(int damage) {
 		ParasiteHealth -= damage;
@@ -50,7 +52,7 @@ public class ParasiteData
 
 	#region [Private Methods]
 
-	void DefaultDeathHandler() {
+	void DefaultDeathHandler(CharacterSpawner unused) {
 		EventCodes.RaiseGameOverEvent(CharacterType.Hunter);
 	}
 	

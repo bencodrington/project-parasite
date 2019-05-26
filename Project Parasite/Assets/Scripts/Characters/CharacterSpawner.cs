@@ -13,10 +13,21 @@ public class CharacterSpawner
     #region [Private Variables]
 
 	GameObject characterGameObject;
+
+	// If not null, this is a function that should be called when any Parasites
+	// 	spawned by this CharacterSpawner run out of health
+	ParasiteData.DeathHandler deathHandler;
     
     #endregion
 
     #region [Public Methods]
+
+	public CharacterSpawner(ParasiteData.DeathHandler deathHandler = null) {
+		if (deathHandler != null) {
+			TutorialManager.parasitesStillAlive++;
+		}
+		this.deathHandler = deathHandler;
+	}
     
 	public Character SpawnPlayerCharacter(
 					CharacterType assignedCharacterType,
@@ -24,8 +35,7 @@ public class CharacterSpawner
 					Vector2 velocity,
 					bool forceCameraSnap = true,
 					bool shouldCameraFollow = true,
-					InputSource inputSource = null,
-					ParasiteData.DeathHandler deathHandler = null) {
+					InputSource inputSource = null) {
 		if (inputSource == null) {
 			inputSource = new PlayerInput();
 		}
@@ -45,7 +55,7 @@ public class CharacterSpawner
 		// Make the character draw in front of other characters
     	character.SetRenderLayer();
 		if (assignedCharacterType == CharacterType.Parasite) {
-            parasiteData = new ParasiteData(deathHandler);
+            parasiteData = new ParasiteData(this, deathHandler);
 		}
 		character.SetInputSource(inputSource);
 		return character;
@@ -55,6 +65,9 @@ public class CharacterSpawner
     	if (characterGameObject != null) {
             PhotonNetwork.Destroy(characterGameObject);
     	}
+		if (deathHandler != null) {
+			TutorialManager.parasitesStillAlive--;
+		}
     }
     
     #endregion

@@ -214,6 +214,12 @@ public class Parasite : Character {
 	
 	void OnTakingDamage() {
 		StartCoroutine(FlashColours());
+		if (screechAudioSource == null) {
+			// This can happen the frame that an infected NPC gets fried
+			// 	The newly spawned parasite can take damage before its OnStart() method
+			// 	is called.
+			return;
+		}
 		if (!screechAudioSource.isPlaying) {
 			screechAudioSource.pitch = Random.Range(0.5f, 1.5f);
 			screechAudioSource.Play();

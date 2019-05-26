@@ -105,7 +105,7 @@ public class NpcManager : IOnEventCallback {
 			npc.Infect();
 			// Instantiate new dummy CharacterSpawner so that the npc can spawn a parasite when it
 			//	gets fried
-			npc.CharacterSpawner = new CharacterSpawner(); 
+			npc.CharacterSpawner = new CharacterSpawner(TutorialManager.OnParasiteKilled);
 		}
 		NpcList.Add(npc);
 	}
@@ -127,8 +127,13 @@ public class NpcManager : IOnEventCallback {
 		characterSpawners = new CharacterSpawner[spawnData.playableCharacterSpawnPoints.Length];
 		for (int i = 0; i < spawnData.playableCharacterSpawnPoints.Length; i++) {
 			NpcSpawnData.playableCharacterSpawnPoint spawnPoint = spawnData.playableCharacterSpawnPoints[i];
-			type = spawnPoint.isParasite ? CharacterType.Parasite : CharacterType.Hunter;
-			characterSpawners[i] = new CharacterSpawner();
+			if (spawnPoint.isParasite) {
+				type = CharacterType.Parasite;
+				characterSpawners[i] = new CharacterSpawner(TutorialManager.OnParasiteKilled);
+			} else {
+				type = CharacterType.Hunter;
+				characterSpawners[i] = new CharacterSpawner();
+			}
 			character = characterSpawners[i].SpawnPlayerCharacter(type, spawnPoint.coordinates, Vector2.zero, false, false, new EmptyInputSource());
 		}
 	}
