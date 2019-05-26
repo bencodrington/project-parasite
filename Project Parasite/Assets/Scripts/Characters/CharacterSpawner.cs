@@ -12,7 +12,7 @@ public class CharacterSpawner
 
     #region [Private Variables]
 
-	GameObject characterGameObject;
+	Character character;
 
 	// If not null, this is a function that should be called when any Parasites
 	// 	spawned by this CharacterSpawner run out of health
@@ -42,9 +42,9 @@ public class CharacterSpawner
 		String characterPrefabName = assignedCharacterType == CharacterType.Parasite ? "Parasite" : "Hunter";
 		GameObject characterPrefab = Resources.Load(characterPrefabName) as GameObject;
         // Create PlayerCharacter game object on the server
-        characterGameObject = PhotonNetwork.Instantiate(characterPrefab.name, atPosition, Quaternion.identity);
+        GameObject characterGameObject = PhotonNetwork.Instantiate(characterPrefab.name, atPosition, Quaternion.identity);
     	// Get PlayerCharacter script
-    	Character character = characterGameObject.GetComponentInChildren<Character>();
+    	character = characterGameObject.GetComponentInChildren<Character>();
     	// Initialize each player's character on their own client
     	character.SetStartingVelocity(velocity);
     	character.CharacterSpawner = this;
@@ -62,8 +62,8 @@ public class CharacterSpawner
 	}
 
 	public void DestroyCharacter() {
-    	if (characterGameObject != null) {
-            PhotonNetwork.Destroy(characterGameObject);
+    	if (character != null) {
+			character.Destroy();
     	}
 		if (deathHandler != null) {
 			TutorialManager.parasitesStillAlive--;

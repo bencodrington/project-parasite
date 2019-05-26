@@ -97,16 +97,12 @@ public class Hunter : Character {
 	
 	#endregion
 
-	#region [MonoBehaviour Callbacks]
-	
-	void OnDestroy() {
+	protected override void OnCharacterDestroy() {
 		DestroyAllOrbs();
 		if (HasAuthority()) {
 			Destroy(orbUiManager.gameObject);
 		}
 	}
-	
-	#endregion
 
 	#region [Private Methods]
 	

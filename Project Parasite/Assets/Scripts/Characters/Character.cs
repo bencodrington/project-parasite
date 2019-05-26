@@ -211,6 +211,11 @@ public abstract class Character : MonoBehaviourPun {
 		physicsEntity.Move(displacement);
 		transform.position = physicsEntity.transformPosition;
 	}
+
+	public void Destroy() {
+		OnCharacterDestroy();
+		PhotonNetwork.Destroy(gameObject);
+	}
 	
 	#endregion
 
