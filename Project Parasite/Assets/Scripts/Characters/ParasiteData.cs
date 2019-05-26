@@ -12,9 +12,9 @@ public class ParasiteData
 		set {
 			_parasiteHealth = Mathf.Clamp(value, 0, STARTING_HEALTH);
 			UiManager.Instance.UpdateHealthObject(_parasiteHealth);
-			if (value <= 0 && !hasSentGameOver) {
-                EventCodes.RaiseGameOverEvent(CharacterType.Hunter);
-				hasSentGameOver = false;
+			if (value <= 0 && !hasHandledDeath) {
+				deathHandler();
+				hasHandledDeath = true;
 			}
 		}
 	}
@@ -23,21 +23,37 @@ public class ParasiteData
 
     #region [Private Variables]
     
-    bool hasSentGameOver;
+    bool hasHandledDeath;
+
+	DeathHandler deathHandler;
     
     #endregion
 
     #region [Public Methods]
 
-    public ParasiteData() {
-		hasSentGameOver = false;
+    public ParasiteData(DeathHandler deathHandler = null) {
+		if (deathHandler == null) {
+			deathHandler = DefaultDeathHandler;
+		}
+		this.deathHandler = deathHandler;
+		hasHandledDeath = false;
         ParasiteHealth = STARTING_HEALTH;
     }
+	
+	public delegate void DeathHandler();
     
 	public void ParasiteTakeDamage(int damage) {
 		ParasiteHealth -= damage;
 	}
     
     #endregion
+
+	#region [Private Methods]
+
+	void DefaultDeathHandler() {
+		EventCodes.RaiseGameOverEvent(CharacterType.Hunter);
+	}
+	
+	#endregion
 
 }

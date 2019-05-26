@@ -18,7 +18,14 @@ public class CharacterSpawner
 
     #region [Public Methods]
     
-	public Character SpawnPlayerCharacter(CharacterType assignedCharacterType, Vector3 atPosition, Vector2 velocity, bool forceCameraSnap = true, bool shouldCameraFollow = true, InputSource inputSource = null) {
+	public Character SpawnPlayerCharacter(
+					CharacterType assignedCharacterType,
+					Vector3 atPosition,
+					Vector2 velocity,
+					bool forceCameraSnap = true,
+					bool shouldCameraFollow = true,
+					InputSource inputSource = null,
+					ParasiteData.DeathHandler deathHandler = null) {
 		if (inputSource == null) {
 			inputSource = new PlayerInput();
 		}
@@ -38,7 +45,7 @@ public class CharacterSpawner
 		// Make the character draw in front of other characters
     	character.SetRenderLayer();
 		if (assignedCharacterType == CharacterType.Parasite) {
-            parasiteData = new ParasiteData();
+            parasiteData = new ParasiteData(deathHandler);
 		}
 		character.SetInputSource(inputSource);
 		return character;

@@ -16,6 +16,8 @@ public class TutorialManager
     // Used for spawning and keeping track of static orbs,
     //  not associated with any given hunter
     OrbManager orbManager;
+
+    CharacterType characterType;
     
     #endregion
 
@@ -23,8 +25,8 @@ public class TutorialManager
 
     public TutorialManager(CharacterType type, NpcSpawnData spawnData = null) {
         characterSpawner = new CharacterSpawner();
-        Vector2 spawnCoords = type == CharacterType.Parasite ? PARASITE_SPAWN_COORDINATES : HUNTER_SPAWN_COORDINATES;
-        characterSpawner.SpawnPlayerCharacter(type, spawnCoords, Vector2.zero, true);
+        characterType = type;
+        SpawnPlayer();
         UiManager.Instance.SetCharacterType(type);
         if (spawnData != null) {
             npcManager = new NpcManager(spawnData);
@@ -54,6 +56,24 @@ public class TutorialManager
         orbManager.DestroyOrbs();
         orbManager = null;
     }
+
+    public void Restart() {
+        // Respawn player
+        characterSpawner.DestroyCharacter();
+        SpawnPlayer();
+        // Respawn NPCs
+        npcManager.Restart();
+    }
     
     #endregion
+
+    #region [Private Methods]
+    
+    void SpawnPlayer() {
+        Vector2 spawnCoords = characterType == CharacterType.Parasite ? PARASITE_SPAWN_COORDINATES : HUNTER_SPAWN_COORDINATES;
+        characterSpawner.SpawnPlayerCharacter(characterType, spawnCoords, Vector2.zero, true, true, null, Restart);
+    }
+    
+    #endregion
+
 }

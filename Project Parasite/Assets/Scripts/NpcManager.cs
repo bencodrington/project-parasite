@@ -42,7 +42,6 @@ public class NpcManager : IOnEventCallback {
 		parasitePrefab = (GameObject)Resources.Load("Parasite");
 		hunterPrefab = (GameObject)Resources.Load("Hunter");
 		SpawnNPCs();
-		SpawnPlayableCharacters();
 	}
 
     public void OnEvent(EventData photonEvent) {
@@ -54,6 +53,11 @@ public class NpcManager : IOnEventCallback {
             }
 		}
     }
+
+	public void Restart() {
+		DespawnNPCs(false);
+		SpawnNPCs();
+	}
 	
 	#endregion
 
@@ -71,6 +75,7 @@ public class NpcManager : IOnEventCallback {
 		}
 		object[] content = { NpcList.Count };
 		EventCodes.RaiseEventAll(EventCodes.SetNpcCount, content);
+		SpawnPlayableCharacters();
 	}
 	
 	void SpawnNpcGroup(NpcSpawnData.spawnPoint spawnCenter) {
@@ -130,7 +135,7 @@ public class NpcManager : IOnEventCallback {
 	
 	#endregion
 
-	public void DespawnNPCs() {
+	public void DespawnNPCs(bool shouldRemoveCallbackTarget = true) {
 		// Remove NPCs
 		foreach (NonPlayerCharacter npc in NpcList) {
 			if (npc != null) {
@@ -143,6 +148,7 @@ public class NpcManager : IOnEventCallback {
 			characterSpawners[i].DestroyCharacter();
 		}
 		characterSpawners = null;
+		if (!shouldRemoveCallbackTarget) { return; }
         PhotonNetwork.RemoveCallbackTarget(this);
 	}
 

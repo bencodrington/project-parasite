@@ -164,7 +164,10 @@ public class Parasite : Character {
 		if (photonView.IsMine) {
 			CharacterSpawner.parasiteData.ParasiteTakeDamage(damage);
 		}
-		OnTakingDamage();
+		if (gameObject.activeInHierarchy) {
+			// This gameObject hasn't been marked for deletion when we just applied the damage
+			OnTakingDamage();
+		}
 	}
 	
 	#endregion
