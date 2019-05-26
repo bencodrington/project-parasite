@@ -24,6 +24,8 @@ public class TutorialManager
     OrbManager orbManager;
 
     CharacterType characterType;
+
+    GameObject pauseOverlay;
     
     #endregion
 
@@ -43,6 +45,8 @@ public class TutorialManager
             orbManager = GameObject.Instantiate(orbManagerPrefab).GetComponent<OrbManager>();
             new ParasiteTutorialWinCondition();
         }
+        InstantiatePauseOverlay();
+        SetPauseOverlayActive(false);
     }
 
 	public void PhysicsUpdate() {
@@ -61,6 +65,7 @@ public class TutorialManager
         if (orbManager == null) { return; }
         orbManager.DestroyOrbs();
         orbManager = null;
+        GameObject.Destroy(pauseOverlay);
     }
 
     public void Restart(CharacterSpawner spawner) {
@@ -79,6 +84,10 @@ public class TutorialManager
             UiManager.Instance.SetReturnToMenuPanelActive(true);
         }
     }
+
+    public void TogglePauseOverlay() {
+        SetPauseOverlayActive(!pauseOverlay.activeInHierarchy);
+    }
     
     #endregion
 
@@ -87,6 +96,17 @@ public class TutorialManager
     void SpawnPlayer() {
         Vector2 spawnCoords = characterType == CharacterType.Parasite ? PARASITE_SPAWN_COORDINATES : HUNTER_SPAWN_COORDINATES;
         characterSpawner.SpawnPlayerCharacter(characterType, spawnCoords, Vector2.zero);
+    }
+
+    void InstantiatePauseOverlay() {
+        GameObject overlayPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/UI/Tutorial Pause Overlay.prefab", typeof(GameObject)) as GameObject;
+        pauseOverlay = GameObject.Instantiate(overlayPrefab, Vector3.zero, Quaternion.identity);
+        // NOTE: the 'false' in the SetParent call is necessary when using the Canvas Scaler
+        pauseOverlay.transform.SetParent(UiManager.Instance.GetCanvas(), false);
+    }
+
+    void SetPauseOverlayActive(bool isActive) {
+        pauseOverlay.SetActive(isActive);
     }
     
     #endregion

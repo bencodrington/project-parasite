@@ -132,6 +132,9 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 		if (DEBUG_MODE && Input.GetKeyDown(KeyCode.T)) {
 			AdvanceOnePhysicsUpdate();
 		}
+        if (tutorialManager != null && Input.GetKeyDown(KeyCode.Escape)) {
+            tutorialManager.TogglePauseOverlay();
+        }
     }
 
     void FixedUpdate() {
