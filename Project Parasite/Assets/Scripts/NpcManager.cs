@@ -124,17 +124,20 @@ public class NpcManager : IOnEventCallback {
 	void SpawnPlayableCharacters() {
 		CharacterType type;
 		Character character;
+		InputSource inputSource;
 		characterSpawners = new CharacterSpawner[spawnData.playableCharacterSpawnPoints.Length];
 		for (int i = 0; i < spawnData.playableCharacterSpawnPoints.Length; i++) {
 			NpcSpawnData.playableCharacterSpawnPoint spawnPoint = spawnData.playableCharacterSpawnPoints[i];
 			if (spawnPoint.isParasite) {
 				type = CharacterType.Parasite;
 				characterSpawners[i] = new CharacterSpawner(TutorialManager.OnParasiteKilled);
+				inputSource = new EmptyInputSource();
 			} else {
 				type = CharacterType.Hunter;
 				characterSpawners[i] = new CharacterSpawner();
+				inputSource = new HunterAiInputSource();
 			}
-			character = characterSpawners[i].SpawnPlayerCharacter(type, spawnPoint.coordinates, Vector2.zero, false, false, new EmptyInputSource());
+			character = characterSpawners[i].SpawnPlayerCharacter(type, spawnPoint.coordinates, Vector2.zero, false, false, inputSource);
 		}
 	}
 	
