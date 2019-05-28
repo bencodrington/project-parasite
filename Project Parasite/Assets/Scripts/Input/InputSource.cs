@@ -19,8 +19,13 @@ public abstract class InputSource
     
     #endregion
 
-    protected Dictionary<Key, bool> oldState;
-    protected Dictionary<Key, bool> state;
+    protected struct InputState {
+        public Dictionary<Key, bool> keyState;
+        public Vector2 mousePosition;
+    }
+
+    protected InputState oldState;
+    protected InputState state;
 
     protected bool shouldCameraFollowOwner = false;
 
@@ -41,15 +46,15 @@ public abstract class InputSource
     }
 
     public bool isDown(Key key) {
-        return state[key];
+        return state.keyState[key];
     }
 
     public bool isJustPressed(Key key) {
-        return state[key] && !oldState[key];
+        return state.keyState[key] && !oldState.keyState[key];
     }
 
     public bool isJustReleased(Key key) {
-        return !state[key] && oldState[key];
+        return !state.keyState[key] && oldState.keyState[key];
     }
 
     public bool ShouldCameraFollowOwner() {
@@ -59,14 +64,20 @@ public abstract class InputSource
     public virtual void SetOwner(Character owner) {
         this.owner = owner;
     }
+
+    public Vector2 getMousePosition() {
+        return state.mousePosition;
+    }
     
     #endregion
 
-    protected Dictionary<Key, bool> NewState() {
-        Dictionary<Key, bool> newState = new Dictionary<Key, bool>();
+    protected InputState NewState() {
+        InputState newState = new InputState();
+        newState.keyState = new Dictionary<Key, bool>();
         foreach(Key key in (Key[])Enum.GetValues(typeof(Key)))  {
-            newState.Add(key, false);
+            newState.keyState.Add(key, false);
         }
+        newState.mousePosition = Vector2.zero;
         return newState;
     }
 }

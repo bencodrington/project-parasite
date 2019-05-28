@@ -75,8 +75,8 @@ public class Hunter : Character {
 		if (input.isJustPressed(PlayerInput.Key.action1)) {
 			// CLEANUP: this can be cleaner, once InputManager is implemented
 			// Don't spawn orb if clicking elevator button
-			if (Physics2D.OverlapPoint(Utility.GetMousePos(), Utility.GetLayerMask("clickable")) == null) {
-				AttemptToSpawnOrb(Utility.GetMousePos());
+			if (Physics2D.OverlapPoint(input.getMousePosition(), Utility.GetLayerMask("clickable")) == null) {
+				AttemptToSpawnOrb(input.getMousePosition());
 			}
 		}
 		// Recall orb

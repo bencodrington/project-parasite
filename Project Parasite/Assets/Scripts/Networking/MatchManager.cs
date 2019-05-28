@@ -24,6 +24,9 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     public NpcSpawnData parasiteTutorialNpcSpawnData;
     public NpcSpawnData hunterTutorialNpcSpawnData;
 
+    // CLEANUP: this definitely shouldn't be in such a general location
+    public OrbSetData hunterAiOrbData;
+
     public GameObject playerObjectPrefab;
     // If this is true, skip straight to game and don't connect to multiplayer
     public bool DEBUG_MODE = false;

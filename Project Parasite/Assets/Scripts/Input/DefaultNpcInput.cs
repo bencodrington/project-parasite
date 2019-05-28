@@ -68,9 +68,9 @@ public class DefaultNpcInput : InputSource
 		} else {
 			// Still moving
 			if (targetX >= owner.transform.position.x) {
-				state[InputSource.Key.right] = true;
+				state.keyState[InputSource.Key.right] = true;
 			} else {
-				state[InputSource.Key.left] = true;
+				state.keyState[InputSource.Key.left] = true;
 			}
 		}
 	}

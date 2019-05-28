@@ -12,4 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d1526d99a4fe464cb3ef48aafb7f679, type: 3}
   m_Name: HunterAiOrbSetData
   m_EditorClassIdentifier: 
-  orbChains: []
+  orbChains:
+  - positions:
+    - {x: 159, y: -57.25}
+    - {x: 159, y: -52.75}
+    - {x: 159.5, y: -57.25}
+    - {x: 159.5, y: -52.75}
