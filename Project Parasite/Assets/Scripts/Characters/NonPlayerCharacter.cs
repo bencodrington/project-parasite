@@ -173,7 +173,7 @@ public class NonPlayerCharacter : Character {
 	}
 
 	void SpawnParasite() {
-		Character parasite = CharacterSpawner.SpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY), false, false, originalInputSource != null ? originalInputSource : input);
+		Character parasite = CharacterSpawner.SpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY), false, false, input);
 	}
 
 	void HandleBurstCharging() {
