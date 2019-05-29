@@ -138,6 +138,10 @@ public class NpcManager : IOnEventCallback {
 				inputSource = new HunterAiInputSource();
 			}
 			character = characterSpawners[i].SpawnPlayerCharacter(type, spawnPoint.coordinates, Vector2.zero, false, false, inputSource);
+			// Don't draw hunter UI
+			if (!spawnPoint.isParasite) {
+				((Hunter)character).isNpcControlled = true;
+			}
 		}
 	}
 	

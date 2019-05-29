@@ -6,6 +6,19 @@ using Photon.Pun;
 
 public class Hunter : Character {
 
+	#region [Public Variables]
+
+	public AudioClip cantPlaceOrbSound;
+	public AudioClip placeOrbSound;
+	public GameObject orbPrefab;
+	public GameObject orbBeamPrefab;
+	public GameObject orbUiManagerPrefab;
+	public bool isNpcControlled = false;
+	
+	#endregion
+
+	#region [Private Variables]
+
 	private float jumpVelocity = 15f;
 	// The maximum number of orbs that this hunter can have spawned at any given time 
 	const int MAX_ORB_COUNT = 4;
@@ -14,11 +27,6 @@ public class Hunter : Character {
 	// 	NPCs will be alerted to run away
 	Vector2 NPC_ALERT_RANGE = new Vector2(12, 4);
 
-	public AudioClip cantPlaceOrbSound;
-	public AudioClip placeOrbSound;
-	public GameObject orbPrefab;
-	public GameObject orbBeamPrefab;
-	public GameObject orbUiManagerPrefab;
 	OrbUiManager orbUiManager;
 	OrbBeamRangeManager orbBeamRangeManager;
 	AudioSource cantPlaceOrbAudioSource;
@@ -26,11 +34,13 @@ public class Hunter : Character {
 
 	Queue<Orb> orbs;
 
+	#endregion
+
 	protected override void OnStart() {
 		orbs = new Queue<Orb>();
 		// Cache reference to orb beam range manager
 		orbBeamRangeManager = GetComponentInChildren<OrbBeamRangeManager>();
-		if (HasAuthority()) {
+		if (!isNpcControlled && HasAuthority()) {
 			// Spawn orb UI manager to display how many orbs are remaining
 			orbUiManager = Instantiate(orbUiManagerPrefab,
 										Vector3.zero,
@@ -99,7 +109,7 @@ public class Hunter : Character {
 
 	protected override void OnCharacterDestroy() {
 		DestroyAllOrbs();
-		if (HasAuthority()) {
+		if (!isNpcControlled && HasAuthority()) {
 			Destroy(orbUiManager.gameObject);
 		}
 	}
@@ -144,7 +154,7 @@ public class Hunter : Character {
 
 	void RecallOrb() {
 		Destroy(orbs.Dequeue().gameObject);
-		if (HasAuthority()) {
+		if (!isNpcControlled && HasAuthority()) {
 			// Update the number of remaining orbs currently displayed onscreen
 			orbUiManager.OnOrbCountChange(orbs.Count);
 			// User can definitely place at least one orb, so show markers
@@ -182,7 +192,7 @@ public class Hunter : Character {
 		orbs.Enqueue(orb);
 		// Update reference to most recent orb for displaying distance limit to player
 		orbBeamRangeManager.mostRecentOrb = orb;
-		if (HasAuthority()) {
+		if (!isNpcControlled && HasAuthority()) {
 			// Update the number of remaining orbs currently displayed onscreen
 			orbUiManager.OnOrbCountChange(orbs.Count);
 			// CLEANUP: this should probably be extracted to the rangemanager itself
