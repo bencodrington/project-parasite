@@ -41,7 +41,7 @@ public class TutorialManager
         }
         if (type == CharacterType.Parasite) {
             // Spawn static orbs
-            GameObject orbManagerPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/Objects/OrbManager.prefab", typeof(GameObject)) as GameObject;
+            GameObject orbManagerPrefab = Resources.Load("OrbManager") as GameObject;
             orbManager = GameObject.Instantiate(orbManagerPrefab).GetComponent<OrbManager>();
             new ParasiteTutorialWinCondition();
         }
@@ -99,7 +99,7 @@ public class TutorialManager
     }
 
     void InstantiatePauseOverlay() {
-        GameObject overlayPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/UI/Tutorial Pause Overlay.prefab", typeof(GameObject)) as GameObject;
+        GameObject overlayPrefab = Resources.Load("Tutorial Pause Overlay") as GameObject;
         pauseOverlay = GameObject.Instantiate(overlayPrefab, Vector3.zero, Quaternion.identity);
         // NOTE: the 'false' in the SetParent call is necessary when using the Canvas Scaler
         pauseOverlay.transform.SetParent(UiManager.Instance.GetCanvas(), false);
