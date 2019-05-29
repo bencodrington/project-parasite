@@ -6,10 +6,20 @@ public class HunterAiInputSource : InputSource
 {
 
     #region [Private Variables]
+    // How long to wait (in seconds) between placing/recalling each orb
+    const float TIME_BETWEEN_ORBS = 0.1f;
+    // The box size (in game units) centered around the hunter, in which it
+    //  can detect a parasite
+    Vector2 AWARENESS_ZONE_SIZE = new Vector2(8, 1);
+    int PARASITE_LAYER_MASK = Utility.GetLayerMask(CharacterType.Parasite);
     
+    // Used to determine if we are placing/recalling orbs at all, or just waiting
     bool transitioningState = false;
+    // Used to determine whether we are placing orbs or recalling them
     bool isPlacingOrbs = false;
-    bool modifiedOrbLastFrame = false;
+    // Whether we're in the cooldown period after placing or recalling an orb
+    bool isWaiting = false;
+    bool canSeeParasite = false;
     OrbSetData orbData;
     int numOrbsInData;
     int numOrbsPlaced = 0;
@@ -28,14 +38,9 @@ public class HunterAiInputSource : InputSource
 
     public override void UpdateInputState() {
         base.UpdateInputState();
-        if (!transitioningState && Random.Range(0, 200) < 1) {
-            ToggleOrbPlacement();
-        } else if (transitioningState) {
-            if (isPlacingOrbs) {
-                TryPlacingOrb();
-            } else {
-                TryRecallingOrb();
-            }
+        LookForParasite();
+        if (!isWaiting) {
+            OnReadyToPerformNextAction();
         }
     }
 
@@ -43,60 +48,38 @@ public class HunterAiInputSource : InputSource
 
     #region [Private Methods]
 
-    void ToggleOrbPlacement() {
-        // This should only be called when orbs are fully placed or fully recalled
-        if (numOrbsPlaced == numOrbsInData) {
-            StartRecallingOrbs();
-        } else {
-            StartPlacingOrbs();
-        }
-    }
-
     void StartRecallingOrbs() {
         transitioningState = true;
         isPlacingOrbs = false;
-        modifiedOrbLastFrame = false;
         TryRecallingOrb();
     }
 
     void TryRecallingOrb() {
-        // Alternate clicks every two frames so that it's
-        //  not interpreted as holding the mouse down
-        if (modifiedOrbLastFrame) { 
-            modifiedOrbLastFrame = false;
-            return;
-        }
         RecallOrb();
         numOrbsPlaced--;
         if (numOrbsPlaced == 0) {
             transitioningState = false;
-        } 
+        }
+        Wait();
     }
 
     void RecallOrb() {
         state.keyState[Key.action2] = true;
-        modifiedOrbLastFrame = true;
     }
 
     void StartPlacingOrbs() {
         transitioningState = true;
         isPlacingOrbs = true;
-        modifiedOrbLastFrame = false;
         TryPlacingOrb();
     }
 
     void TryPlacingOrb() {
-        // Alternate clicks every two frames so that it's
-        //  not interpreted as holding the mouse down
-        if (modifiedOrbLastFrame) { 
-            modifiedOrbLastFrame = false;
-            return;
-        }
         PlaceOrb(numOrbsPlaced);
         numOrbsPlaced++;
         if (numOrbsPlaced == numOrbsInData) {
             transitioningState = false;
-        } 
+        }
+        Wait();
     }
 
     void PlaceOrb(int orbIndex) {
@@ -108,10 +91,37 @@ public class HunterAiInputSource : InputSource
                     state.mousePosition = position;
                     // 'Click'
                     state.keyState[Key.action1] = true;
-                    modifiedOrbLastFrame = true;
                     return;
                 }
                 i++;
+            }
+        }
+    }
+
+    void LookForParasite() {
+        // Don't interrupt placing/recalling orbs with a change of state
+        if (isWaiting || (numOrbsPlaced != numOrbsInData && numOrbsPlaced != 0)) { return; }
+        bool oldCanSeeParasite = canSeeParasite;
+        canSeeParasite = (bool)Physics2D.OverlapBox(owner.transform.position, AWARENESS_ZONE_SIZE, 0, PARASITE_LAYER_MASK);
+        if (canSeeParasite && !oldCanSeeParasite) {
+            StartPlacingOrbs();
+        } else if (!canSeeParasite && oldCanSeeParasite) {
+            StartRecallingOrbs();
+        }
+    }
+
+    void Wait() {
+        isWaiting = true;
+        MatchManager.Instance.StartCoroutine(Utility.WaitXSeconds(TIME_BETWEEN_ORBS, () => { isWaiting = false; }));
+    }
+
+    void OnReadyToPerformNextAction() {
+        // transitioningState is set to false when all orbs are placed or all are recalled
+        if (transitioningState) {
+            if (isPlacingOrbs) {
+                TryPlacingOrb();
+            } else {
+                TryRecallingOrb();
             }
         }
     }
