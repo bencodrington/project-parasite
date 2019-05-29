@@ -10,7 +10,7 @@ public class HunterAiInputSource : InputSource
     const float TIME_BETWEEN_ORBS = 0.1f;
     // The box size (in game units) centered around the hunter, in which it
     //  can detect a parasite
-    Vector2 AWARENESS_ZONE_SIZE = new Vector2(8, 1);
+    Vector2 AWARENESS_ZONE_SIZE = new Vector2(16, 1);
     int PARASITE_LAYER_MASK = Utility.GetLayerMask(CharacterType.Parasite);
     
     // Used to determine if we are placing/recalling orbs at all, or just waiting
