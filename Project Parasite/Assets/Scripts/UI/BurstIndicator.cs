@@ -35,7 +35,7 @@ public class BurstIndicator : MonoBehaviour
     public void StopFilling() {
         isFilling = false;
         float progress = Mathf.Min(timeElapsed / timeToFill, 1);
-        FindObjectOfType<CameraFollow>().ShakeScreen(Mathf.Lerp(0, 1, progress), 0.2f);
+        FindObjectOfType<CameraFollow>().ShakeScreen(Mathf.Lerp(0, .25f, progress), 0.2f);
     }
     
     #endregion
@@ -58,7 +58,7 @@ public class BurstIndicator : MonoBehaviour
             spriteMask.alphaCutoff = 1 - progress;
             if (timeElapsed >= timeToFill) {
                 animator.SetBool("isActive", true);
-                FindObjectOfType<CameraFollow>().ShakeScreen(0.075f, 0.1f);
+                FindObjectOfType<CameraFollow>().ShakeScreen(0.05f, 0.1f);
             } else {
                 FindObjectOfType<CameraFollow>().ShakeScreen(Mathf.Lerp(0, 0.03f, progress), 0.1f);
             }
