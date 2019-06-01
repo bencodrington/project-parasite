@@ -92,7 +92,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 
     public void SetRemainingNpcCount(int remainingNpcCount) {
         if (npcCountText != null) {
-            npcCountText.text = remainingNpcCount.ToString();
+            npcCountText.text = "Living civilians: " + remainingNpcCount.ToString();
         }
     }
 
