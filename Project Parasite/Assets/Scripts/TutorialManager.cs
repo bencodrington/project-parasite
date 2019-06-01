@@ -83,7 +83,6 @@ public class TutorialManager
     //  to a separate class
     public static void OnParasiteKilled(CharacterSpawner spawner) {
         spawner.DestroyCharacter();
-        Debug.Log("PARASITE KILLED. Remaining: " + parasitesStillAlive);
         if (parasitesStillAlive == 0) {
             UiManager.Instance.SetReturnToMenuPanelActive(true);
         }
