@@ -49,6 +49,7 @@ public class NoMoreNPCsWinCondition : IOnEventCallback
     
     void SetNpcCount(int newNpcCount) {
         npcCount = newNpcCount;
+        UiManager.Instance.SetRemainingNpcCount(npcCount);
     }
     
     #endregion

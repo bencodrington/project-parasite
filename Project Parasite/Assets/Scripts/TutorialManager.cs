@@ -45,6 +45,8 @@ public class TutorialManager
             GameObject orbManagerPrefab = Resources.Load("OrbManager") as GameObject;
             orbManager = GameObject.Instantiate(orbManagerPrefab).GetComponent<OrbManager>();
             new ParasiteTutorialWinCondition();
+        } else {
+            new HunterTutorialNpcWinCondition();
         }
         InstantiatePauseOverlay();
         SetPauseOverlayActive(false);
