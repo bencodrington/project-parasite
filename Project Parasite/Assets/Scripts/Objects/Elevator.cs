@@ -130,7 +130,6 @@ public class Elevator : MonoBehaviourPun {
 
 		Vector2 spawnPos = new Vector2(transform.position.x,
 								transform.position.y +	// Base vertical position of the center of the elevator
-								(SIZE.y / 2) +			// Get to the top of the elevator
 								BUTTON_OFFSET / 2 );	// Add some padding before start of first button
 		// Spawn button prefabs based on # of stops
 		for (int i = 0; i < buttonCount; i++) {
