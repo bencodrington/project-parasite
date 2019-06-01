@@ -163,7 +163,10 @@ public class Parasite : Character {
 	public void TakeDamage(int damage) {
 		if (photonView.IsMine) {
 			CharacterSpawner.parasiteData.ParasiteTakeDamage(damage);
-			FindObjectOfType<CameraFollow>().ShakeScreen(0.2f, 0.1f);
+			if (input.ShouldCameraFollowOwner()) {
+				// Only shake the screen if this client is playing as this parasite
+				FindObjectOfType<CameraFollow>().ShakeScreen(0.2f, 0.1f);
+			}
 		}
 		if (gameObject.activeInHierarchy) {
 			// This gameObject hasn't been marked for deletion when we just applied the damage
