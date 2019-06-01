@@ -54,7 +54,8 @@ public class CharacterSpawner
 		}
 		// Make the character draw in front of other characters
     	character.SetRenderLayer();
-		if (assignedCharacterType == CharacterType.Parasite) {
+		if (assignedCharacterType == CharacterType.Parasite && parasiteData == null) {
+			// This is the first time this spawner is spawning a parasite, so initialize it's data object
             parasiteData = new ParasiteData(this, deathHandler);
 		}
 		character.SetInputSource(inputSource);
