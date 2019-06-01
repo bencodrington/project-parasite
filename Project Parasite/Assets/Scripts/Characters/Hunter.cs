@@ -175,6 +175,7 @@ public class Hunter : Character {
 		GameObject orbGameObject = Instantiate(orbPrefab, atPosition, Quaternion.identity);
 		Orb orb = orbGameObject.GetComponent<Orb>();
 		placeOrbAudioSource.Play();
+		FindObjectOfType<CameraFollow>().ShakeScreen(0.1f, 0.1f);
 
 		AlertNpcsInRange(atPosition);
 
