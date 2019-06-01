@@ -169,6 +169,26 @@ public class Parasite : Character {
 			OnTakingDamage();
 		}
 	}
+
+	public override void Update() {
+		// Called once per frame for each Parasite
+		if (HasAuthority()) {
+			// This character belongs to this client
+			HandleInput();
+			HandlePositionAndInputUpdates();
+		}
+		if (animator) {
+			bool shouldRun = false;
+			if (physicsEntity.applyGravity) {
+				// Either on the ceiling, floor, or in midair
+				shouldRun = isMovingLeft || isMovingRight;
+			} else {
+				// Stuck to a wall
+				shouldRun = isMovingDown || isMovingUp;
+			}
+			animator.SetBool("isRunning", shouldRun);
+		}
+	}
 	
 	#endregion
 	
