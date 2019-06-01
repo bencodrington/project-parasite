@@ -30,10 +30,6 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 				if (actorNumber == PhotonNetwork.LocalPlayer.ActorNumber) {
 					CharacterType assignedCharacterType = (CharacterType)EventCodes.GetEventContentAtPosition(photonEvent, 1);
 					Vector3 spawnPoint = (Vector2)EventCodes.GetEventContentAtPosition(photonEvent, 2);
-					if (characterSpawner != null) {
-						// TODO: destroy characterspawner
-						Debug.LogError("TODO: destroy existing characterSpawner");
-					}
 					characterSpawner = new CharacterSpawner();
 					// Spawn Character of type `assignedCharacterType` across clients
 					characterSpawner.SpawnPlayerCharacter(assignedCharacterType, spawnPoint, Vector2.zero);
