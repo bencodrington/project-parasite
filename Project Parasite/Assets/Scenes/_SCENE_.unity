@@ -1585,6 +1585,33 @@ PrefabInstance:
       propertyPath: m_isInputParsingRequired
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3781242518032389364, guid: 263ace3d3ad6f5a498f5ec875e2b4a85,
+        type: 3}
+      propertyPath: m_text
+      value: 'Right-Click to
+
+        Eject Host'
+      objectReference: {fileID: 0}
+    - target: {fileID: 3781242518032389364, guid: 263ace3d3ad6f5a498f5ec875e2b4a85,
+        type: 3}
+      propertyPath: m_textInfo.characterCount
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 3781242518032389364, guid: 263ace3d3ad6f5a498f5ec875e2b4a85,
+        type: 3}
+      propertyPath: m_textInfo.spaceCount
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3781242518032389364, guid: 263ace3d3ad6f5a498f5ec875e2b4a85,
+        type: 3}
+      propertyPath: m_textInfo.wordCount
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3781242518032389364, guid: 263ace3d3ad6f5a498f5ec875e2b4a85,
+        type: 3}
+      propertyPath: m_textInfo.lineCount
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 263ace3d3ad6f5a498f5ec875e2b4a85, type: 3}
 --- !u!224 &536522342 stripped
@@ -3875,24 +3902,24 @@ PrefabInstance:
     - target: {fileID: 3781242518032389364, guid: 263ace3d3ad6f5a498f5ec875e2b4a85,
         type: 3}
       propertyPath: m_text
-      value: 'Right-Click
+      value: 'Right-Click and HOLD
 
-        and HOLD'
+        to Devour Host'
       objectReference: {fileID: 0}
     - target: {fileID: 3781242518032389364, guid: 263ace3d3ad6f5a498f5ec875e2b4a85,
         type: 3}
       propertyPath: m_textInfo.characterCount
-      value: 20
+      value: 35
       objectReference: {fileID: 0}
     - target: {fileID: 3781242518032389364, guid: 263ace3d3ad6f5a498f5ec875e2b4a85,
         type: 3}
       propertyPath: m_textInfo.spaceCount
-      value: 2
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3781242518032389364, guid: 263ace3d3ad6f5a498f5ec875e2b4a85,
         type: 3}
       propertyPath: m_textInfo.wordCount
-      value: 3
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3781242518032389364, guid: 263ace3d3ad6f5a498f5ec875e2b4a85,
         type: 3}
@@ -7040,6 +7067,33 @@ PrefabInstance:
       propertyPath: m_isInputParsingRequired
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3781242518032389364, guid: 79fefafa86d14514db15fae786ce06c8,
+        type: 3}
+      propertyPath: m_text
+      value: 'Left-Click to Place
+
+        <color=#0ff>Power Orb</color>'
+      objectReference: {fileID: 0}
+    - target: {fileID: 3781242518032389364, guid: 79fefafa86d14514db15fae786ce06c8,
+        type: 3}
+      propertyPath: m_textInfo.characterCount
+      value: 29
+      objectReference: {fileID: 0}
+    - target: {fileID: 3781242518032389364, guid: 79fefafa86d14514db15fae786ce06c8,
+        type: 3}
+      propertyPath: m_textInfo.spaceCount
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3781242518032389364, guid: 79fefafa86d14514db15fae786ce06c8,
+        type: 3}
+      propertyPath: m_textInfo.wordCount
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3781242518032389364, guid: 79fefafa86d14514db15fae786ce06c8,
+        type: 3}
+      propertyPath: m_textInfo.lineCount
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 79fefafa86d14514db15fae786ce06c8, type: 3}
 --- !u!224 &1676773303 stripped
@@ -8812,7 +8866,7 @@ PrefabInstance:
     - target: {fileID: 8793009769251551783, guid: 79fefafa86d14514db15fae786ce06c8,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 1.6
+      value: 2.45
       objectReference: {fileID: 0}
     - target: {fileID: 8793009769251551783, guid: 79fefafa86d14514db15fae786ce06c8,
         type: 3}
@@ -8868,6 +8922,33 @@ PrefabInstance:
         type: 3}
       propertyPath: m_isInputParsingRequired
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3781242518032389364, guid: 79fefafa86d14514db15fae786ce06c8,
+        type: 3}
+      propertyPath: m_text
+      value: 'Left-Click to
+
+        Pounce'
+      objectReference: {fileID: 0}
+    - target: {fileID: 3781242518032389364, guid: 79fefafa86d14514db15fae786ce06c8,
+        type: 3}
+      propertyPath: m_textInfo.characterCount
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3781242518032389364, guid: 79fefafa86d14514db15fae786ce06c8,
+        type: 3}
+      propertyPath: m_textInfo.spaceCount
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3781242518032389364, guid: 79fefafa86d14514db15fae786ce06c8,
+        type: 3}
+      propertyPath: m_textInfo.wordCount
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3781242518032389364, guid: 79fefafa86d14514db15fae786ce06c8,
+        type: 3}
+      propertyPath: m_textInfo.lineCount
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 79fefafa86d14514db15fae786ce06c8, type: 3}
