@@ -32,6 +32,7 @@ public class TutorialManager
     #region [Public Methods]
 
     public TutorialManager(CharacterType type, NpcSpawnData spawnData = null) {
+        parasitesStillAlive = 0;
         characterSpawner = type == CharacterType.Parasite ? new CharacterSpawner(Restart) : new CharacterSpawner();
         characterType = type;
         SpawnPlayer();
@@ -80,6 +81,7 @@ public class TutorialManager
     //  to a separate class
     public static void OnParasiteKilled(CharacterSpawner spawner) {
         spawner.DestroyCharacter();
+        Debug.Log("PARASITE KILLED. Remaining: " + parasitesStillAlive);
         if (parasitesStillAlive == 0) {
             UiManager.Instance.SetReturnToMenuPanelActive(true);
         }
