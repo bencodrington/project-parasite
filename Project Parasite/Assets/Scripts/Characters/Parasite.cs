@@ -165,7 +165,7 @@ public class Parasite : Character {
 			CharacterSpawner.parasiteData.ParasiteTakeDamage(damage);
 			if (input.ShouldCameraFollowOwner()) {
 				// Only shake the screen if this client is playing as this parasite
-				FindObjectOfType<CameraFollow>().ShakeScreen(0.2f, 0.1f);
+				FindObjectOfType<CameraFollow>().ShakeScreen(0.1f, 0.1f);
 			}
 		}
 		if (gameObject.activeInHierarchy) {

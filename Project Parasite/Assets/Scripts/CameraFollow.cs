@@ -26,7 +26,7 @@ public class CameraFollow : MonoBehaviour {
 		}
 	}
 
-	public void ShakeScreen(float duration, float intensity) {
+	public void ShakeScreen(float intensity, float duration) {
 		if (shakingScreen != null) {
 			StopCoroutine(shakingScreen);
 		}
