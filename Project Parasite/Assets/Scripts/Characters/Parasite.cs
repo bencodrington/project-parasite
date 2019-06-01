@@ -100,7 +100,9 @@ public class Parasite : Character {
 		}
 		isMovingUp = false;
 		isMovingDown = false;
-		if (input.isJustPressed(PlayerInput.Key.up) && physicsEntity.IsOnGround() && !IsChargingPounce()) {
+		if ((input.isJustPressed(PlayerInput.Key.up) || input.isJustPressed(PlayerInput.Key.jump))
+					&& physicsEntity.IsOnGround()
+					&& !IsChargingPounce()) {
 			// Jump
 			photonView.RPC("RpcJump", RpcTarget.All);
 		}  else if (input.isDown(PlayerInput.Key.up) && physicsEntity.IsOnWall() && !IsChargingPounce()) {

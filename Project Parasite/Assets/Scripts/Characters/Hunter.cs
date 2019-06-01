@@ -72,7 +72,8 @@ public class Hunter : Character {
 		HandleHorizontalMovement();
 
 		// If up was pressed this frame for the first time and the player is on the ground
-		if (input.isJustPressed(PlayerInput.Key.up) && physicsEntity.IsOnGround()) {
+		if ((input.isJustPressed(PlayerInput.Key.up) || input.isJustPressed(PlayerInput.Key.jump))
+					&& physicsEntity.IsOnGround()) {
 			// Jump
 			photonView.RPC("RpcJump", RpcTarget.All);
 		}

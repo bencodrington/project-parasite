@@ -14,7 +14,8 @@ public abstract class InputSource
         down,
         action1,
         action2,
-        interact
+        interact,
+        jump
     }
     
     #endregion

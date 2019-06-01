@@ -18,6 +18,7 @@ public class PlayerInput : InputSource
 		state.keyState[Key.action1] 	= Input.GetMouseButton(0);
 		state.keyState[Key.action2] 	= Input.GetMouseButton(1);
 		state.keyState[Key.interact]	= Input.GetKey(KeyCode.E);
+		state.keyState[Key.jump]		= Input.GetKey(KeyCode.Space);
 		state.mousePosition				= Utility.GetMousePos();
     }
 
