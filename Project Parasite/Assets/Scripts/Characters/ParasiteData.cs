@@ -10,8 +10,12 @@ public class ParasiteData
 	int ParasiteHealth {
 		get { return _parasiteHealth; }
 		set {
+			bool isTakingDamage = false;
+			if (value < _parasiteHealth) {
+				isTakingDamage = true;
+			}
 			_parasiteHealth = Mathf.Clamp(value, 0, STARTING_HEALTH);
-			UiManager.Instance.UpdateHealthObject(_parasiteHealth);
+			UiManager.Instance.UpdateHealthObject(_parasiteHealth, isTakingDamage);
 			if (value <= 0 && !hasHandledDeath) {
 				deathHandler(owner);
 				hasHandledDeath = true;

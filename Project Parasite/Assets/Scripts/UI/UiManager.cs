@@ -51,6 +51,15 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	GameObject selectParasiteButton;
 	GameObject selectHunterButton;
 	GameObject returnToMenuPanel;
+
+	// CLEANUP: this should be extracted to its own file
+	// Used for cycling parasite health colours
+	Dictionary<Color, Color> parasiteHealthColourMap;
+	Coroutine parasiteHealthColourFade;
+	bool parasiteTakingDamage = false;
+	Color parasiteHealthStartingColour;
+	Color parasiteHealthCurrentColour;
+	const float PARASITE_HEALTH_COLOUR_FADE_TIME = 1f;
     
     #endregion
 
@@ -114,8 +123,14 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 		startGameButton.SetActive(isActive);
 	}
 
-	public void UpdateHealthObject(int newValue) {
+	public void UpdateHealthObject(int newValue, bool isTakingDamage = false) {
 		topRightUiText.text = newValue.ToString();
+		parasiteTakingDamage = isTakingDamage;
+		if (!isTakingDamage && parasiteHealthColourFade != null) {
+			// (Re)setting initial health, so cancel fade
+			StopCoroutine(parasiteHealthColourFade);
+			topRightUiText.color = parasiteHealthStartingColour;
+		}
 	}
 
 	public void OnIsRandomParasiteChanged(bool isRandomParasite) {
@@ -170,13 +185,24 @@ public class UiManager : MonoBehaviour, IOnEventCallback
         readyToggleButton.SetActive(false);
 		randomParasiteToggleButton.SetActive(false);
 		returnToMenuPanel.SetActive(false);
+
+		InitializeColourMap();
     }
 
     void Start() {
+		// Cache the health text object and its starting colour
 		topRightUiText = GameObject.FindGameObjectWithTag("TopRightUI").GetComponent<Text>();
+		parasiteHealthStartingColour = topRightUiText.color;
 		// Find main canvas before other canvases are created
         canvas = FindObjectOfType<Canvas>().transform;
     }
+
+	void Update() {
+		if (parasiteTakingDamage) {
+			OnTakingDamage();
+			parasiteTakingDamage = false;
+		}
+	}
 
     void OnDisable() {
         PhotonNetwork.RemoveCallbackTarget(this);
@@ -185,6 +211,43 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     #endregion
 
     #region [Private Methods]
+
+	void InitializeColourMap() {
+		// Used for cycling parasite health text colours
+		parasiteHealthColourMap = new Dictionary<Color, Color>();
+		parasiteHealthColourMap.Add(Color.red, Color.cyan);
+		parasiteHealthColourMap.Add(Color.cyan, Color.yellow);
+		parasiteHealthColourMap.Add(Color.yellow, Color.red);
+		parasiteHealthCurrentColour = Color.red;
+	}
+
+	Color GetParasiteHealthColour(Color currentColour) {
+		// Switch to next colour
+		parasiteHealthColourMap.TryGetValue(currentColour, out currentColour);
+		return currentColour;
+	}
+
+	void OnTakingDamage() {
+		if (parasiteHealthColourFade != null) {
+			StopCoroutine(parasiteHealthColourFade);
+		}
+		parasiteHealthColourFade = StartCoroutine(FadeParasiteHealthColour());
+	}
+
+	IEnumerator FadeParasiteHealthColour() {
+		float timeElapsed = 0f;
+		float progress = 0f;
+		// Switch to next colour in the map
+		parasiteHealthCurrentColour = GetParasiteHealthColour(parasiteHealthCurrentColour);
+		// Fade back to starting colour over time
+		while (timeElapsed < PARASITE_HEALTH_COLOUR_FADE_TIME) {
+			timeElapsed += Time.deltaTime;
+			progress = timeElapsed / PARASITE_HEALTH_COLOUR_FADE_TIME;
+			topRightUiText.color = Color.Lerp(parasiteHealthCurrentColour, parasiteHealthStartingColour, progress);
+			yield return null;
+		}
+		topRightUiText.color = parasiteHealthStartingColour;
+	}
 
     void SetTitleScreenActive(bool isActive) {
         titleScreen.SetActive(isActive);
