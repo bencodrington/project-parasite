@@ -53,7 +53,7 @@ public class RoundManager : MonoBehaviourPun {
 	}
 
 	public void EndRound() {
-		transform.GetComponentInChildren<NpcManager>().DespawnNPCs();
+		npcManager.DespawnNPCs();
 		objectManager.OnRoundEnd();
 		PhotonNetwork.Destroy(photonView);
 	}
