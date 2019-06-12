@@ -4,14 +4,15 @@
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5ad99cddb3b559e44ae814e8abcf679a, type: 3}
   m_Name: NpcCharacterStats
   m_EditorClassIdentifier: 
-  height: 0.5
-  width: 0.5
+  height: 1
+  width: 1
   movementSpeed: 6
   accelerationSpeed: 2
