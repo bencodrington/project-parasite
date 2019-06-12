@@ -334,6 +334,7 @@ GameObject:
   - component: {fileID: 311}
   - component: {fileID: 339}
   - component: {fileID: 388}
+  - component: {fileID: 2522840345549341168}
   m_Layer: 0
   m_Name: Sprite
   m_TagString: IgnoreComponent
@@ -450,6 +451,17 @@ SpriteMask:
   m_BackSortingOrder: 0
   m_IsCustomRangeActive: 0
   m_SpriteSortPoint: 0
+--- !u!210 &2522840345549341168
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 113}
+  m_Enabled: 1
+  m_SortingLayerID: 1974396419
+  m_SortingLayer: 2
+  m_SortingOrder: 0
 --- !u!1 &154
 GameObject:
   m_ObjectHideFlags: 0
