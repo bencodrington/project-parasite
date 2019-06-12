@@ -34,6 +34,8 @@ public class NonPlayerCharacter : Character {
 	Action<Vector2> OnNearbyOrbAlert;
 
 	InputSource originalInputSource;
+
+	SpriteTransform spriteTransform;
 	
 	#endregion
 
@@ -106,6 +108,8 @@ public class NonPlayerCharacter : Character {
 	protected override void OnStart() {
 		burstIndicator = GetComponentInChildren<BurstIndicator>();
 		burstIndicator.SetTimeToFill(MIN_BURST_TIME);
+		spriteTransform = GetComponentInChildren<SpriteTransform>();
+		spriteTransform.SetTargetTransform(transform);
 	}
 
 	#region [MonoBehaviour Callbacks]
@@ -115,6 +119,9 @@ public class NonPlayerCharacter : Character {
 			HandleInput();
 			HandlePositionAndInputUpdates();
 			HandleBurstCharging();
+		}
+		if (animator) {
+			animator.SetBool("isRunning", (isMovingLeft || isMovingRight));
 		}
 	}
 	
