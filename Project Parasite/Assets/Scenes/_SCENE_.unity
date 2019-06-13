@@ -4374,8 +4374,8 @@ MonoBehaviour:
   hunterAiOrbData: {fileID: 11400000, guid: 5ca4bc84dd413db4aa2fb9f2d7a9783d, type: 2}
   playerObjectPrefab: {fileID: 1820297792491458, guid: c3d12b587d0975b4787bf47335c8913f,
     type: 3}
-  DEBUG_MODE: 0
-  spawnPlayersAtZero: 0
+  DEBUG_MODE: 1
+  spawnPlayersAtZero: 1
   huntersOnlyMode: 0
   spawnOneNpcOnly: 0
 --- !u!224 &1107280060 stripped

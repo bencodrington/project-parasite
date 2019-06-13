@@ -52,6 +52,19 @@ MonoBehaviour:
   isInfected: 0
   alertIconPrefab: {fileID: 2806494360319329461, guid: 1d719373aff2a4f42a76583c5d3df407,
     type: 3}
+  alertSounds:
+  - {fileID: 8300000, guid: a1e14ef1ecf42ff4a922516c6d972e68, type: 3}
+  - {fileID: 8300000, guid: c68d0e6ac8a8be847b47a8d500c03f2e, type: 3}
+  - {fileID: 8300000, guid: a6018e67387b1a74f995f676f29ca39a, type: 3}
+  - {fileID: 8300000, guid: 1100e8f37351e694f8d33fe005fcd414, type: 3}
+  - {fileID: 8300000, guid: 153a0a9de66a72e4e81d4eddb050455f, type: 3}
+  - {fileID: 8300000, guid: 3b7de97c257a5954c8aecac0861c2e9f, type: 3}
+  - {fileID: 8300000, guid: 7e98f3ecb0a919f48ad256a4dbceafee, type: 3}
+  - {fileID: 8300000, guid: cc5188519b67bd04b989865dc21eba57, type: 3}
+  - {fileID: 8300000, guid: 1cfbaca8f02382f4498ac3b9280d1623, type: 3}
+  - {fileID: 8300000, guid: 1f29613adcaffd143a832d487ddfc8d1, type: 3}
+  - {fileID: 8300000, guid: 55dd0a9a58cf04144a3eee90f4c6f5b2, type: 3}
+  - {fileID: 8300000, guid: 86d5f8d986a9a96478a287bf564a849b, type: 3}
 --- !u!114 &404
 MonoBehaviour:
   m_ObjectHideFlags: 0

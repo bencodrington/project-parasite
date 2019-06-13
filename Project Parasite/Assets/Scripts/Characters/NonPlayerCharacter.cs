@@ -12,6 +12,8 @@ public class NonPlayerCharacter : Character {
 	
 	// The exclamation mark that is shown when orbs are placed nearby
 	public GameObject alertIconPrefab;
+	// One of these sound clips is selected to play when an orb is placed nearby
+	public AudioClip[] alertSounds;
 
 	#endregion
 
@@ -36,6 +38,8 @@ public class NonPlayerCharacter : Character {
 	InputSource originalInputSource;
 
 	SpriteTransform spriteTransform;
+
+	AudioSource alertSource;
 	
 	#endregion
 
@@ -91,6 +95,7 @@ public class NonPlayerCharacter : Character {
 		// Show exclamation mark above NPC
 		GameObject alertIcon = Instantiate(alertIconPrefab, (Vector2)transform.position + ALERT_ICON_OFFSET, Quaternion.identity);
 		alertIcon.transform.SetParent(transform);
+		PlayAlertSound();
 		if (!HasAuthority() || isInfected) { return; }
 		// Only uninfected NPCs should flee, and the calculations
 		// 	should only be done on the server
@@ -110,6 +115,7 @@ public class NonPlayerCharacter : Character {
 		burstIndicator.SetTimeToFill(MIN_BURST_TIME);
 		spriteTransform = GetComponentInChildren<SpriteTransform>();
 		spriteTransform.SetTargetTransform(transform);
+		alertSource = Utility.AddAudioSource(gameObject);
 	}
 
 	#region [MonoBehaviour Callbacks]
@@ -186,6 +192,14 @@ public class NonPlayerCharacter : Character {
 	void HandleBurstCharging() {
 		if (isChargingForBurst) {
 			timeChargingForBurst += Time.deltaTime;
+		}
+	}
+
+	void PlayAlertSound() {
+		if (!alertSource.isPlaying) {
+			alertSource.pitch = UnityEngine.Random.Range(0.9f, 1.1f);
+			alertSource.clip = alertSounds[UnityEngine.Random.Range(0, alertSounds.Length)];
+			alertSource.PlayDelayed(UnityEngine.Random.Range(0, 0.5f));
 		}
 	}
 	
