@@ -27,7 +27,7 @@ public class NpcManager : IOnEventCallback {
 	// 	([-SPAWN_RANGE_X...SPAWN_RANGE_X], [-SPAWN_RANGE_Y...SPAWN_RANGE_Y])
 	// 	around its spawn center
 	const float SPAWN_RANGE_X = 6;
-	const float SPAWN_RANGE_Y = 2;
+	const float SPAWN_RANGE_Y = 0;
 	
 	#endregion
 

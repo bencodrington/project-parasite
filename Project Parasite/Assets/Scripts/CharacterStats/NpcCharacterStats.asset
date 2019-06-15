@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: NpcCharacterStats
   m_EditorClassIdentifier: 
   height: 1
-  width: 1
-  movementSpeed: 6
+  width: 0.75
+  movementSpeed: 5
   accelerationSpeed: 2

@@ -58,14 +58,14 @@ public class PlatformPhysicsEntity : RaycastController
         // Rays are cast from SKIN_WIDTH within the entity
         float rayLength = Mathf.Abs(velocityY) + SKIN_WIDTH;
         Vector2 rayOrigin;
-        RaycastHit2D hit;
+        RaycastHit2D[] hits;
         // Player on top, platform moving upwards
         if (velocityY != 0 && directionY == 1) {
             for (int i = 0; i < VERTICAL_RAY_COUNT; i++) {
                 // Always check above, spread the rays out along the width of the entity
                 rayOrigin = rayCastOrigins.topLeft + Vector2.right * (i * verticalRaySpacing);
                 // Cast each ray
-                hit = Physics2D.Raycast(rayOrigin, Vector2.up, rayLength, passengerMask);
+                hits = Physics2D.RaycastAll(rayOrigin, Vector2.up, rayLength, passengerMask);
                 // Draw visuals for debugging
                 if (MatchManager.Instance.GetDebugMode()) {
                     // Draw ray origin
@@ -73,10 +73,12 @@ public class PlatformPhysicsEntity : RaycastController
                     // Draw ray we're actually firing
                     Debug.DrawRay(rayOrigin, Vector2.up * rayLength, Color.red);
                 }
-                if (hit && !movedPassengers.Contains(hit.transform)) {
-                    float pushY = velocityY - (hit.distance - SKIN_WIDTH);
-                    passengerMovements.Add(GetPassengerMovement(hit.transform, pushY));
-                    movedPassengers.Add(hit.transform);
+                foreach (RaycastHit2D hit in hits) {
+                    if (!movedPassengers.Contains(hit.transform)) {
+                        float pushY = velocityY - (hit.distance - SKIN_WIDTH);
+                        passengerMovements.Add(GetPassengerMovement(hit.transform, pushY));
+                        movedPassengers.Add(hit.transform);
+                    }
                 }
             }
         }
@@ -88,7 +90,7 @@ public class PlatformPhysicsEntity : RaycastController
                 // Always check up, spread the rays out along the width of the entity
                 rayOrigin = rayCastOrigins.topLeft + Vector2.right * (i * verticalRaySpacing);
                 // Cast each ray upwards
-                hit = Physics2D.Raycast(rayOrigin, Vector2.up, rayLength, passengerMask);
+                hits = Physics2D.RaycastAll(rayOrigin, Vector2.up, rayLength, passengerMask);
                 // Draw visuals for debugging
                 if (MatchManager.Instance.GetDebugMode()) {
                     // Draw ray origin
@@ -96,10 +98,12 @@ public class PlatformPhysicsEntity : RaycastController
                     // Draw ray we're actually firing
                     Debug.DrawRay(rayOrigin, Vector2.up * directionY * rayLength, Color.red);
                 }
-                if (hit && !movedPassengers.Contains(hit.transform)) {
-                    float pushY = velocityY + (hit.distance - SKIN_WIDTH);
-                    passengerMovements.Add(GetPassengerMovement(hit.transform, pushY));
-                    movedPassengers.Add(hit.transform);
+                foreach (RaycastHit2D hit in hits) {
+                    if (!movedPassengers.Contains(hit.transform)) {
+                        float pushY = velocityY + (hit.distance - SKIN_WIDTH);
+                        passengerMovements.Add(GetPassengerMovement(hit.transform, pushY));
+                        movedPassengers.Add(hit.transform);
+                    }
                 }
             }
         }
