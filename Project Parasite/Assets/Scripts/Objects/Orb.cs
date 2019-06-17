@@ -4,13 +4,15 @@ using UnityEngine;
 
 public class Orb : MonoBehaviour {
 
-	const float RESTING_ENERGY_FORCE = 0f;
-	const float BURST_ENERGY_FORCE = 15f;
-	const float RESTING_ENERGY_RADIUS = 0f;
-	const float BURST_ENERGY_RADIUS = 4f;
+	#region [Private Variables]
+	
+	const float FORCE = 35f;
+	const float RADIUS = 4f;
+	const float FULL_FORCE_CUTOFF_RADIUS = 2f;
 	const float BURST_FADE_TIME = .1f;
-	float energyRadius = BURST_ENERGY_RADIUS;
-	float energyForce = BURST_ENERGY_FORCE;
+	bool isActive;
+
+	#endregion
 
 	public SpriteRenderer burstSprite;
 
@@ -22,10 +24,12 @@ public class Orb : MonoBehaviour {
 	
 	void Start() {
 		intensityCoroutine = StartCoroutine(FadeIntensity());
+		isActive = true;
 	}
 
 	void FixedUpdate() {
-		Collider2D[] hunterColliders = Physics2D.OverlapCircleAll(transform.position, energyRadius, Utility.GetLayerMask("energyCenter"));
+		if (!isActive) { return; }
+		Collider2D[] hunterColliders = Physics2D.OverlapCircleAll(transform.position, RADIUS, Utility.GetLayerMask("energyCenter"));
 		Vector2 forceDirection;
 		foreach (Collider2D hunterCollider in hunterColliders) {
 			Hunter hunter = hunterCollider.transform.parent.GetComponent<Hunter>();
@@ -34,6 +38,8 @@ public class Orb : MonoBehaviour {
 				hunter.Repel(forceDirection, CalculateForce(hunterCollider.transform.position));
 			}
 		}
+		// Only run on the first fixedupdate
+		isActive = false;
 	}
 
 	void OnDestroy() {
@@ -61,29 +67,26 @@ public class Orb : MonoBehaviour {
 		float distance = Vector2.Distance(transform.position, hunterPosition);
 		// The maximum distance from the orb that the force recipient will receive full force
 		// 	after this point, the force starts to fall off
-		float fullForceCutoff = energyRadius * (3f / 4f);
-		if (distance < fullForceCutoff) {
-			return energyForce;
+		if (distance < FULL_FORCE_CUTOFF_RADIUS) {
+			return FORCE;
 		}
-		// POINT LABELS: orb       fullForceCutoff    energyRadius
+		// POINT LABELS: orb  FULL_FORCE_CUTOFF_RADIUS      RADIUS
 		//                |----------------|----------------|
 		// FORCE OUTPUT:   ^--FULL FORCE--^			       0
-		float t = (distance - fullForceCutoff) / (energyRadius - fullForceCutoff);
-		return Mathf.Lerp(energyForce, 0, t);
+		float t = (distance - FULL_FORCE_CUTOFF_RADIUS) / (RADIUS - FULL_FORCE_CUTOFF_RADIUS);
+		return Mathf.Lerp(FORCE, 0, t);
 	}
 
 	IEnumerator FadeIntensity() {
 		float remainingFadeTime = BURST_FADE_TIME;
+		float spriteRadius;
 		while (remainingFadeTime > 0) {
 			yield return null;
 			remainingFadeTime -= Time.deltaTime;
-			energyForce = Mathf.Lerp(RESTING_ENERGY_FORCE, BURST_ENERGY_FORCE, remainingFadeTime / BURST_FADE_TIME);
-			energyRadius = Mathf.Lerp(RESTING_ENERGY_RADIUS, BURST_ENERGY_RADIUS, remainingFadeTime / BURST_FADE_TIME);
-			burstSprite.transform.localScale = Vector2.Lerp(Vector2.zero, new Vector2(3, 3), remainingFadeTime / BURST_FADE_TIME);
+			spriteRadius = remainingFadeTime / BURST_FADE_TIME;
+			burstSprite.transform.localScale = new Vector2(spriteRadius, spriteRadius);
 			burstSprite.color = new Color(burstSprite.color.r, burstSprite.color.g, burstSprite.color.b, Random.Range(0.25f, 0.5f));
 		}
-		energyForce = RESTING_ENERGY_FORCE;
-		energyRadius = RESTING_ENERGY_RADIUS;
 		intensityCoroutine = null;
 		Destroy(burstSprite.gameObject);
 	}
