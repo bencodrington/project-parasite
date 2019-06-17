@@ -64,7 +64,7 @@ public abstract class Character : MonoBehaviourPun {
 
 	void Start() {
 		spriteRenderers = GetSpriteRenderers();
-		animator = GetComponentInChildren<Animator>();
+		animator = GetComponentInChildren<SpriteTransform>().GetComponent<Animator>();
 		OnStart();
 		// Only continue if this client owns this gameObject
 		if (!HasAuthority()) { return; }
