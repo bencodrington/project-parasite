@@ -62,12 +62,14 @@ public abstract class InteractableObject : MonoBehaviour {
         // FIXME: this whole thing can do with a LOT of optimization
 		foreach (Collider2D oldCaller in oldCallers) {
 			if (oldCaller != null) {
-				// Character is leaving the field
-				character = Utility.GetCharacterFromCollider(oldCaller);
-                if (character.photonView.IsMine) {
-                    character.UnregisterInteractableObject(this);
-                    HideControlKey();
-                }
+				try {
+					// Character is leaving the field
+					character = Utility.GetCharacterFromCollider(oldCaller);
+					if (character.photonView.IsMine) {
+						character.UnregisterInteractableObject(this);
+						HideControlKey();
+					}
+				} catch { /* Parasite infected an NPC while in range */ }
 			}
 		}
 		foreach (Collider2D caller in callers) {
