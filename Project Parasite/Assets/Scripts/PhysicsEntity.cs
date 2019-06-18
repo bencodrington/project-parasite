@@ -290,7 +290,8 @@ public class PhysicsEntity : RaycastController {
 	}
 
 	float HandleVerticalFriction(float _velocityY) {
-		if (IsMovingIntoWall()) {
+		// Only add vertical friction if character is sliding down a wall
+		if (IsMovingIntoWall() && _velocityY < 0) {
 			_velocityY /= DEFAULT_FRICTION_DENOMINATOR;
 			// Snap to 0
 			if (Mathf.Abs(_velocityY) < 0.001) { _velocityY = 0; }
