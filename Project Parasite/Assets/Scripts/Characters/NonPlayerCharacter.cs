@@ -121,8 +121,8 @@ public class NonPlayerCharacter : Character {
 	#region [MonoBehaviour Callbacks]
 	
 	public override void Update() {
+		HandleInput();
 		if (HasAuthority()) {
-			HandleInput();
 			HandlePositionAndInputUpdates();
 			HandleBurstCharging();
 		}

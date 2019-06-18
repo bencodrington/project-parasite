@@ -11,7 +11,6 @@ public abstract class Character : MonoBehaviourPun {
 
 	protected List<InteractableObject> objectsInRange = new List<InteractableObject>();
 
-	protected byte serverInputs;
 	protected bool shouldSnapToTruePosition = false;
 
 	protected bool isMovingRight;
@@ -73,10 +72,10 @@ public abstract class Character : MonoBehaviourPun {
 	}
 	
 	public virtual void Update () {
+		HandleInput();
 		// Called once per frame for each Character
 		if (HasAuthority()) {
 			// This character belongs to this client
-			HandleInput();
 			HandlePositionAndInputUpdates();
 		}
 		if (animator) {
@@ -129,7 +128,6 @@ public abstract class Character : MonoBehaviourPun {
 		if (HasAuthority()) {
 			// Update the local position based on physics simulation
 			transform.position = physicsEntity.transformPosition;
-			serverInputs = PackInputs();
 		} else if (shouldSnapToTruePosition) {
 			// Verify current position is up to date with server position
 			transform.position = physicsEntity.transformPosition;
@@ -176,6 +174,7 @@ public abstract class Character : MonoBehaviourPun {
 			SetCameraFollow(shouldCameraFollowSnap);
 		}
 		input.SetOwner(this);
+		photonView.RPC("AddRemoteInputSource", RpcTarget.Others);
 	}
 
 	public virtual bool IsUninfectedNpc() {
@@ -292,6 +291,7 @@ public abstract class Character : MonoBehaviourPun {
 	}
 	
 	void SendInputUpdate() {
+		byte serverInputs = PackInputs();
 		// Don't send input update if this isn't our character or if we haven't started/stopped pressing buttons
 		if (!HasAuthority() || (serverInputs == lastSentInputs)) {
 			return;
@@ -301,24 +301,25 @@ public abstract class Character : MonoBehaviourPun {
 	}
 
 	byte PackInputs() {
-		byte packedInputs = isMovingUp ? (byte)1 : (byte)0;
-		if (isMovingDown) {
+		byte packedInputs = input.isDown(InputSource.Key.up) ? (byte)1 : (byte)0;
+		if (input.isDown(InputSource.Key.down)) {
 			packedInputs |= ((byte)1 << 1);
 		}
-		if (isMovingLeft) {
+		if (input.isDown(InputSource.Key.left)) {
 			packedInputs |= ((byte)1 << 2);
 		}
-		if (isMovingRight) {
+		if (input.isDown(InputSource.Key.right)) {
 			packedInputs |= ((byte)1 << 3);
 		}
 		return packedInputs;
 	}
 
 	void UnpackInputs(byte packedInputs) {
-		isMovingUp = ((byte) 1 & packedInputs) == 1;
-		isMovingDown = ((byte) 2 & packedInputs) == 2;
-		isMovingLeft = ((byte) 4 & packedInputs) == 4;
-		isMovingRight = ((byte) 8 & packedInputs) == 8;
+		bool _isMovingUp = ((byte) 1 & packedInputs) == 1;
+		bool _isMovingDown = ((byte) 2 & packedInputs) == 2;
+		bool _isMovingLeft = ((byte) 4 & packedInputs) == 4;
+		bool _isMovingRight = ((byte) 8 & packedInputs) == 8;
+		((RemoteInputSource)input).SetInputState(_isMovingUp, _isMovingDown, _isMovingLeft, _isMovingRight);
 	}
 
 	void ModifyDebugDrawColour() {
@@ -346,6 +347,11 @@ public abstract class Character : MonoBehaviourPun {
 	[PunRPC]
 	protected void RpcUpdateInputs(byte newInputs) {
 		UnpackInputs(newInputs);
+	}
+
+	[PunRPC]
+	protected void AddRemoteInputSource() {
+		input = new RemoteInputSource();
 	}
 
 	protected void InteractWithObjectsInRange() {

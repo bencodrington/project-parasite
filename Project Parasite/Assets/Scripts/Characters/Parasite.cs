@@ -69,7 +69,9 @@ public class Parasite : Character {
 	#endregion
 
 	protected override void HandleInput()  {
-		input.UpdateInputState();
+		if (HasAuthority()) {
+			input.UpdateInputState();
+		}
 
 		isMovingLeft = false;
 		isMovingRight = false;
@@ -177,10 +179,10 @@ public class Parasite : Character {
 	}
 
 	public override void Update() {
+		HandleInput();
 		// Called once per frame for each Parasite
 		if (HasAuthority()) {
 			// This character belongs to this client
-			HandleInput();
 			HandlePositionAndInputUpdates();
 		}
 		if (animator) {

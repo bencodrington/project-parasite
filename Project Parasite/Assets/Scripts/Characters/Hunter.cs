@@ -62,8 +62,10 @@ public class Hunter : Character {
 	}
 
 	protected override void HandleInput()  {
-		input.UpdateInputState();
-		if (orbBeamRangeManager.mostRecentOrb != null) {
+		if (HasAuthority()) {
+			input.UpdateInputState();
+		}
+		if (orbBeamRangeManager != null && orbBeamRangeManager.mostRecentOrb != null) {
 			// Debug.DrawLine(mostRecentOrb.transform.position, transform.position, Color.cyan);
 			// Debug.DrawLine(mostRecentOrb.transform.position, (Vector2)mostRecentOrb.transform.position + new Vector2(0, 6f), Color.black);
 		}
