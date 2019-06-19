@@ -54,9 +54,8 @@ public class OrbBeam : MonoBehaviour {
 		nextColour.Add(Color.yellow, Color.red);
 		// Switch to next colour
 		nextColour.TryGetValue(currentColour, out currentColour);
-		bool isOverlappingHunter = Physics2D.OverlapBox(transform.position, hitboxSize, hitboxAngle, Utility.GetLayerMask(CharacterType.Hunter));
 		// Update spriterenderer
-		SetColour(currentColour, isOverlappingHunter);
+		SetColour(currentColour);
 	}
 	
 	#endregion
@@ -102,13 +101,10 @@ public class OrbBeam : MonoBehaviour {
 		return Mathf.Lerp(energyForce, 0, t);
 	}
 
-	void SetColour(Color colour, bool isOverlappingHunter) {
+	void SetColour(Color colour) {
 		currentColour = colour;
 		// If hunter is blocking beam, fade the beam slightly
-		spriteRenderer.color = new Color(
-				colour.r, colour.g, colour.b,
-				isOverlappingHunter ? blockedByHunterAlpha : 1
-			);
+		spriteRenderer.color = new Color(colour.r, colour.g, colour.b, 1);
 	}
 	
 	#endregion
