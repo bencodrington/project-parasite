@@ -1751,22 +1751,22 @@ PrefabInstance:
       propertyPath: m_text
       value: 'Right-Click to
 
-        Eject Host'
+        Infect / Eject Host'
       objectReference: {fileID: 0}
     - target: {fileID: 3781242518032389364, guid: 263ace3d3ad6f5a498f5ec875e2b4a85,
         type: 3}
       propertyPath: m_textInfo.characterCount
-      value: 25
+      value: 34
       objectReference: {fileID: 0}
     - target: {fileID: 3781242518032389364, guid: 263ace3d3ad6f5a498f5ec875e2b4a85,
         type: 3}
       propertyPath: m_textInfo.spaceCount
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3781242518032389364, guid: 263ace3d3ad6f5a498f5ec875e2b4a85,
         type: 3}
       propertyPath: m_textInfo.wordCount
-      value: 4
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3781242518032389364, guid: 263ace3d3ad6f5a498f5ec875e2b4a85,
         type: 3}
@@ -3016,6 +3016,140 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 844227269}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &793404516
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 1395473566}
+    m_Modifications:
+    - target: {fileID: 8781415547381287253, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_Name
+      value: TutorialText-BeamsZapHost
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 17
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 51.63
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 3.52
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 35.38
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_Pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6184771470086914457, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2636160748987581827, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_havePropertiesChanged
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2636160748987581827, guid: 280b91d47050d4441a91ab9535c2adee,
+        type: 3}
+      propertyPath: m_isInputParsingRequired
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 280b91d47050d4441a91ab9535c2adee, type: 3}
 --- !u!224 &803332811 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 534113112230405492, guid: aecc670150fefde42adcf2f3f990e9e7,
@@ -4217,7 +4351,7 @@ PrefabInstance:
       propertyPath: m_text
       value: 'Right-Click and HOLD
 
-        to Devour Host'
+        to <color=red>Devour</color> Host'
       objectReference: {fileID: 0}
     - target: {fileID: 3781242518032389364, guid: 263ace3d3ad6f5a498f5ec875e2b4a85,
         type: 3}
@@ -6055,6 +6189,7 @@ Transform:
   - {fileID: 1107280060}
   - {fileID: 536522342}
   - {fileID: 1002335994}
+  - {fileID: 1827854502}
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -8263,6 +8398,12 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!224 &1827854502 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 7704288964568427344, guid: 280b91d47050d4441a91ab9535c2adee,
+    type: 3}
+  m_PrefabInstance: {fileID: 793404516}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1844915001
 GameObject:
   m_ObjectHideFlags: 0
@@ -9242,24 +9383,24 @@ PrefabInstance:
     - target: {fileID: 3781242518032389364, guid: 79fefafa86d14514db15fae786ce06c8,
         type: 3}
       propertyPath: m_text
-      value: 'Left-Click to
+      value: 'Hold Left-Click to
 
         Pounce'
       objectReference: {fileID: 0}
     - target: {fileID: 3781242518032389364, guid: 79fefafa86d14514db15fae786ce06c8,
         type: 3}
       propertyPath: m_textInfo.characterCount
-      value: 20
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 3781242518032389364, guid: 79fefafa86d14514db15fae786ce06c8,
         type: 3}
       propertyPath: m_textInfo.spaceCount
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3781242518032389364, guid: 79fefafa86d14514db15fae786ce06c8,
         type: 3}
       propertyPath: m_textInfo.wordCount
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3781242518032389364, guid: 79fefafa86d14514db15fae786ce06c8,
         type: 3}
