@@ -15,6 +15,10 @@ public class DefaultNpcInput : InputSource
 	const float VALID_DISTANCE_FROM_TARGET = .5f;
 	// The farthest that NPCs will try to move when running away
 	const float FLEE_DISTANCE = 8f;
+	// How fast each NPC will react to each nearby orb is selected from the following range
+	// 	(measured in seconds)
+	const float MIN_REACTION_TIME = .25f;
+	const float MAX_REACTION_TIME = .5f;
 	// The x coordinate of the movement target
 	float targetX;
 	float minTimeUntilNewPath = 2f;
@@ -22,6 +26,7 @@ public class DefaultNpcInput : InputSource
 	bool hasTarget = false;
 
 	Coroutine idle;
+	Coroutine alertReaction;
 	
 	#endregion
 
@@ -107,7 +112,13 @@ public class DefaultNpcInput : InputSource
 		Utility.Directions fleeDirection = position.x < owner.transform.position.x ?
 			Utility.Directions.Right :
 			Utility.Directions.Left;
-		FleeInDirection(fleeDirection);
+		float reflexTime = Random.Range(MIN_REACTION_TIME, MAX_REACTION_TIME);
+		if (alertReaction != null) {
+			MatchManager.Instance.StopCoroutine(alertReaction);
+		}
+		alertReaction = MatchManager.Instance.StartCoroutine(Utility.WaitXSeconds(reflexTime, () => {
+			FleeInDirection(fleeDirection);
+		}));
 	}
 
 	void FleeInDirection(Utility.Directions direction) {
