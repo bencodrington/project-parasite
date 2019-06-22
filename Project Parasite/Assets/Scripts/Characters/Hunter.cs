@@ -166,6 +166,7 @@ public class Hunter : Character {
 	}
 
 	void Jump() {
+		animator.SetTrigger("startJump");
 		physicsEntity.AddVelocity(0, jumpVelocity);
 	}
 	
