@@ -94,13 +94,19 @@ public class DefaultNpcInput : InputSource
 	}
 
 	float ModifyTargetToAvoidObstacles(float target) {
-		Vector2 pathHitboxSize = new Vector2(target - owner.transform.position.x, owner.stats.height * 2);
+		float pathHitboxHeight = owner.stats.height * 2;
 		// TODO: the below can cause npcs to walk into beams at head height,
 		//  but also stops the hitbox from being triggered by the floor
-		pathHitboxSize.y -= 0.1f;
+		pathHitboxHeight -= 0.1f;
 		// Calculate corners of hitbox
-		Vector2 pathHitboxTopStart = new Vector2(owner.transform.position.x, owner.transform.position.y + pathHitboxSize.y / 2);
-		Vector2 pathHitboxBottomEnd = new Vector2(target, owner.transform.position.y - pathHitboxSize.y / 2);
+		Vector2 pathHitboxTopStart = new Vector2(
+					owner.transform.position.x,
+					owner.transform.position.y + pathHitboxHeight / 2
+				);
+		Vector2 pathHitboxBottomEnd = new Vector2(
+					target + owner.stats.width, // Include the space that the npc will take up once they've reached their destination
+					owner.transform.position.y - pathHitboxHeight / 2
+				);
 		bool isObstacleInTheWay = Physics2D.OverlapArea(pathHitboxTopStart, pathHitboxBottomEnd, Utility.GetLayerMask("npcPathObstacle"));
 		if (isObstacleInTheWay) {
 			target = owner.transform.position.x;
