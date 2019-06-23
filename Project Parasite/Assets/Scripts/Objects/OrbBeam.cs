@@ -15,9 +15,6 @@ public class OrbBeam : MonoBehaviour {
 	Vector2 hitboxSize;
 	float hitboxAngle;
 	Color currentColour = Color.red;
-	// The opacity that the beam should be rendered at if
-	//	a hunter is blocking it
-	float blockedByHunterAlpha = 0.25f;
 
 	SpriteRenderer spriteRenderer;
 
