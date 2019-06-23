@@ -86,7 +86,7 @@ public class NonPlayerCharacter : Character {
 			// We're being infected by a player parasite
 			SetInputSource(parasiteInputSource);
 			// We're on the parasite's client, so update sprite
-			SetSpriteRenderersColour(Color.magenta);
+			SetSpriteRenderersColour(Color.red);
 		}
 		isInfected = true;
 	}
