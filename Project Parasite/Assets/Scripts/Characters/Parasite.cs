@@ -59,6 +59,7 @@ public class Parasite : Character {
 			return pounceIndicator;
 		}
 	}
+	InfectRangeIndicator infectRangeIndicator;
 
 	SpriteTransform spriteTransform;
 
@@ -148,7 +149,7 @@ public class Parasite : Character {
 		// Infect
 		if (input.isDown(PlayerInput.Key.action2)) {
 			IsAttemptingInfection = true;
-			Collider2D npc = Physics2D.OverlapCircle(transform.position, INFECT_RADIUS, Utility.GetLayerMask(CharacterType.NPC));
+			Collider2D npc = infectRangeIndicator.GetNpcCollider();
 			if (npc != null) {
 				InfectNpc(npc.transform.parent.GetComponent<NonPlayerCharacter>());
 				DestroySelf();
@@ -204,6 +205,10 @@ public class Parasite : Character {
 		spriteTransform = GetComponentInChildren<SpriteTransform>();
 		spriteTransform.SetTargetTransform(transform);
 		screechAudioSource = Utility.AddAudioSource(gameObject, screechSound, .2f);
+		if (HasAuthority()) {
+			infectRangeIndicator = GetComponentInChildren<InfectRangeIndicator>();
+			infectRangeIndicator.SetOriginTransform(transform);
+		}
 	}
 
 	#region [Private Methods]
