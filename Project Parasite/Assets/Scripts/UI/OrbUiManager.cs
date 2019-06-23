@@ -76,6 +76,7 @@ public class OrbUiManager : MonoBehaviour {
 		if (flashing != null) {
 			// Must have recalled an orb while flashing placeholders
 			StopCoroutine(flashing);
+			SetPlaceholderColour(PLACEHOLDER_DEFAULT_COLOUR);
 		}
 		while (numOrbSpritesEnabled < numOrbsRemaining) {
 			// Enable sprite
