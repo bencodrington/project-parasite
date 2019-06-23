@@ -4,9 +4,14 @@ using UnityEngine;
 
 public abstract class RangeIndicator : MonoBehaviour
 {
+    #region [Public Variables]
+    
+    public GameObject indicatorPrefab;
+    
+    #endregion
+
 	// Number of indicators to display
     protected abstract int IndicatorCount { get; }
-    public GameObject indicatorPrefab;
 
     #region [Private Variables]
     // The transform from which the range is measured

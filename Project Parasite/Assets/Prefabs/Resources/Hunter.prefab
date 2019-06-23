@@ -43,7 +43,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 295af49870b08614cbfe1da1b6c18eaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  orbBeamRangeMarkerPrefab: {fileID: 1560553297825558, guid: da9a392ec156b834f818186a3b8c48a0,
+  indicatorPrefab: {fileID: 1560553297825558, guid: da9a392ec156b834f818186a3b8c48a0,
     type: 3}
   mostRecentOrb: {fileID: 0}
   shouldShowMarkers: 1

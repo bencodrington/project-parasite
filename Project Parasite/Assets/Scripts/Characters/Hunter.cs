@@ -65,10 +65,6 @@ public class Hunter : Character {
 		if (HasAuthority()) {
 			input.UpdateInputState();
 		}
-		if (orbBeamRangeManager != null && orbBeamRangeManager.mostRecentOrb != null) {
-			// Debug.DrawLine(mostRecentOrb.transform.position, transform.position, Color.cyan);
-			// Debug.DrawLine(mostRecentOrb.transform.position, (Vector2)mostRecentOrb.transform.position + new Vector2(0, 6f), Color.black);
-		}
 
 		// Movement
 		HandleHorizontalMovement();
@@ -191,17 +187,17 @@ public class Hunter : Character {
 		// If new orb is within "beaming" range of most recently placed orb
 		if (orbBeamRangeManager.isInRange(atPosition)) {
 			// Spawn beam halfway between orbs
-			beamSpawnPosition = Vector2.Lerp(orbBeamRangeManager.mostRecentOrb.transform.position, atPosition, 0.5f);
+			beamSpawnPosition = Vector2.Lerp(orbBeamRangeManager.MostRecentOrb.transform.position, atPosition, 0.5f);
 			OrbBeam orbBeam = Instantiate(orbBeamPrefab, beamSpawnPosition, Quaternion.identity).GetComponent<OrbBeam>();
 			// Store beam in most recent orb so when the orb is destroyed it can take the beam with it
-			orbBeamRangeManager.mostRecentOrb.AttachBeam(orbBeam);
-			orbBeam.Initialize(orbBeamRangeManager.mostRecentOrb.transform.position, atPosition);
+			orbBeamRangeManager.MostRecentOrb.AttachBeam(orbBeam);
+			orbBeam.Initialize(orbBeamRangeManager.MostRecentOrb.transform.position, atPosition);
 		}
 
 		// Add to queue
 		orbs.Enqueue(orb);
 		// Update reference to most recent orb for displaying distance limit to player
-		orbBeamRangeManager.mostRecentOrb = orb;
+		orbBeamRangeManager.MostRecentOrb = orb;
 		if (!isNpcControlled && HasAuthority()) {
 			// Update the number of remaining orbs currently displayed onscreen
 			orbUiManager.OnOrbCountChange(orbs.Count);
