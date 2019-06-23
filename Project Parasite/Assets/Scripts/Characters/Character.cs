@@ -81,6 +81,7 @@ public abstract class Character : MonoBehaviourPun {
 		if (animator) {
 			animator.SetBool("isRunning", (isMovingLeft || isMovingRight));
 		}
+		OnUpdate();
 	}
 	
 	#endregion
@@ -224,6 +225,8 @@ public abstract class Character : MonoBehaviourPun {
 
 	// Overridden by child classes to be called by the base Start() method
 	protected virtual void OnStart() {}
+	// Overridden by child classes to be called by the base Update() method
+	protected virtual void OnUpdate() {}
 
 	protected void HandleHorizontalMovement() {
 		isMovingLeft = false;

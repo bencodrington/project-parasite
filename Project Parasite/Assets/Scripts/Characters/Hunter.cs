@@ -98,6 +98,11 @@ public class Hunter : Character {
 		}
 	}
 
+	protected override void OnUpdate() {
+		animator.SetBool("isAscending", physicsEntity.IsAscending());
+		animator.SetBool("isOnGround", physicsEntity.IsOnGround());
+	}
+
 	#region [Public Methods]
 	
 	public void Repel(Vector2 forceDirection, float force) {

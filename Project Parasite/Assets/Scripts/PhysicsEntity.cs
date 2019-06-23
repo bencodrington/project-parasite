@@ -55,11 +55,12 @@ public class PhysicsEntity : RaycastController {
 	private Vector2 oldPixelToTheLeft;
 	private Vector2 oldPixelToTheRight;
 	// Public-facing methods for determining the state of the entity
-	public bool IsOnGround()	{ return collisionInfo.below; }
-	public bool IsOnCeiling()	{ return collisionInfo.above; }
-	public bool IsOnLeftWall()	{ return collisionInfo.left;  }
-	public bool IsOnRightWall()	{ return collisionInfo.right; }
-	public bool IsOnWall() { return IsOnLeftWall() || IsOnRightWall(); }
+	public bool IsOnGround()	{ return collisionInfo.below; 	}
+	public bool IsOnCeiling()	{ return collisionInfo.above; 	}
+	public bool IsOnLeftWall()	{ return collisionInfo.left;  	}
+	public bool IsOnRightWall()	{ return collisionInfo.right; 	}
+	public bool IsOnWall() 		{ return IsOnLeftWall() || IsOnRightWall(); }
+	public bool IsAscending() 	{ return velocityY > 0;			}
 	public bool applyGravity = true;
 	bool _isTryingToStickToCeiling = false;
 	public void SetIsTryingToStickToCeiling(bool isTryingToStickToCeiling) {
