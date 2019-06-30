@@ -15,6 +15,14 @@ MonoBehaviour:
   mapOrigin: {x: 0, y: -70}
   debugSpawnCoordinates: {x: 0, y: 6}
   platforms:
+  - xCoordinate: -43
+    stops:
+    - name: Lower Bunks
+      yCoordinate: -10
+      isOnRightSide: 1
+    - name: Engine Room
+      yCoordinate: 10
+      isOnRightSide: 0
   - xCoordinate: -21
     stops:
     - name: Lower Bunks
@@ -24,19 +32,19 @@ MonoBehaviour:
       yCoordinate: 4
       isOnRightSide: 1
     - name: Upper Bunks
-      yCoordinate: 31
+      yCoordinate: 24
       isOnRightSide: 0
   - xCoordinate: 21
     stops:
-    - name: Cafeteria
+    - name: Yoga Studio
       yCoordinate: -10
       isOnRightSide: 0
     - name: Bingo Chamber
       yCoordinate: 4
       isOnRightSide: 0
     - name: Bridge
-      yCoordinate: 22
+      yCoordinate: 16
       isOnRightSide: 1
-    - name: Yoga Studio
-      yCoordinate: 24
+    - name: Cafeteria
+      yCoordinate: 22
       isOnRightSide: 0
