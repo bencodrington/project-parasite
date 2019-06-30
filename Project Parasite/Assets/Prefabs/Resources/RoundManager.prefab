@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isGameOver: 0
+  mapData: {fileID: 11400000, guid: 15e220041a99c244fb4fe90466ba89fc, type: 2}
 --- !u!114 &482
 MonoBehaviour:
   m_ObjectHideFlags: 0

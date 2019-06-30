@@ -117,11 +117,11 @@ public class Elevator : MonoBehaviourPun {
 	}
 
 	Vector2 GetStopSpawnCoordinates(float xCoordinate, float yCoordinate, bool isOnRightSide) {
-		// -1f is because call fields are positioned by their bottom left corner, not the middle
-		// CLEANUP: this can be cleaner
-		xCoordinate += isOnRightSide ? STOP_X_OFFSET - 1f : -STOP_X_OFFSET - 1f;
-		// CLEANUP: replace magic number, half of elevator height
-		return new Vector2(xCoordinate, yCoordinate - 1.5f);
+		// Get the X coordinate on either the left or right of the elevator
+		xCoordinate += isOnRightSide ? STOP_X_OFFSET : -STOP_X_OFFSET;
+		// -1 is because call fields are positioned by their bottom left corner, not the middle
+		xCoordinate -= 1;
+		return new Vector2(xCoordinate, yCoordinate);
 	}
 
 	void InitializeButtons(int buttonCount) {
@@ -176,6 +176,9 @@ public class Elevator : MonoBehaviourPun {
 		Vector2 targetPosition;
 		float potentialMovement = MOVEMENT_SPEED * Time.deltaTime;
 		targetPosition = new Vector2(transform.position.x, stopYCoordinates[targetStop]);
+		// The transform's position is measured from halfway up its height, so add half of its height
+		// 	to make the platform line up with the floor
+		targetPosition.y += SIZE.y / 2;
 		if (Vector3.Distance(transform.position, targetPosition) < potentialMovement) {
 			// Destination reached
 			isMoving = false;

@@ -10,6 +10,7 @@ public class RoundManager : MonoBehaviourPun {
 	#region [Public Variables]
 
 	public bool isGameOver = false;
+	public MapData mapData;
 	
 	#endregion
 
@@ -136,8 +137,8 @@ public class RoundManager : MonoBehaviourPun {
 		hunterSpawnPoint = spawnPointData.spawnPoints[hunterSpawnPointIndex].coordinates;
 
 		if (spawnPlayersAtZero) {
-			parasiteSpawnPoint = Vector2.zero;
-			hunterSpawnPoint = Vector2.zero;
+			parasiteSpawnPoint = mapData.mapOrigin + mapData.debugSpawnCoordinates;
+			hunterSpawnPoint = mapData.mapOrigin + mapData.debugSpawnCoordinates;
 		}
 	}
 
@@ -187,6 +188,9 @@ public class RoundManager : MonoBehaviourPun {
 	[PunRPC]
 	void RpcSetObjectManager(int objectManagerViewId) {
 		objectManager = PhotonView.Find(objectManagerViewId).GetComponentInChildren<ObjectManager>();
+		// Only the master client needs to have access to the map data and instantiate the map
+		if (!PhotonNetwork.IsMasterClient) { return; }
+		objectManager.SetMap(mapData);
 		objectManager.OnRoundStart();
 	}
 }

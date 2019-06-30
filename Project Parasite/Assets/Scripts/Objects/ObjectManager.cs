@@ -5,61 +5,13 @@ using UnityEngine;
 
 public class ObjectManager : MonoBehaviourPun {
 
-	class StopData {
-		public float yCoordinate;
-		public bool isOnRightSide;
-		public StopData(float yCoordinate, bool isOnRightSide){
-			this.yCoordinate = yCoordinate;
-			this.isOnRightSide = isOnRightSide;
-		}
-	}
-	class ElevatorData {
-		public float xCoordinate;
-		public StopData[] stops;
-		public ElevatorData(float xCoordinate, StopData[] stops) {
-			this.xCoordinate = xCoordinate;
-			this.stops = stops;
-		}
-
-		public Vector2 GetVerticalRange() {
-			if (stops.Length == 0) { return Vector2.zero; }
-			// Initialize range min and max to first stop's yCoordinate
-			Vector2 range = new Vector2(stops[0].yCoordinate, stops[0].yCoordinate);
-			// For each of the remaining stops
-			for (int i = 1; i < stops.Length; i++) {
-				// Update range to include current stop's yCoordinate
-				if (stops[i].yCoordinate < range.x) {
-					range.x = stops[i].yCoordinate;
-				} else if (stops[i].yCoordinate > range.y) {
-					range.y = stops[i].yCoordinate;
-				}
-			}
-			return range;
-		}
-
-	}
-	ElevatorData[] elevatorDataArray = {
-		new ElevatorData(-15f, new StopData[] {
-			new StopData(-8.5f, false),
-			new StopData(-0.5f, true),
-			new StopData(11.5f, true),
-			new StopData(23.5f, true),
-			new StopData(35.5f, false),
-		}),
-		new ElevatorData(15f, new StopData[] {
-			new StopData(-8.5f, true),
-			new StopData(-0.5f, false),
-			new StopData(11.5f, false),
-			new StopData(23.5f, false),
-			new StopData(35.5f, true),
-		})
-	};
-
 	#region [Private Variables]
 
 	GameObject elevatorPrefab;
 	
 	List<Elevator> elevators;
+
+	MapData mapData;
 	
 	#endregion
 
@@ -69,7 +21,7 @@ public class ObjectManager : MonoBehaviourPun {
 		// Elevators only need to be spawned on one client and propagated to the rest
 		if (!PhotonNetwork.IsMasterClient) { return; }
 		elevatorPrefab = Resources.Load("Elevator") as GameObject;
-		SpawnElevators();
+		SpawnPlatforms();
 	}
 
 	public void OnRoundEnd() {
@@ -86,6 +38,10 @@ public class ObjectManager : MonoBehaviourPun {
 			elevator.PhysicsUpdate();
 		}
 	}
+
+	public void SetMap(MapData _mapData) {
+		mapData = _mapData;
+	}
 	
 	#endregion
 
@@ -100,37 +56,41 @@ public class ObjectManager : MonoBehaviourPun {
 
 	#region [Private Methods]
 
-	void SpawnElevators() {
+	void SpawnPlatforms() {
 		int elevatorViewId;
+		if (mapData == null) {
+			Debug.LogError("ObjectManager:SpawnPlatforms():mapData not set");
+			return;
+		}
 		// This should only ever be called on the Master Client
-		foreach (ElevatorData elevatorData in elevatorDataArray) {
-			elevatorViewId = SpawnElevator(elevatorData);
+		foreach (MapData.PlatformData platformData in mapData.platforms) {
+			elevatorViewId = SpawnPlatform(platformData, mapData.mapOrigin);
 			photonView.RPC("RpcStoreElevator", RpcTarget.All, elevatorViewId);
 		}
 	}
 
-	int SpawnElevator(ElevatorData elevatorData) {
+	int SpawnPlatform(MapData.PlatformData platformData, Vector2 mapOrigin) {
 		// Instantiate GameObject
-		GameObject elevatorGameObject = PhotonNetwork.Instantiate(
+		GameObject platformGameObject = PhotonNetwork.Instantiate(
 											elevatorPrefab.name,
-											GetElevatorSpawnCoordinates(elevatorData),
+											mapOrigin + GetPlatformSpawnCoordinates(platformData),
 											Quaternion.identity);
-		Elevator elevator = elevatorGameObject.GetComponent<Elevator>();
-		float[] yCoordinates = new float[elevatorData.stops.Length];
+		Elevator elevator = platformGameObject.GetComponent<Elevator>();
+		float[] yCoordinates = new float[platformData.stops.Length];
 		bool[] isOnRightSideValues = new bool[yCoordinates.Length];
 		for (int i = 0; i < yCoordinates.Length; i++) {
-			yCoordinates[i] = elevatorData.stops[i].yCoordinate;
-			isOnRightSideValues[i] = elevatorData.stops[i].isOnRightSide;
+			yCoordinates[i] = mapOrigin.y + platformData.stops[i].yCoordinate;
+			isOnRightSideValues[i] = platformData.stops[i].isOnRightSide;
 		}
 		// Let all copies of the elevator know what their stops are
 		elevator.photonView.RPC("RpcSetStopData", RpcTarget.All, yCoordinates, isOnRightSideValues);
 		return elevator.photonView.ViewID;
 	}
 
-	Vector2 GetElevatorSpawnCoordinates(ElevatorData elevator) {
-		Vector2 range = elevator.GetVerticalRange();
+	Vector2 GetPlatformSpawnCoordinates(MapData.PlatformData platformData) {
+		Vector2 range = platformData.GetVerticalRange();
 		float yCoordinate = Random.Range(range.x, range.y);
-		return new Vector2(elevator.xCoordinate, yCoordinate);
+		return new Vector2(platformData.xCoordinate, yCoordinate);
 	}
 
 	void DestroyElevators() {
