@@ -14,7 +14,7 @@ public abstract class InteractableObject : MonoBehaviour {
     GameObject controlKey;
 
     // How far from this root's transform the key icon should be displayed
-    protected Vector2 controlKeyOffset = new Vector2(1, 2);
+    protected Vector2 controlKeyOffset = new Vector2(1, 2.5f);
 
     public virtual void Start() {
         // Create and hide the key icon

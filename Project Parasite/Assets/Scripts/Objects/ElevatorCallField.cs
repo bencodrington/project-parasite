@@ -11,7 +11,7 @@ public class ElevatorCallField : InteractableObject {
 
 	// How far from the origin (bottom left of this object)
 	// 	should the 'platform called' alert be spawned
-	Vector2 PLATFORM_CALLED_ALERT_OFFSET = new Vector2(1, 3);
+	Vector2 PLATFORM_CALLED_ALERT_OFFSET = new Vector2(1, 3.5f);
 
 	AudioSource audioSource;
 
