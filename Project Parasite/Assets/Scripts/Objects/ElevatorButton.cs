@@ -15,6 +15,9 @@ public class ElevatorButton : MonoBehaviour {
 	public Elevator elevator;
 	public bool isDisabled = false;
 	
+	public Color hoverColour = new Color(0.4f, 0.7f, 0.9f, 1);
+	public Color disabledColour = new Color(0.1f, 0.2f, 0.3f, .5f);
+	
 	#endregion
 
 	#region [Private Variables]
@@ -24,8 +27,6 @@ public class ElevatorButton : MonoBehaviour {
 
 	SpriteRenderer spriteRenderer;
 	Color defaultColour;
-	Color hoverColour = new Color(0.4f, 0.7f, 0.9f, 1);
-	Color disabledColour = new Color(0.1f, 0.2f, 0.3f, .5f);
 	
 	#endregion
 

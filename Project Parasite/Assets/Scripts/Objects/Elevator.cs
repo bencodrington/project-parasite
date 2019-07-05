@@ -21,8 +21,11 @@ public class Elevator : MonoBehaviourPun {
 	// The higher this value is, the snappier lag correction will be
 	const float LAG_LERP_FACTOR = 0.1f;
 	const float MOVEMENT_SPEED = 8f;
+	// The vertical distance from the center of the platform gameobject to the
+	// 	bottom of the first button
+	const float BUTTON_OFFSET = 1.5f;
 	// The vertical distance between elevator buttons
-	const float BUTTON_OFFSET = 0.6f;
+	const float BUTTON_SPACING = 0.6f;
 	Vector2 SIZE = new Vector2(2, 3);
 	float[] stopYCoordinates;
 	int targetStop;
@@ -130,7 +133,7 @@ public class Elevator : MonoBehaviourPun {
 
 		Vector2 spawnPos = new Vector2(transform.position.x,
 								transform.position.y +	// Base vertical position of the center of the elevator
-								BUTTON_OFFSET / 2 );	// Add some padding before start of first button
+								BUTTON_OFFSET );	// Add some padding before start of first button
 		// Spawn button prefabs based on # of stops
 		for (int i = 0; i < buttonCount; i++) {
 			button = Instantiate(buttonPrefab, spawnPos, Quaternion.identity, transform).GetComponentInChildren<ElevatorButton>();
@@ -138,7 +141,7 @@ public class Elevator : MonoBehaviourPun {
 			button.stopIndex = i;
 			button.elevator = this;
 			buttons[i] = button;
-			spawnPos.y += BUTTON_OFFSET;
+			spawnPos.y += BUTTON_SPACING;
 		}
 	}
 
