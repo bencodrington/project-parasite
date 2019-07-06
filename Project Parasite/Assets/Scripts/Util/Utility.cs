@@ -93,6 +93,7 @@ public static class Utility {
 		newSource = gameObject.AddComponent<AudioSource>();
 		newSource.clip = clip;
 		newSource.volume = volume;
+		newSource.playOnAwake = false;
 		return newSource;
 	}
 

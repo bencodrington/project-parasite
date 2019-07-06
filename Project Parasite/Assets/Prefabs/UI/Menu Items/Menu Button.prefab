@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 114481709472682086}
   - component: {fileID: 222603501057386868}
   - component: {fileID: 114121408084827802}
+  - component: {fileID: 8270606247977803373}
   m_Layer: 0
   m_Name: Menu Button
   m_TagString: Untagged
@@ -129,6 +130,20 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
+--- !u!114 &8270606247977803373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1241366077115434}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60de0f6f1b4e16a4eb14d16e47b5a633, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverSound: {fileID: 8300000, guid: 1250153abccfe8347bc2fcc2a362f017, type: 3}
+  clickSound: {fileID: 8300000, guid: 68cdcc321ca95e449a37eb0db8bdf80c, type: 3}
 --- !u!1 &1310719485374002
 GameObject:
   m_ObjectHideFlags: 0
