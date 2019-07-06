@@ -205,9 +205,11 @@ public class Parasite : Character {
 		spriteTransform = GetComponentInChildren<SpriteTransform>();
 		spriteTransform.SetTargetTransform(transform);
 		screechAudioSource = Utility.AddAudioSource(gameObject, screechSound, .2f);
+		infectRangeIndicator = GetComponentInChildren<InfectRangeIndicator>();
 		if (HasAuthority()) {
-			infectRangeIndicator = GetComponentInChildren<InfectRangeIndicator>();
 			infectRangeIndicator.SetOriginTransform(transform);
+		} else {
+			infectRangeIndicator.enabled = false;
 		}
 	}
 
