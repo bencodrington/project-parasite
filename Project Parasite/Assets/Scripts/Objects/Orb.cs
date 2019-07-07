@@ -16,14 +16,11 @@ public class Orb : MonoBehaviour {
 
 	public SpriteRenderer burstSprite;
 
-	Coroutine intensityCoroutine;
-
 	OrbBeam beam;
 
 	#region [MonoBehaviour Callbacks]
 	
 	void Start() {
-		intensityCoroutine = StartCoroutine(FadeIntensity());
 		isActive = true;
 	}
 
@@ -45,9 +42,6 @@ public class Orb : MonoBehaviour {
 	void OnDestroy() {
 		if (beam != null) {
 			Destroy(beam.gameObject);
-		}
-		if (intensityCoroutine != null) {
-			StopCoroutine(intensityCoroutine);
 		}
 	}
 	
@@ -75,20 +69,6 @@ public class Orb : MonoBehaviour {
 		// FORCE OUTPUT:   ^--FULL FORCE--^			       0
 		float t = (distance - FULL_FORCE_CUTOFF_RADIUS) / (RADIUS - FULL_FORCE_CUTOFF_RADIUS);
 		return Mathf.Lerp(FORCE, 0, t);
-	}
-
-	IEnumerator FadeIntensity() {
-		float remainingFadeTime = BURST_FADE_TIME;
-		float spriteRadius;
-		while (remainingFadeTime > 0) {
-			yield return null;
-			remainingFadeTime -= Time.deltaTime;
-			spriteRadius = remainingFadeTime / BURST_FADE_TIME;
-			burstSprite.transform.localScale = new Vector2(spriteRadius, spriteRadius);
-			burstSprite.color = new Color(burstSprite.color.r, burstSprite.color.g, burstSprite.color.b, Random.Range(0.25f, 0.5f));
-		}
-		intensityCoroutine = null;
-		Destroy(burstSprite.gameObject);
 	}
 	
 	#endregion

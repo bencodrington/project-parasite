@@ -47905,10 +47905,10 @@ MonoBehaviour:
   hunterAiOrbData: {fileID: 11400000, guid: 5ca4bc84dd413db4aa2fb9f2d7a9783d, type: 2}
   playerObjectPrefab: {fileID: 1820297792491458, guid: c3d12b587d0975b4787bf47335c8913f,
     type: 3}
-  DEBUG_MODE: 0
-  spawnPlayersAtZero: 0
-  huntersOnlyMode: 0
-  spawnOneNpcOnly: 0
+  DEBUG_MODE: 1
+  spawnPlayersAtZero: 1
+  huntersOnlyMode: 1
+  spawnOneNpcOnly: 1
 --- !u!1 &1092527282
 GameObject:
   m_ObjectHideFlags: 0

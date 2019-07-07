@@ -4,6 +4,15 @@ using UnityEngine;
 
 public class OrbBeam : MonoBehaviour {
 
+	#region [Public Variables]
+	
+	// The colours that the beam flashes between each frame
+	public Color[] flashColours;
+	
+	#endregion
+
+	#region [Private Variables]
+	
 	float energyRadius = 2f;
 	float energyForce = 10f;
 
@@ -14,9 +23,14 @@ public class OrbBeam : MonoBehaviour {
 	Ray2D hitboxRay;
 	Vector2 hitboxSize;
 	float hitboxAngle;
-	Color currentColour = Color.red;
+	
+	// Used for cycling colours
+	Dictionary<Color, Color> nextColour = new Dictionary<Color, Color>();
+	Color currentColour;
 
 	SpriteRenderer spriteRenderer;
+	
+	#endregion
 
 	public void Initialize(Vector2 startPoint, Vector2 endPoint) {
 		this.startPoint = startPoint;
@@ -34,6 +48,7 @@ public class OrbBeam : MonoBehaviour {
 		);
 		spriteRenderer.transform.localScale = spriteScale;
 		spriteRenderer.transform.Rotate(new Vector3(0, 0, hitboxAngle));
+		InitializeFlashColours();
 	}
 
 	#region [MonoBehaviour Callbacks]
@@ -43,16 +58,9 @@ public class OrbBeam : MonoBehaviour {
 	}
 
 	void Update() {
-		// Flash colours
-		// Used for cycling colours
-		Dictionary<Color, Color> nextColour = new Dictionary<Color, Color>();
-		nextColour.Add(Color.red, Color.cyan);
-		nextColour.Add(Color.cyan, Color.yellow);
-		nextColour.Add(Color.yellow, Color.red);
 		// Switch to next colour
 		nextColour.TryGetValue(currentColour, out currentColour);
-		// Update spriterenderer
-		SetColour(currentColour);
+		UpdateSpriteRendererColour();
 	}
 	
 	#endregion
@@ -98,10 +106,16 @@ public class OrbBeam : MonoBehaviour {
 		return Mathf.Lerp(energyForce, 0, t);
 	}
 
-	void SetColour(Color colour) {
-		currentColour = colour;
-		// If hunter is blocking beam, fade the beam slightly
-		spriteRenderer.color = new Color(colour.r, colour.g, colour.b, 1);
+	void InitializeFlashColours() {
+		currentColour = flashColours[0];
+		for (int i = 0; i < flashColours.Length - 1; i++) {
+			nextColour.Add(flashColours[i], flashColours[i+1]);
+		}
+		nextColour.Add(flashColours[flashColours.Length - 1], flashColours [0]);
+	}
+
+	void UpdateSpriteRendererColour() {
+		spriteRenderer.color = currentColour;
 	}
 	
 	#endregion
