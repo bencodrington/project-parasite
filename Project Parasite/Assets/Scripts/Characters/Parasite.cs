@@ -30,8 +30,14 @@ public class Parasite : Character {
 	// The pounce speed will be capped off after this many seconds
 	const float MAX_CHARGE_TIME = 1.5f;
 	bool IsChargingPounce() {
-		return timeSpentCharging > 0f;
+		if (HasAuthority()) {
+			return timeSpentCharging > 0f;
+		}
+		return remoteIsChargingPounce;
 	}
+	// Used by remote clients to know whether to maintain a wall cling or not
+	// 	The owner client should ignore this
+	bool remoteIsChargingPounce = false;
 
 	bool _isAttemptingInfection = false;
 	bool IsAttemptingInfection {
@@ -288,9 +294,12 @@ public class Parasite : Character {
 	}
 
 	void HandlePounceInput() {
+		// None of this is relevant on remote clients
+		if (!HasAuthority()) { return; }
 		if (input.isJustPressed(PlayerInput.Key.action1)) {
 			// Action key just pressed
 			PounceIndicator.Show();
+			photonView.RPC("RpcSetRemoteIsChargingPounce", RpcTarget.All, true);
 		}
 		if (input.isDown(PlayerInput.Key.action1)) {
 			// Action key is down, so charge leap
@@ -304,6 +313,7 @@ public class Parasite : Character {
 			}
 			ResetPounceCharge();
 			PounceIndicator.Hide();
+			photonView.RPC("RpcSetRemoteIsChargingPounce", RpcTarget.All, false);
 		}
 	}
 
@@ -331,6 +341,11 @@ public class Parasite : Character {
 	[PunRPC]
 	void RpcJump() {
 		Jump();
+	}
+
+	[PunRPC]
+	void RpcSetRemoteIsChargingPounce(bool isChargingPounce) {
+		remoteIsChargingPounce = isChargingPounce;
 	}
 
 }

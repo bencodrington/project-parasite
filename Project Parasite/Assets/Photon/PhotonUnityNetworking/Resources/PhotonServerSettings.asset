@@ -42,5 +42,6 @@ MonoBehaviour:
   - RpcJump
   - RpcSetIsTryingToStickToCeiling
   - AddRemoteInputSource
+  - RpcSetRemoteIsChargingPounce
   DisableAutoOpenWizard: 1
   ShowSettings: 1
