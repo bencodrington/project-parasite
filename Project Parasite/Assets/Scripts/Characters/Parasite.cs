@@ -48,8 +48,6 @@ public class Parasite : Character {
 		SetSpriteRenderersColour(isAttempting ? IS_ATTEMPTING_INFECTION_COLOUR : RESTING_COLOUR);
 	}
 
-	bool oldIsTryingToStickToCeiling;
-
 	PounceIndicator pounceIndicator;
 	PounceIndicator PounceIndicator {
 		get {
@@ -66,6 +64,12 @@ public class Parasite : Character {
 	// The direction that the parasite is attached to (left wall, right wall, ceiling)
 	// 	when it began charging a pounce
 	Utility.Directions attachedDirection = Utility.Directions.Null;
+	bool IsAttachedToWall{
+		get { 
+			return attachedDirection == Utility.Directions.Left
+				|| attachedDirection == Utility.Directions.Right;
+		}
+	}
 	
 	#endregion
 
@@ -74,93 +78,26 @@ public class Parasite : Character {
 			input.UpdateInputState();
 		}
 
-		isMovingLeft = false;
-		isMovingRight = false;
-		bool isTryingToStickToCeiling = false;
-		float pounceAngle;
 		if (IsChargingPounce()) {
-			pounceAngle = Utility.GetAngleToMouse(transform.position);
-			PounceIndicator.SetAngle(pounceAngle);
-			// Make sure physicsEntity keeps checking for walls we're attached to
-			// 	so that CanPounce() resolves to true.
-			if (!physicsEntity.IsOnGround()) {
-				switch (attachedDirection) {
-					case Utility.Directions.Right: isMovingRight = true; break;
-					case Utility.Directions.Left: isMovingLeft = true; break;
-					case Utility.Directions.Up: isTryingToStickToCeiling = true; break;
-				}
-			}
+			// HandlePounceChargeInput doesn't affect attached direction, so the parasite will stay attached
+			// 	to the wall/ceiling it started the pounce on
+			HandlePounceChargeInput();
+			HandlePounceChargeMovementState();
 		} else {
-			if (input.isDown(PlayerInput.Key.right) && !input.isDown(PlayerInput.Key.left)) {
-				physicsEntity.applyGravity = !physicsEntity.IsOnRightWall();
-				isMovingRight = true;
-			} else if (input.isDown(PlayerInput.Key.left) && !input.isDown(PlayerInput.Key.right)) {
-				physicsEntity.applyGravity = !physicsEntity.IsOnLeftWall();
-				isMovingLeft = true;
-			} else {
-				physicsEntity.applyGravity = true;
-			}
+			// Only reset the movement state variables if we're not charging pounce, so that the physicsEntity
+			// 	keeps checking for colliders on the wall we're attached to
+			ResetMovementState();
+			HandleHorizontalInput();
+			HandleVerticalInput();
 		}
-		isMovingUp = false;
-		isMovingDown = false;
-		if ((input.isJustPressed(PlayerInput.Key.up) || input.isJustPressed(PlayerInput.Key.jump))
-					&& physicsEntity.IsOnGround()
-					&& !IsChargingPounce()) {
-			// Jump
-			photonView.RPC("RpcJump", RpcTarget.All);
-		}  else if (input.isDown(PlayerInput.Key.up) && physicsEntity.IsOnWall() && !IsChargingPounce()) {
-			// Climb Up
-			isMovingUp = true;
-		} else if (input.isDown(PlayerInput.Key.down) && physicsEntity.IsOnWall() && !IsChargingPounce()) {
-			// Climb Down
-			isMovingDown = true;
-		}
-		if (input.isDown(PlayerInput.Key.up)) {
-			// Attempt to stick to ceiling
-			isTryingToStickToCeiling = true;
-		}
-		if (input.isJustPressed(PlayerInput.Key.action1)) {
-			// Action key just pressed
-			PounceIndicator.Show();
-		}
+		// Update attached direction before handling the pounce input, otherwise it won't be stored
+		// 	for the duration of the pounce
 		UpdateAttachedDirection();
-		if (input.isDown(PlayerInput.Key.action1)) {
-			// Action key is down
-			// Charge leap
-			timeSpentCharging += Time.deltaTime;
-			PounceIndicator.SetPercentage(PounceChargePercentage());
-		} else if (input.isJustReleased(PlayerInput.Key.action1)) {
-			// On action button release
-			if (CanPounce()) {
-				// Pounce
-				physicsEntity.AddVelocity(CalculatePounceVelocity());
-				isTryingToStickToCeiling = false;
-			}
-			ResetPounceCharge();
-			PounceIndicator.Hide();
-		}
-		
-		if (oldIsTryingToStickToCeiling != isTryingToStickToCeiling) {
-			// Only send updates
-			photonView.RPC("RpcSetIsTryingToStickToCeiling", RpcTarget.All, isTryingToStickToCeiling);
-			oldIsTryingToStickToCeiling = isTryingToStickToCeiling;
-		}
-
-		// Infect
-		if (input.isDown(PlayerInput.Key.action2)) {
-			IsAttemptingInfection = true;
-			Collider2D npc = infectRangeIndicator.GetNpcCollider();
-			if (npc != null) {
-				InfectNpc(npc.transform.parent.GetComponent<NonPlayerCharacter>());
-				DestroySelf();
-			}
-		} else {
-			IsAttemptingInfection = false;
-		}
-
-		if (input.isJustPressed(PlayerInput.Key.interact)) {
-			InteractWithObjectsInRange();
-		}
+		HandlePounceInput();
+		HandleInfection();
+		HandleInteraction();
+		physicsEntity.SetIsTryingToStickInDirection(attachedDirection, true);
+		UpdateSpriteRotation();
 	}
 
 	#region [Public Methods]
@@ -188,12 +125,10 @@ public class Parasite : Character {
 		}
 		if (animator) {
 			bool shouldRun = false;
-			if (physicsEntity.applyGravity) {
-				// Either on the ceiling, floor, or in midair
-				shouldRun = isMovingLeft || isMovingRight;
+			if (IsAttachedToWall) {
+				shouldRun = isMovingUp || isMovingDown;
 			} else {
-				// Stuck to a wall
-				shouldRun = isMovingDown || isMovingUp;
+				shouldRun = isMovingLeft || isMovingRight;
 			}
 			animator.SetBool("isRunning", shouldRun);
 		}
@@ -215,15 +150,7 @@ public class Parasite : Character {
 
 	#region [Private Methods]
 	
-	void UpdateAttachedDirection() {
-		attachedDirection = Utility.Directions.Null;
-		if (physicsEntity.IsOnCeiling()) {
-			attachedDirection = Utility.Directions.Up;
-		} else if (physicsEntity.IsOnLeftWall()) {
-			attachedDirection = Utility.Directions.Left;
-		} else if (physicsEntity.IsOnRightWall()) {
-			attachedDirection = Utility.Directions.Right;
-		}
+	void UpdateSpriteRotation() {
 		spriteTransform.SetRotateDirection(attachedDirection);
 	}
 
@@ -302,17 +229,108 @@ public class Parasite : Character {
 		npc.SetCameraFollow(false);
 		npc.SetRenderLayer();
 	}
+
+	void ResetMovementState() {
+		isMovingLeft = false;
+		isMovingRight = false;
+		isMovingUp = false;
+		isMovingDown = false;
+	}
+
+	void HandlePounceChargeInput() {
+		float pounceAngle;
+		pounceAngle = Utility.GetAngleToMouse(transform.position);
+		PounceIndicator.SetAngle(pounceAngle);
+	}
+
+	void HandlePounceChargeMovementState() {
+		// Reset movement variables except in the direction we're attached
+		isMovingLeft	= attachedDirection == Utility.Directions.Left;
+		isMovingRight 	= attachedDirection == Utility.Directions.Right;
+		isMovingUp 		= attachedDirection == Utility.Directions.Up;
+		isMovingDown 	= false; // Never attached to the floor
+	}
+
+	void HandleHorizontalInput() {
+		if (input.isDown(PlayerInput.Key.right) && !input.isDown(PlayerInput.Key.left)) {
+			isMovingRight = true;
+		} else if (input.isDown(PlayerInput.Key.left) && !input.isDown(PlayerInput.Key.right)) {
+			isMovingLeft = true;
+		}
+	}
+
+	void HandleVerticalInput() {
+		if ((input.isJustPressed(PlayerInput.Key.up) || input.isJustPressed(PlayerInput.Key.jump))
+				&& physicsEntity.IsOnGround()) {
+			// Jump
+			photonView.RPC("RpcJump", RpcTarget.All);
+		}  else if (input.isDown(PlayerInput.Key.up) && physicsEntity.IsOnWall()) {
+			// Climb Up
+			isMovingUp = true;
+		} else if (input.isDown(PlayerInput.Key.down) && physicsEntity.IsOnWall()) {
+			// Climb Down
+			isMovingDown = true;
+		}
+	}
+
+	void UpdateAttachedDirection() {
+		// Don't update the attached direction if we're charging a pounce
+		// 	(could be stuck to a wall or ceiling, shouldn't have to hold down the button)
+		if (IsChargingPounce()) { return; }
+		attachedDirection = Utility.Directions.Null;
+		if (input.isDown(PlayerInput.Key.left) && physicsEntity.IsOnLeftWall()) {
+			attachedDirection = Utility.Directions.Left;
+		} else if (input.isDown(PlayerInput.Key.right) && physicsEntity.IsOnRightWall()) {
+			attachedDirection = Utility.Directions.Right;
+		} else if (input.isDown(PlayerInput.Key.up) && physicsEntity.IsOnCeiling()) {
+			attachedDirection = Utility.Directions.Up;
+		}
+	}
+
+	void HandlePounceInput() {
+		if (input.isJustPressed(PlayerInput.Key.action1)) {
+			// Action key just pressed
+			PounceIndicator.Show();
+		}
+		if (input.isDown(PlayerInput.Key.action1)) {
+			// Action key is down, so charge leap
+			timeSpentCharging += Time.deltaTime;
+			PounceIndicator.SetPercentage(PounceChargePercentage());
+		} else if (input.isJustReleased(PlayerInput.Key.action1)) {
+			if (CanPounce()) {
+				// Pounce
+				physicsEntity.AddVelocity(CalculatePounceVelocity());
+				attachedDirection = Utility.Directions.Null;
+			}
+			ResetPounceCharge();
+			PounceIndicator.Hide();
+		}
+	}
+
+	void HandleInfection() {
+		if (input.isDown(PlayerInput.Key.action2)) {
+			IsAttemptingInfection = true;
+			Collider2D npc = infectRangeIndicator.GetNpcCollider();
+			if (npc != null) {
+				InfectNpc(npc.transform.parent.GetComponent<NonPlayerCharacter>());
+				DestroySelf();
+			}
+		} else {
+			IsAttemptingInfection = false;
+		}
+	}
+
+	void HandleInteraction() {
+		if (input.isJustPressed(PlayerInput.Key.interact)) {
+			InteractWithObjectsInRange();
+		}
+	}
 	
 	#endregion
 
 	[PunRPC]
 	void RpcJump() {
 		Jump();
-	}
-
-	[PunRPC]
-	void RpcSetIsTryingToStickToCeiling(bool isTrying) {
-		physicsEntity.SetIsTryingToStickToCeiling(isTrying);
 	}
 
 }

@@ -66,15 +66,6 @@ public class PhysicsEntity : RaycastController {
 	public bool IsOnRightWall()	{ return collisionInfo.right; 	}
 	public bool IsOnWall() 		{ return IsOnLeftWall() || IsOnRightWall(); }
 	public bool IsAscending() 	{ return velocityY > 0;			}
-	public bool applyGravity = true;
-	// CLEANUP: merge with isTryingToStick DirectionInfo
-	bool _isTryingToStickToCeiling = false;
-	public void SetIsTryingToStickToCeiling(bool isTryingToStickToCeiling) {
-		_isTryingToStickToCeiling = isTryingToStickToCeiling;
-	}
-	bool IsStuckToCeiling() {
-		return _isTryingToStickToCeiling && IsOnCeiling();
-	}
 
 	#region [Public Methods]
 	
@@ -159,12 +150,15 @@ public class PhysicsEntity : RaycastController {
 		Debug.DrawLine(rayCastOrigins.bottomLeft, rayCastOrigins.bottomRight, Color.yellow, duration);
 	}
 
-	public void SetIsTryingToStickInDirection(Utility.Directions direction, bool value = true) {
+	public void SetIsTryingToStickInDirection(Utility.Directions direction, bool resetFirst = false) {
+		if (resetFirst) {
+			isTryingToStick.Reset();
+		}
 		switch(direction) {
-			case Utility.Directions.Up: 	isTryingToStick.above 	= value; break;
-			case Utility.Directions.Down: 	isTryingToStick.below 	= value; break;
-			case Utility.Directions.Left: 	isTryingToStick.left 	= value; break;
-			case Utility.Directions.Right:  isTryingToStick.right 	= value; break;
+			case Utility.Directions.Up: 	isTryingToStick.above 	= true; break;
+			case Utility.Directions.Down: 	isTryingToStick.below 	= true; break;
+			case Utility.Directions.Left: 	isTryingToStick.left 	= true; break;
+			case Utility.Directions.Right:  isTryingToStick.right 	= true; break;
 			case Utility.Directions.Null:	isTryingToStick.Reset(); break;
 		}
 	}
@@ -291,9 +285,12 @@ public class PhysicsEntity : RaycastController {
 	}
 
 	float HandleGravity(float _velocityY) {
-		if (applyGravity && !IsStickingToSurface()) {
-			// CLEANUP:
-			_velocityY += IsStuckToCeiling() ? -gravityAcceleration : gravityAcceleration;
+		if (IsStickingToCeiling()){
+			// Keep attempting to move up so that the entity keeps colliding with the ceiling
+			// 	so IsOnCeiling() keeps evaluating to true
+			_velocityY -= gravityAcceleration;
+		} else if (!IsStickingToSurface()) {
+			_velocityY += gravityAcceleration;
 		}
 		return _velocityY;
 	}
@@ -331,18 +328,21 @@ public class PhysicsEntity : RaycastController {
 	}
 
 	bool ShouldApplyHorizontalFriction() {
-		return (applyGravity && IsOnGround()) || IsStuckToCeiling();
+		return IsOnGround() || IsStickingToCeiling();
 	}
 
 	bool IsStickingToSurface() {
-		return (isTryingToStick.above && IsOnCeiling())
-			|| (isTryingToStick.below && IsOnGround())
+		return IsStickingToCeiling()
 			|| IsStickingToWall();
 	}
 
 	bool IsStickingToWall() {
 		return (isTryingToStick.left && IsOnLeftWall())
 			|| (isTryingToStick.right && IsOnRightWall());
+	}
+
+	bool IsStickingToCeiling() {
+		return isTryingToStick.above && IsOnCeiling();
 	}
 
 	#endregion

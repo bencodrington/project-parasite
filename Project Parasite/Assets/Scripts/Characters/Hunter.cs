@@ -224,7 +224,7 @@ public class Hunter : Character {
 		physicsEntity.SetIsTryingToStickInDirection(Utility.Directions.Null);
 		if (IsClingingToWall && timeSpentClinging <= MAX_CLING_TIME) {
 			timeSpentClinging += Time.deltaTime;
-			physicsEntity.SetIsTryingToStickInDirection(wallClingDirection, true);
+			physicsEntity.SetIsTryingToStickInDirection(wallClingDirection);
 			animator.SetBool("isClingingToWall", true);
 			animator.SetFloat("wallClingProgress", timeSpentClinging / MAX_CLING_TIME);
 		} else {
