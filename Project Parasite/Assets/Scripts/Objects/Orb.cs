@@ -9,7 +9,6 @@ public class Orb : MonoBehaviour {
 	const float FORCE = 35f;
 	const float RADIUS = 4f;
 	const float FULL_FORCE_CUTOFF_RADIUS = 2f;
-	const float BURST_FADE_TIME = .1f;
 	bool isActive;
 
 	#endregion
