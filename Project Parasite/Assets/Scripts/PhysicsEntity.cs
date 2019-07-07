@@ -43,7 +43,7 @@ public class PhysicsEntity : RaycastController {
 	DirectionInfo collisionInfo;
 	// The directions in which we're currently trying to stick to walls
 	DirectionInfo isTryingToStick;
-	
+
 	/// Objects ///
 	// Keep track of obstacles for determining how far they've moved since last frame
 	// 	so that this object can absorb their momentum (elevators, etc.)
@@ -161,14 +161,13 @@ public class PhysicsEntity : RaycastController {
 
 	public void SetIsTryingToStickInDirection(Utility.Directions direction, bool value = true) {
 		switch(direction) {
-			case Utility.Directions.Up: 	isTryingToStick.above = value; break;
-			case Utility.Directions.Down: 	isTryingToStick.below = value; break;
+			case Utility.Directions.Up: 	isTryingToStick.above 	= value; break;
+			case Utility.Directions.Down: 	isTryingToStick.below 	= value; break;
 			case Utility.Directions.Left: 	isTryingToStick.left 	= value; break;
-			case Utility.Directions.Right:  isTryingToStick.right = value; break;
+			case Utility.Directions.Right:  isTryingToStick.right 	= value; break;
 			case Utility.Directions.Null:	isTryingToStick.Reset(); break;
 		}
 	}
-	
 	
 	#endregion
 
