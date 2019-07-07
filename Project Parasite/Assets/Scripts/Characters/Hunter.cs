@@ -225,6 +225,10 @@ public class Hunter : Character {
 		if (IsClingingToWall && timeSpentClinging <= MAX_CLING_TIME) {
 			timeSpentClinging += Time.deltaTime;
 			physicsEntity.SetIsTryingToStickInDirection(wallClingDirection, true);
+			animator.SetBool("isClingingToWall", true);
+			animator.SetFloat("wallClingProgress", timeSpentClinging / MAX_CLING_TIME);
+		} else {
+			animator.SetBool("isClingingToWall", false);
 		}
 	}
 	
