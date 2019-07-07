@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using System;
 using Photon.Pun;
@@ -19,9 +18,11 @@ public class Hunter : Character {
 
 	#region [Private Variables]
 
-	private float jumpVelocity = 15f;
+	float jumpVelocity = 15f;
 	// The maximum number of orbs that this hunter can have spawned at any given time 
 	const int MAX_ORB_COUNT = 4;
+	// The amount of time a hunter will cling to a wall for if they collide at maximum speed
+	const float MAX_CLING_TIME = 1.5f;
 
 	// The size of the box around newly-placed orbs, inside of which
 	// 	NPCs will be alerted to run away
@@ -33,6 +34,15 @@ public class Hunter : Character {
 	AudioSource placeOrbAudioSource;
 
 	Queue<Orb> orbs;
+
+	bool isClingingToLeftWall;
+	bool isClingingToRightWall;
+
+	bool IsClingingToWall {
+		get { return isClingingToLeftWall || isClingingToRightWall; }
+	}
+
+	float timeSpentClinging;
 
 	#endregion
 
@@ -67,7 +77,34 @@ public class Hunter : Character {
 		}
 
 		// Movement
-		HandleHorizontalMovement();
+		isMovingLeft = false;
+		isMovingRight = false;
+		if (input.isDown(PlayerInput.Key.right) && !input.isDown(PlayerInput.Key.left)) {
+			isMovingRight = true;
+			isClingingToRightWall = physicsEntity.IsOnRightWall();
+			isClingingToLeftWall = false;
+		} else if (input.isDown(PlayerInput.Key.left) && !input.isDown(PlayerInput.Key.right)) {
+			isMovingLeft = true;
+			isClingingToLeftWall = physicsEntity.IsOnLeftWall();
+			isClingingToRightWall = false;
+		} else {
+			isClingingToLeftWall = false;
+			isClingingToRightWall = false;
+		}
+
+		if (physicsEntity.IsOnGround()) {
+			// Hunters have to land to reset their cling time
+			timeSpentClinging = 0;
+		}
+		// Reset physics entity's instructions from last frame
+		physicsEntity.SetIsTryingToStickInDirection(Utility.Directions.Null);
+		if (IsClingingToWall) {
+			if (timeSpentClinging <= MAX_CLING_TIME) {
+				timeSpentClinging += Time.deltaTime;
+				Utility.Directions direction = isClingingToLeftWall ? Utility.Directions.Left : Utility.Directions.Right;
+				physicsEntity.SetIsTryingToStickInDirection(direction, true);
+			}
+		}
 
 		// If up was pressed this frame for the first time and the player is on the ground
 		if ((input.isJustPressed(PlayerInput.Key.up) || input.isJustPressed(PlayerInput.Key.jump))

@@ -3,7 +3,7 @@ using UnityEditor;
 
 public class PhysicsEntity : RaycastController {
 	
-	public struct CollisionInfo {
+	struct DirectionInfo {
 		public bool above, below;
 		public bool left, right;
 	
@@ -39,21 +39,26 @@ public class PhysicsEntity : RaycastController {
 	// 	this allows us to limit movement speed on its own
 	float inputVelocityX = 0f;
 	float inputVelocityY = 0f;
-	public CollisionInfo collisionInfo;
-
-	#endregion
+	// The directions in which we're currently colliding with walls
+	DirectionInfo collisionInfo;
+	// The directions in which we're currently trying to stick to walls
+	DirectionInfo isTryingToStick;
+	
 	/// Objects ///
 	// Keep track of obstacles for determining how far they've moved since last frame
 	// 	so that this object can absorb their momentum (elevators, etc.)
-	private Collider2D obstacleBelow;
-	private Collider2D obstacleAbove;
+	Collider2D obstacleBelow;
+	Collider2D obstacleAbove;
 	Collider2D obstacleToTheLeft;
 	Collider2D obstacleToTheRight;
 	// The old position of the entity, used for collision checking
-	private Vector2 oldPixelBelow;
-	private Vector2 oldPixelAbove;
-	private Vector2 oldPixelToTheLeft;
-	private Vector2 oldPixelToTheRight;
+	Vector2 oldPixelBelow;
+	Vector2 oldPixelAbove;
+	Vector2 oldPixelToTheLeft;
+	Vector2 oldPixelToTheRight;
+
+	#endregion
+
 	// Public-facing methods for determining the state of the entity
 	public bool IsOnGround()	{ return collisionInfo.below; 	}
 	public bool IsOnCeiling()	{ return collisionInfo.above; 	}
@@ -62,6 +67,7 @@ public class PhysicsEntity : RaycastController {
 	public bool IsOnWall() 		{ return IsOnLeftWall() || IsOnRightWall(); }
 	public bool IsAscending() 	{ return velocityY > 0;			}
 	public bool applyGravity = true;
+	// CLEANUP: merge with isTryingToStick DirectionInfo
 	bool _isTryingToStickToCeiling = false;
 	public void SetIsTryingToStickToCeiling(bool isTryingToStickToCeiling) {
 		_isTryingToStickToCeiling = isTryingToStickToCeiling;
@@ -151,6 +157,16 @@ public class PhysicsEntity : RaycastController {
 		Debug.DrawLine(rayCastOrigins.topLeft, rayCastOrigins.bottomLeft, Color.yellow, duration);
 		Debug.DrawLine(rayCastOrigins.topRight, rayCastOrigins.bottomRight, Color.yellow, duration);
 		Debug.DrawLine(rayCastOrigins.bottomLeft, rayCastOrigins.bottomRight, Color.yellow, duration);
+	}
+
+	public void SetIsTryingToStickInDirection(Utility.Directions direction, bool value = true) {
+		switch(direction) {
+			case Utility.Directions.Up: 	isTryingToStick.above = value; break;
+			case Utility.Directions.Down: 	isTryingToStick.below = value; break;
+			case Utility.Directions.Left: 	isTryingToStick.left 	= value; break;
+			case Utility.Directions.Right:  isTryingToStick.right = value; break;
+			case Utility.Directions.Null:	isTryingToStick.Reset(); break;
+		}
 	}
 	
 	
@@ -276,7 +292,7 @@ public class PhysicsEntity : RaycastController {
 	}
 
 	float HandleGravity(float _velocityY) {
-		if (applyGravity) {
+		if (applyGravity && !IsStickingToSurface()) {
 			// CLEANUP:
 			_velocityY += IsStuckToCeiling() ? -gravityAcceleration : gravityAcceleration;
 		}
@@ -291,8 +307,8 @@ public class PhysicsEntity : RaycastController {
 	}
 
 	float HandleVerticalFriction(float _velocityY) {
-		// Only add vertical friction if character is sliding down a wall
-		if (IsMovingIntoWall() && _velocityY < 0) {
+		if (IsStickingToWall()) {
+			// Only add vertical friction if character is sliding down a wall
 			_velocityY /= DEFAULT_FRICTION_DENOMINATOR;
 			// Snap to 0
 			if (Mathf.Abs(_velocityY) < 0.001) { _velocityY = 0; }
@@ -317,6 +333,17 @@ public class PhysicsEntity : RaycastController {
 
 	bool ShouldApplyHorizontalFriction() {
 		return (applyGravity && IsOnGround()) || IsStuckToCeiling();
+	}
+
+	bool IsStickingToSurface() {
+		return (isTryingToStick.above && IsOnCeiling())
+			|| (isTryingToStick.below && IsOnGround())
+			|| IsStickingToWall();
+	}
+
+	bool IsStickingToWall() {
+		return (isTryingToStick.left && IsOnLeftWall())
+			|| (isTryingToStick.right && IsOnRightWall());
 	}
 
 	#endregion
