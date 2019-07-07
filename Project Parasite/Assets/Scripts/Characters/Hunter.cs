@@ -43,6 +43,7 @@ public class Hunter : Character {
 	}
 
 	float timeSpentClinging;
+	Utility.Directions mostRecentWallClingDirection = Utility.Directions.Null;
 
 	#endregion
 
@@ -79,6 +80,7 @@ public class Hunter : Character {
 		// Movement
 		isMovingLeft = false;
 		isMovingRight = false;
+		bool wasClingingToWall = IsClingingToWall;
 		if (input.isDown(PlayerInput.Key.right) && !input.isDown(PlayerInput.Key.left)) {
 			isMovingRight = true;
 			isClingingToRightWall = physicsEntity.IsOnRightWall();
@@ -91,20 +93,7 @@ public class Hunter : Character {
 			isClingingToLeftWall = false;
 			isClingingToRightWall = false;
 		}
-
-		if (physicsEntity.IsOnGround()) {
-			// Hunters have to land to reset their cling time
-			timeSpentClinging = 0;
-		}
-		// Reset physics entity's instructions from last frame
-		physicsEntity.SetIsTryingToStickInDirection(Utility.Directions.Null);
-		if (IsClingingToWall) {
-			if (timeSpentClinging <= MAX_CLING_TIME) {
-				timeSpentClinging += Time.deltaTime;
-				Utility.Directions direction = isClingingToLeftWall ? Utility.Directions.Left : Utility.Directions.Right;
-				physicsEntity.SetIsTryingToStickInDirection(direction, true);
-			}
-		}
+		HandleWallClinging(wasClingingToWall);
 
 		// If up was pressed this frame for the first time and the player is on the ground
 		if ((input.isJustPressed(PlayerInput.Key.up) || input.isJustPressed(PlayerInput.Key.jump))
@@ -206,6 +195,37 @@ public class Hunter : Character {
 	void Jump() {
 		animator.SetTrigger("startJump");
 		physicsEntity.AddVelocity(0, jumpVelocity);
+	}
+
+	void HandleWallClinging(bool wasClingingToWall) {
+		if (physicsEntity.IsOnGround()) {
+			// After landing on the ground, make grabbing a wall in either direction
+			// 	reset the cling timer
+			mostRecentWallClingDirection = Utility.Directions.Null;
+		}
+		// Convert cling direction to a Utility.Directions value for easy comparison
+		Utility.Directions wallClingDirection = Utility.Directions.Null;
+		if (isClingingToLeftWall) {
+			wallClingDirection = Utility.Directions.Left;
+		} else if (isClingingToRightWall) {
+			wallClingDirection = Utility.Directions.Right;
+		}
+		// Don't reset the cling timer if this hunter has grabbed the same wall repeatedly
+		bool isFirstClingOnThisWall = wallClingDirection != mostRecentWallClingDirection;
+		// Whether or not this is the first frame we've grabbed this wall
+		bool didJustGrabWall = !wasClingingToWall && IsClingingToWall;
+		if (isFirstClingOnThisWall && didJustGrabWall) {
+			// Reset cling time
+			timeSpentClinging = 0;
+			// Store direction
+			mostRecentWallClingDirection = wallClingDirection;
+		}
+		// Reset physics entity's instructions from last frame
+		physicsEntity.SetIsTryingToStickInDirection(Utility.Directions.Null);
+		if (IsClingingToWall && timeSpentClinging <= MAX_CLING_TIME) {
+			timeSpentClinging += Time.deltaTime;
+			physicsEntity.SetIsTryingToStickInDirection(wallClingDirection, true);
+		}
 	}
 	
 	#endregion
