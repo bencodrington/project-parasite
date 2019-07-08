@@ -19,6 +19,8 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	public GameObject ParasiteControlsPrefab;
 	public GameObject HunterControlsPrefab;
 	public GameObject NpcCountPrefab;
+
+	public Color[] flashColours;
     
     #endregion
 
@@ -52,13 +54,11 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	GameObject selectHunterButton;
 	GameObject returnToMenuPanel;
 
-	// CLEANUP: this should be extracted to its own file
 	// Used for cycling parasite health colours
-	Dictionary<Color, Color> parasiteHealthColourMap;
 	Coroutine parasiteHealthColourFade;
 	bool parasiteTakingDamage = false;
 	Color parasiteHealthStartingColour;
-	Color parasiteHealthCurrentColour;
+	ColourRotator parasiteHealthColourRotator;
 	const float PARASITE_HEALTH_COLOUR_FADE_TIME = 1f;
     
     #endregion
@@ -214,17 +214,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 
 	void InitializeColourMap() {
 		// Used for cycling parasite health text colours
-		parasiteHealthColourMap = new Dictionary<Color, Color>();
-		parasiteHealthColourMap.Add(Color.red, Color.cyan);
-		parasiteHealthColourMap.Add(Color.cyan, Color.yellow);
-		parasiteHealthColourMap.Add(Color.yellow, Color.red);
-		parasiteHealthCurrentColour = Color.red;
-	}
-
-	Color GetParasiteHealthColour(Color currentColour) {
-		// Switch to next colour
-		parasiteHealthColourMap.TryGetValue(currentColour, out currentColour);
-		return currentColour;
+		parasiteHealthColourRotator = new ColourRotator(flashColours);
 	}
 
 	void OnTakingDamage() {
@@ -238,7 +228,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 		float timeElapsed = 0f;
 		float progress = 0f;
 		// Switch to next colour in the map
-		parasiteHealthCurrentColour = GetParasiteHealthColour(parasiteHealthCurrentColour);
+		Color parasiteHealthCurrentColour = parasiteHealthColourRotator.GetNextColour();
 		// Fade back to starting colour over time
 		while (timeElapsed < PARASITE_HEALTH_COLOUR_FADE_TIME) {
 			timeElapsed += Time.deltaTime;

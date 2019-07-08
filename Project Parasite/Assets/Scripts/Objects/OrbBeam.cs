@@ -23,10 +23,9 @@ public class OrbBeam : MonoBehaviour {
 	Ray2D hitboxRay;
 	Vector2 hitboxSize;
 	float hitboxAngle;
-	
+
 	// Used for cycling colours
-	Dictionary<Color, Color> nextColour = new Dictionary<Color, Color>();
-	Color currentColour;
+	ColourRotator flashColourRotator;
 
 	SpriteRenderer spriteRenderer;
 	
@@ -48,6 +47,7 @@ public class OrbBeam : MonoBehaviour {
 		);
 		spriteRenderer.transform.localScale = spriteScale;
 		spriteRenderer.transform.Rotate(new Vector3(0, 0, hitboxAngle));
+		flashColourRotator = new ColourRotator(flashColours);
 		InitializeFlashColours();
 	}
 
@@ -59,8 +59,7 @@ public class OrbBeam : MonoBehaviour {
 
 	void Update() {
 		// Switch to next colour
-		nextColour.TryGetValue(currentColour, out currentColour);
-		UpdateSpriteRendererColour();
+		UpdateSpriteRendererColour(flashColourRotator.GetNextColour());
 	}
 	
 	#endregion
@@ -107,15 +106,10 @@ public class OrbBeam : MonoBehaviour {
 	}
 
 	void InitializeFlashColours() {
-		currentColour = flashColours[0];
-		for (int i = 0; i < flashColours.Length - 1; i++) {
-			nextColour.Add(flashColours[i], flashColours[i+1]);
-		}
-		nextColour.Add(flashColours[flashColours.Length - 1], flashColours [0]);
 	}
 
-	void UpdateSpriteRendererColour() {
-		spriteRenderer.color = currentColour;
+	void UpdateSpriteRendererColour(Color newColour) {
+		spriteRenderer.color = newColour;
 	}
 	
 	#endregion

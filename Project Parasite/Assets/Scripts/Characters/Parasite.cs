@@ -9,6 +9,8 @@ public class Parasite : Character {
 	#region [Public Variables]
 	
 	public AudioClip screechSound;
+
+	public Color[] flashColours;
 	
 	#endregion
 
@@ -21,6 +23,9 @@ public class Parasite : Character {
 	
 	Color IS_ATTEMPTING_INFECTION_COLOUR = new Color(1, 0, 0, 1);
 	Color RESTING_COLOUR = Color.white;
+
+	// Used for cycling colours
+	ColourRotator flashColourRotator;
 
 	float jumpVelocity = 12f;
 	const float MAX_POUNCE_VELOCITY = 30f;
@@ -152,6 +157,7 @@ public class Parasite : Character {
 		} else {
 			infectRangeIndicator.enabled = false;
 		}
+		flashColourRotator = new ColourRotator(flashColours);
 	}
 
 	#region [Private Methods]
@@ -197,18 +203,10 @@ public class Parasite : Character {
 	IEnumerator FlashColours() {
 		// How long to flash for
 		float timeRemaining = 0.5f;
-		Color currentColour = Color.red;
-		// Used for cycling colours
-		Dictionary<Color, Color> nextColour = new Dictionary<Color, Color>();
-		nextColour.Add(Color.red, Color.cyan);
-		nextColour.Add(Color.cyan, Color.yellow);
-		nextColour.Add(Color.yellow, Color.red);
 		while (timeRemaining > 0) {
 			timeRemaining -= Time.deltaTime;
-			// Switch to next colour
-			nextColour.TryGetValue(currentColour, out currentColour);
-			// Update spriterenderer
-			SetSpriteRenderersColour(currentColour);
+			// Switch to next colour and update spriteRenderer
+			SetSpriteRenderersColour(flashColourRotator.GetNextColour());
 			yield return null;
 		}
 		// Return to default colour
