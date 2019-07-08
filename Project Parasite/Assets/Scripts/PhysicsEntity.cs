@@ -162,6 +162,15 @@ public class PhysicsEntity : RaycastController {
 			case Utility.Directions.Null:	isTryingToStick.Reset(); break;
 		}
 	}
+
+	public Vector2 GetVelocity() {
+		return new Vector2(velocityX, velocityY);
+	}
+
+	public void SetVelocity(Vector2 newVelocity) {
+		velocityX = newVelocity.x;
+		velocityY = newVelocity.y;
+	}
 	
 	#endregion
 

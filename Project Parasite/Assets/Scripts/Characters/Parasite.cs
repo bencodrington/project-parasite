@@ -132,7 +132,7 @@ public class Parasite : Character {
 		// Called once per frame for each Parasite
 		if (HasAuthority()) {
 			// This character belongs to this client
-			HandlePositionAndInputUpdates();
+			HandleClientUpdates();
 		}
 		if (animator) {
 			bool shouldRun = false;

@@ -76,7 +76,7 @@ public abstract class Character : MonoBehaviourPun {
 		// Called once per frame for each Character
 		if (HasAuthority()) {
 			// This character belongs to this client
-			HandlePositionAndInputUpdates();
+			HandleClientUpdates();
 		}
 		if (animator) {
 			animator.SetBool("isRunning", (isMovingLeft || isMovingRight));
@@ -244,10 +244,11 @@ public abstract class Character : MonoBehaviourPun {
 		return photonView.IsMine;
 	}
 
-	protected void HandlePositionAndInputUpdates() {
+	protected void HandleClientUpdates() {
 		timeUntilNextPositionUpdate -= Time.deltaTime;
 		if (timeUntilNextPositionUpdate <= 0) {
 			SendPositionUpdate();
+			SendVelocityUpdate();
 			SendInputUpdate();
 			timeUntilNextPositionUpdate += timeBetweenPositionUpdates;
 		}
@@ -291,6 +292,11 @@ public abstract class Character : MonoBehaviourPun {
 		}
 		photonView.RPC("RpcUpdatePosition", RpcTarget.Others, (Vector2)transform.position, shouldSnapToNewPosition);
 		lastSentPosition = transform.position;
+	}
+	
+	void SendVelocityUpdate() {
+		if (!HasAuthority()) { return; }
+		photonView.RPC("RpcUpdateVelocity", RpcTarget.Others, physicsEntity.GetVelocity());
 	}
 	
 	void SendInputUpdate() {
@@ -345,6 +351,11 @@ public abstract class Character : MonoBehaviourPun {
 	protected void RpcUpdatePosition(Vector2 newPosition, bool snapToNewPos) {
 		physicsEntity.SetTransformPosition(newPosition);
 		shouldSnapToTruePosition = snapToNewPos;
+	}
+
+	[PunRPC]
+	protected void RpcUpdateVelocity(Vector2 velocity) {
+		physicsEntity.SetVelocity(velocity);
 	}
 
 	[PunRPC]

@@ -123,7 +123,7 @@ public class NonPlayerCharacter : Character {
 	public override void Update() {
 		HandleInput();
 		if (HasAuthority()) {
-			HandlePositionAndInputUpdates();
+			HandleClientUpdates();
 			HandleBurstCharging();
 		}
 		if (animator) {
