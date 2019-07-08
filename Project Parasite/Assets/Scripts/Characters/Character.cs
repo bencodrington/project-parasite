@@ -26,9 +26,9 @@ public abstract class Character : MonoBehaviourPun {
 	// 	a value of 1 indicates that the character will never stop walking once they start
 	// 	a value of 2 indicates the walking speed will be halved each frame
 	const float MOVEMENT_INPUT_FRICTION = 2f;
-	const float POSITION_UPDATES_PER_SECOND = 5;
-	float timeUntilNextPositionUpdate;
-	static float timeBetweenPositionUpdates;
+	const float REMOTE_CLIENT_UPDATES_PER_SECOND = 5;
+	float timeUntilNextRemoteClientUpdate;
+	static float timeBetweenRemoteClientUpdates;
 
 	float inputVelocityX = 0;
 	float inputVelocityY = 0;
@@ -68,7 +68,7 @@ public abstract class Character : MonoBehaviourPun {
 		// Only continue if this client owns this gameObject
 		if (!HasAuthority()) { return; }
 		SendPositionUpdate(true);
-		timeBetweenPositionUpdates = 1f / POSITION_UPDATES_PER_SECOND;
+		timeBetweenRemoteClientUpdates = 1f / REMOTE_CLIENT_UPDATES_PER_SECOND;
 	}
 	
 	public virtual void Update () {
@@ -245,12 +245,12 @@ public abstract class Character : MonoBehaviourPun {
 	}
 
 	protected void HandleClientUpdates() {
-		timeUntilNextPositionUpdate -= Time.deltaTime;
-		if (timeUntilNextPositionUpdate <= 0) {
+		timeUntilNextRemoteClientUpdate -= Time.deltaTime;
+		if (timeUntilNextRemoteClientUpdate <= 0) {
 			SendPositionUpdate();
 			SendVelocityUpdate();
 			SendInputUpdate();
-			timeUntilNextPositionUpdate += timeBetweenPositionUpdates;
+			timeUntilNextRemoteClientUpdate += timeBetweenRemoteClientUpdates;
 		}
 	}
 
