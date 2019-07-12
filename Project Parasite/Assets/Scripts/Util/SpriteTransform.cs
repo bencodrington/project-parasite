@@ -12,6 +12,8 @@ public class SpriteTransform : MonoBehaviour
     Utility.Directions direction = Utility.Directions.Null;
     // Whether our sprite is currently flipped
     bool isFlipped = false;
+    // Used to prevent flipping when 'rubber-banding'
+    bool canFlipThisFrame = true;
     // A buffer to stop float rounding from making us flip wildly
     float minDistanceBeforeFlipping = 0.01f;
 
@@ -19,12 +21,12 @@ public class SpriteTransform : MonoBehaviour
     //  i.e. what's defined in the inspector/prefab
     Vector2 localOffset;
 
-    Transform objectTransform;
+    PhysicsEntity physicsEntity;
 
     #region [Public Methods]
 
-    public void SetTargetTransform(Transform newTransform) {
-        objectTransform = newTransform;
+    public void SetTargetPhysicsEntity(PhysicsEntity newPhysicsEntity) {
+        physicsEntity = newPhysicsEntity;
         UpdateCoords();
     }
     
@@ -37,6 +39,10 @@ public class SpriteTransform : MonoBehaviour
         transform.eulerAngles = new Vector3(0, 0, Utility.DirectionToAngle(newDirection));
         isFlipped = false;
     }
+
+    public void DontFlipThisFrame() {
+        canFlipThisFrame = false;
+    }
     
     #endregion
 
@@ -47,9 +53,9 @@ public class SpriteTransform : MonoBehaviour
     }
 
     void Update() {
-        if (objectTransform == null) { return; }
-        if (ShouldFlipSpriteHorizontally()) { FlipSpriteOnYAxis(); }
-        if (ShouldFlipSpriteVertically()) { FlipSpriteOnXAxis(); }
+        if (physicsEntity == null) { return; }
+        if (canFlipThisFrame && ShouldFlipSpriteHorizontally()) { FlipSpriteOnYAxis(); }
+        if (canFlipThisFrame && ShouldFlipSpriteVertically()) { FlipSpriteOnXAxis(); }
         UpdateCoords();
     }
     
@@ -58,7 +64,7 @@ public class SpriteTransform : MonoBehaviour
     #region [Private Methods]
     
     bool ShouldFlipSpriteHorizontally() {
-        float newX = objectTransform.position.x;
+        float newX = physicsEntity.transformPosition.x;
         switch (direction) {
             case Utility.Directions.Up:
                 return ((!isFlipped && isSignificantlyMoreThan(newX, lastX))
@@ -72,7 +78,7 @@ public class SpriteTransform : MonoBehaviour
     }
     
     bool ShouldFlipSpriteVertically() {
-        float newY = objectTransform.position.y;
+        float newY = physicsEntity.transformPosition.y;
         switch (direction) {
             case Utility.Directions.Right:
                 return ((!isFlipped && isSignificantlyLessThan(newY,lastY))
@@ -105,8 +111,10 @@ public class SpriteTransform : MonoBehaviour
     }
 
     void UpdateCoords() {
-        lastX = objectTransform.position.x;
-        lastY = objectTransform.position.y;
+        lastX = physicsEntity.transformPosition.x;
+        lastY = physicsEntity.transformPosition.y;
+        // Frame is over, if we couldn't flip this frame we can again
+        canFlipThisFrame = true;
     }
 
     void SetOffset() {

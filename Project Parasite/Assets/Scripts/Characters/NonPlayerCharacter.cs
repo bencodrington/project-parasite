@@ -37,8 +37,6 @@ public class NonPlayerCharacter : Character {
 
 	InputSource originalInputSource;
 
-	SpriteTransform spriteTransform;
-
 	AudioSource alertSource;
 	
 	#endregion
@@ -113,8 +111,6 @@ public class NonPlayerCharacter : Character {
 	protected override void OnStart() {
 		burstIndicator = GetComponentInChildren<BurstIndicator>();
 		burstIndicator.SetTimeToFill(MIN_BURST_TIME);
-		spriteTransform = GetComponentInChildren<SpriteTransform>();
-		spriteTransform.SetTargetTransform(transform);
 		alertSource = Utility.AddAudioSource(gameObject);
 	}
 

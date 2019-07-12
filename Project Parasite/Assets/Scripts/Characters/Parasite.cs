@@ -70,8 +70,6 @@ public class Parasite : Character {
 	}
 	InfectRangeIndicator infectRangeIndicator;
 
-	SpriteTransform spriteTransform;
-
 	// The direction that the parasite is attached to (left wall, right wall, ceiling)
 	// 	when it began charging a pounce
 	Utility.Directions attachedDirection = Utility.Directions.Null;
@@ -145,8 +143,6 @@ public class Parasite : Character {
 	#endregion
 	
 	protected override void OnStart() {
-		spriteTransform = GetComponentInChildren<SpriteTransform>();
-		spriteTransform.SetTargetTransform(transform);
 		screechAudioSource = Utility.AddAudioSource(gameObject, screechSound, .2f);
 		infectRangeIndicator = GetComponentInChildren<InfectRangeIndicator>();
 		if (HasAuthority()) {

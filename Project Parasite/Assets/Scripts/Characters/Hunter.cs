@@ -67,8 +67,6 @@ public class Hunter : Character {
 		} else {
 			orbBeamRangeManager.shouldShowMarkers = false;
 		}
-		
-		GetComponentInChildren<SpriteTransform>().SetTargetTransform(transform);
 		placeOrbAudioSource = Utility.AddAudioSource(gameObject, placeOrbSound);
 	}
 

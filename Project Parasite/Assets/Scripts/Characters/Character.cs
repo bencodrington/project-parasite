@@ -8,6 +8,8 @@ public abstract class Character : MonoBehaviourPun {
 	protected SpriteRenderer[] spriteRenderers;
 	protected Animator animator;
 	protected PhysicsEntity physicsEntity;
+	// Used for sprite flipping and rotating
+	protected SpriteTransform spriteTransform;
 
 	protected List<InteractableObject> objectsInRange = new List<InteractableObject>();
 
@@ -73,7 +75,9 @@ public abstract class Character : MonoBehaviourPun {
 
 	void Start() {
 		spriteRenderers = GetSpriteRenderers();
-		animator = GetComponentInChildren<SpriteTransform>().GetComponent<Animator>();
+		spriteTransform = GetComponentInChildren<SpriteTransform>();
+		spriteTransform.SetTargetPhysicsEntity(physicsEntity);
+		animator = spriteTransform.GetComponent<Animator>();
 		OnStart();
 		// Only continue if this client owns this gameObject
 		if (!HasAuthority()) { return; }
@@ -381,6 +385,9 @@ public abstract class Character : MonoBehaviourPun {
 	[PunRPC]
 	protected void RpcUpdatePosition(Vector2 newPosition, bool snapToNewPos) {
 		physicsEntity.SetTransformPosition(newPosition);
+		if (spriteTransform != null) {
+			spriteTransform.DontFlipThisFrame();
+		}
 		// Reset smoothing variables
 		currentLerpFactor = snapToNewPos ? 1 : MIN_LAG_LERP_FACTOR;
 		timeSinceLastOwnerClientUpdate = 0;
