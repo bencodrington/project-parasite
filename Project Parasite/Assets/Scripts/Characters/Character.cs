@@ -11,8 +11,6 @@ public abstract class Character : MonoBehaviourPun {
 
 	protected List<InteractableObject> objectsInRange = new List<InteractableObject>();
 
-	protected bool shouldSnapToTruePosition = false;
-
 	protected bool isMovingRight;
 	protected bool isMovingLeft;
 	protected bool isMovingUp;
@@ -27,19 +25,31 @@ public abstract class Character : MonoBehaviourPun {
 	// 	a value of 2 indicates the walking speed will be halved each frame
 	const float MOVEMENT_INPUT_FRICTION = 2f;
 	const float REMOTE_CLIENT_UPDATES_PER_SECOND = 5;
+	const float TIME_BETWEEN_REMOTE_CLIENT_UPDATES = 1 / REMOTE_CLIENT_UPDATES_PER_SECOND;
+	// Used by the owner's client to stagger updates to the remote clients
 	float timeUntilNextRemoteClientUpdate;
-	static float timeBetweenRemoteClientUpdates;
+	// Used by remote clients for position smoothing (see lerp factors below)
+	float timeSinceLastOwnerClientUpdate;
+	
+	// The lerp value used for smoothing a remote client's position to its actual position
+	// 	on the owner's client. Should be in the range of (0..1]
+	// The higher this is, the snappier lag correction will be
+	const float MIN_LAG_LERP_FACTOR = 0.2f;
+	// Between updates from the owner's client, the lerp value approaches 1
+	// 	This variable keeps track of it
+	float currentLerpFactor = MIN_LAG_LERP_FACTOR;
+	// By the time timeSinceLastOwnerUpdate >= this value, current lerp value will be 1
+	const float MAX_TIME_UNTIL_IN_SYNC = TIME_BETWEEN_REMOTE_CLIENT_UPDATES;
+	// If this remote client comes within this distance of where it thinks the owner's client
+	// 	is, it will stop smoothing and jump the remaining small distance to the "correct" position
+	const float REMOTE_CLIENT_SNAP_DISTANCE = 0.05f;
+	// The colour used when drawing debugging visuals
+	Color debugDrawColour = Color.magenta;
 
 	float inputVelocityX = 0;
 	float inputVelocityY = 0;
 	Vector2 lastSentPosition;
 	byte lastSentInputs;
-	
-	// The higher this is, the snappier lag correction will be
-	// 	Should be in the range of (0..1]
-	const float LAG_LERP_FACTOR = 0.2f;
-	// The colour used when drawing debugging visuals
-	Color debugDrawColour = Color.magenta;
 	
 	#endregion
 
@@ -68,16 +78,12 @@ public abstract class Character : MonoBehaviourPun {
 		// Only continue if this client owns this gameObject
 		if (!HasAuthority()) { return; }
 		SendPositionUpdate(true);
-		timeBetweenRemoteClientUpdates = 1f / REMOTE_CLIENT_UPDATES_PER_SECOND;
 	}
 	
 	public virtual void Update () {
 		HandleInput();
 		// Called once per frame for each Character
-		if (HasAuthority()) {
-			// This character belongs to this client
-			HandleClientUpdates();
-		}
+		HandleClientUpdates();
 		if (animator) {
 			animator.SetBool("isRunning", (isMovingLeft || isMovingRight));
 		}
@@ -129,13 +135,9 @@ public abstract class Character : MonoBehaviourPun {
 		if (HasAuthority()) {
 			// Update the local position based on physics simulation
 			transform.position = physicsEntity.transformPosition;
-		} else if (shouldSnapToTruePosition) {
-			// Verify current position is up to date with server position
-			transform.position = physicsEntity.transformPosition;
-			shouldSnapToTruePosition = false;
 		} else {
 			// Move visual representation a bit closer to the correct position
-			transform.position = Vector3.Lerp(transform.position, physicsEntity.transformPosition, LAG_LERP_FACTOR);
+			transform.position = Vector3.Lerp(transform.position, physicsEntity.transformPosition, GetCurrentLerpFactor());
 		}
 	}
 
@@ -245,12 +247,17 @@ public abstract class Character : MonoBehaviourPun {
 	}
 
 	protected void HandleClientUpdates() {
-		timeUntilNextRemoteClientUpdate -= Time.deltaTime;
-		if (timeUntilNextRemoteClientUpdate <= 0) {
-			SendPositionUpdate();
-			SendVelocityUpdate();
-			SendInputUpdate();
-			timeUntilNextRemoteClientUpdate += timeBetweenRemoteClientUpdates;
+		if (HasAuthority()) {
+			timeUntilNextRemoteClientUpdate -= Time.deltaTime;
+			if (timeUntilNextRemoteClientUpdate <= 0) {
+				// This character belongs to this client
+				SendPositionUpdate();
+				SendVelocityUpdate();
+				SendInputUpdate();
+				timeUntilNextRemoteClientUpdate += TIME_BETWEEN_REMOTE_CLIENT_UPDATES;
+			}
+		} else {
+			timeSinceLastOwnerClientUpdate += Time.deltaTime;
 		}
 	}
 
@@ -344,13 +351,39 @@ public abstract class Character : MonoBehaviourPun {
 		}
 		debugDrawColour = new Color(debugDrawColour.r * rModifier, debugDrawColour.g * gModifier, debugDrawColour.b * bModifier);
 	}
+
+	float GetCurrentLerpFactor() {
+		// Returns a value between MIN_LAG_LERP_FACTOR and 1
+		if (ClientShouldBeInSync()) {
+			currentLerpFactor = 1;
+		} else {
+			currentLerpFactor = Mathf.Lerp(MIN_LAG_LERP_FACTOR, 1, PercentageUntilInSync());
+		}
+		return currentLerpFactor;
+	}
+
+	bool ClientShouldBeInSync() {
+		// 1. If we're already in sync, stay in sync
+		// 2. If we're almost exactly in sync, get in sync
+		// 3. If we've spent the maximum amount of time smoothing we can, get in sync
+		// 4. Else, keep smoothing
+		return currentLerpFactor == 1
+			|| Vector2.Distance(transform.position, physicsEntity.transformPosition) < REMOTE_CLIENT_SNAP_DISTANCE
+			|| timeSinceLastOwnerClientUpdate > MAX_TIME_UNTIL_IN_SYNC;
+	}
+
+	float PercentageUntilInSync() {
+		return Mathf.Min(1, timeSinceLastOwnerClientUpdate / MAX_TIME_UNTIL_IN_SYNC);
+	}
 	
 	#endregion
 
 	[PunRPC]
 	protected void RpcUpdatePosition(Vector2 newPosition, bool snapToNewPos) {
 		physicsEntity.SetTransformPosition(newPosition);
-		shouldSnapToTruePosition = snapToNewPos;
+		// Reset smoothing variables
+		currentLerpFactor = snapToNewPos ? 1 : MIN_LAG_LERP_FACTOR;
+		timeSinceLastOwnerClientUpdate = 0;
 	}
 
 	[PunRPC]

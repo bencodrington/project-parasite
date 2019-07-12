@@ -122,8 +122,8 @@ public class NonPlayerCharacter : Character {
 	
 	public override void Update() {
 		HandleInput();
+		HandleClientUpdates();
 		if (HasAuthority()) {
-			HandleClientUpdates();
 			HandleBurstCharging();
 		}
 		if (animator) {

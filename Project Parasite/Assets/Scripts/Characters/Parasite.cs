@@ -130,10 +130,7 @@ public class Parasite : Character {
 	public override void Update() {
 		HandleInput();
 		// Called once per frame for each Parasite
-		if (HasAuthority()) {
-			// This character belongs to this client
-			HandleClientUpdates();
-		}
+		HandleClientUpdates();
 		if (animator) {
 			bool shouldRun = false;
 			if (IsAttachedToWall) {
