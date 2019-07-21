@@ -257,9 +257,12 @@ public class Parasite : Character {
 	}
 
 	void HandleVerticalInput() {
-		if ((input.isJustPressed(PlayerInput.Key.up) || input.isJustPressed(PlayerInput.Key.jump))
-				&& physicsEntity.IsOnGround()) {
-			// Jump
+		if (HasAuthority()
+			&& physicsEntity.IsOnGround()
+			&& (input.isJustPressed(PlayerInput.Key.up)
+				|| input.isJustPressed(PlayerInput.Key.jump))
+			) {
+			// Only send jump event if we're the on the client that owns this parasite
 			photonView.RPC("RpcJump", RpcTarget.All);
 		}  else if (input.isDown(PlayerInput.Key.up) && physicsEntity.IsOnWall()) {
 			// Climb Up

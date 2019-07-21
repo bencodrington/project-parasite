@@ -94,9 +94,12 @@ public class Hunter : Character {
 		HandleWallClinging(wasClingingToWall);
 
 		// If up was pressed this frame for the first time and the player is on the ground
-		if ((input.isJustPressed(PlayerInput.Key.up) || input.isJustPressed(PlayerInput.Key.jump))
-					&& physicsEntity.IsOnGround()) {
-			// Jump
+		if (HasAuthority()
+			&& physicsEntity.IsOnGround()
+			&& (input.isJustPressed(PlayerInput.Key.up)
+				|| input.isJustPressed(PlayerInput.Key.jump))
+			) {
+			// Only send jump event if this client owns this hunter
 			photonView.RPC("RpcJump", RpcTarget.All);
 		}
 
