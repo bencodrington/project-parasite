@@ -93,7 +93,12 @@ public class Elevator : MonoBehaviourPun {
 
 	void OnDestroy() {
 		foreach (ElevatorCallField callField in callFields) {
-			Destroy(callField.gameObject);
+			// When stopping the game, the order in which objects are destroyed
+			// 	cannot be guaranteed, so this null check prevents an error when
+			// 	trying to destroy callfields that have already been destroyed
+			if (callField != null) {
+				Destroy(callField.gameObject);
+			}
 		}
 	}
 	
