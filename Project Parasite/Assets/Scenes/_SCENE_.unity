@@ -47869,6 +47869,10 @@ MonoBehaviour:
     type: 3}
   NpcCountPrefab: {fileID: 1257916060788230, guid: ca84bca96eea3ae479cd93d97fc24088,
     type: 3}
+  flashColours:
+  - {r: 0.38431373, g: 0.9137255, b: 0.8745098, a: 1}
+  - {r: 0.38431373, g: 0.9137255, b: 0.49411765, a: 1}
+  - {r: 1, g: 0.34509805, b: 0.93333334, a: 1}
 --- !u!4 &1092008076
 Transform:
   m_ObjectHideFlags: 0
@@ -47905,10 +47909,10 @@ MonoBehaviour:
   hunterAiOrbData: {fileID: 11400000, guid: 5ca4bc84dd413db4aa2fb9f2d7a9783d, type: 2}
   playerObjectPrefab: {fileID: 1820297792491458, guid: c3d12b587d0975b4787bf47335c8913f,
     type: 3}
-  DEBUG_MODE: 1
-  spawnPlayersAtZero: 1
-  huntersOnlyMode: 1
-  spawnOneNpcOnly: 1
+  DEBUG_MODE: 0
+  spawnPlayersAtZero: 0
+  huntersOnlyMode: 0
+  spawnOneNpcOnly: 0
 --- !u!1 &1092527282
 GameObject:
   m_ObjectHideFlags: 0
