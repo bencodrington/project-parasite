@@ -100,4 +100,8 @@ public static class Utility {
 	public static Character GetCharacterFromCollider(Collider2D collider) {
 		return collider.GetComponentInParent<Character>();
 	}
+
+	public static T GetRandom<T>(T[] array) {
+		return array[UnityEngine.Random.Range(0, array.Length)];
+	}
 }
