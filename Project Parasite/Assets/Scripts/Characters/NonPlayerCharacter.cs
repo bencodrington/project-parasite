@@ -23,7 +23,7 @@ public class NonPlayerCharacter : Character {
 	// The amount of time Action 2 must be held before the NPC can be burst
 	//	upon ejecting
 	const float MIN_BURST_TIME = 1f;
-	const int EXECUTION_HEAL_AMOUNT = 25;
+	const int EXECUTION_HEAL_AMOUNT = 5;
 
 	BurstIndicator burstIndicator;
 

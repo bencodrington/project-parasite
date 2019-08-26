@@ -13,7 +13,7 @@ public class ParasiteData
 
     #region [Private Variables]
 
-	const int MAX_HEALTH = 150;
+	const int MAX_HEALTH = 100;
 	Vector2 HEALTH_ALERT_OFFSET = new Vector2(0, 0.5f);
 
 	int _parasiteHealth = STARTING_HEALTH;
