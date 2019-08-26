@@ -23,6 +23,7 @@ public class NonPlayerCharacter : Character {
 	// The amount of time Action 2 must be held before the NPC can be burst
 	//	upon ejecting
 	const float MIN_BURST_TIME = 1f;
+	const int EXECUTION_HEAL_AMOUNT = 25;
 
 	BurstIndicator burstIndicator;
 
@@ -182,7 +183,8 @@ public class NonPlayerCharacter : Character {
 	}
 
 	void SpawnParasite() {
-		Character parasite = CharacterSpawner.SpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY), false, false, input);
+		Character parasite = CharacterSpawner.SpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY), false, false, input, true);
+		((Parasite)parasite).RegainHealth(EXECUTION_HEAL_AMOUNT);
 	}
 
 	void HandleBurstCharging() {

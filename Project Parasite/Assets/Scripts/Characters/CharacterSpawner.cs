@@ -35,7 +35,8 @@ public class CharacterSpawner
 					Vector2 velocity,
 					bool forceCameraSnap = true,
 					bool shouldCameraFollow = true,
-					InputSource inputSource = null) {
+					InputSource inputSource = null,
+					bool preserveParasiteHealth = false) {
 		if (inputSource == null) {
 			inputSource = new PlayerInput();
 		}
@@ -54,8 +55,8 @@ public class CharacterSpawner
 		}
 		// Make the character draw in front of other characters
     	character.SetRenderLayer();
-		if (assignedCharacterType == CharacterType.Parasite) {
-			// This spawner is spawning a parasite, so initialize its data object
+		if (assignedCharacterType == CharacterType.Parasite && !preserveParasiteHealth) {
+			// This spawner is spawning a parasite for the first time, so initialize its data object
             parasiteData = new ParasiteData(this, deathHandler);
 		}
 		character.SetInputSource(inputSource);

@@ -10,16 +10,16 @@ public class ParasiteData
 
     #region [Private Variables]
 
+	const int MAX_HEALTH = 150;
+
 	int _parasiteHealth;
 	int ParasiteHealth {
 		get { return _parasiteHealth; }
 		set {
-			bool isTakingDamage = false;
-			if (value < _parasiteHealth) {
-				isTakingDamage = true;
-			}
-			_parasiteHealth = Mathf.Clamp(value, 0, STARTING_HEALTH);
-			UiManager.Instance.UpdateHealthObject(_parasiteHealth, isTakingDamage);
+			bool isTakingDamage = value < _parasiteHealth;
+			bool isRegainingHealth = value > _parasiteHealth;
+			_parasiteHealth = Mathf.Clamp(value, 0, MAX_HEALTH);
+			UiManager.Instance.UpdateHealthObject(_parasiteHealth, isTakingDamage, isRegainingHealth);
 			if (value <= 0 && !hasHandledDeath) {
 				deathHandler(owner);
 				hasHandledDeath = true;
@@ -50,6 +50,14 @@ public class ParasiteData
     
 	public void ParasiteTakeDamage(int damage) {
 		ParasiteHealth -= damage;
+	}
+    
+	public void ParasiteRegainHealth(int health) {
+		ParasiteHealth += health;
+	}
+
+	public int GetParasiteHealth() {
+		return ParasiteHealth;
 	}
     
     #endregion

@@ -123,13 +123,16 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 		startGameButton.SetActive(isActive);
 	}
 
-	public void UpdateHealthObject(int newValue, bool isTakingDamage = false) {
+	public void UpdateHealthObject(int newValue, bool isTakingDamage = false, bool isRegainingHealth = false) {
 		topRightUiText.text = newValue.ToString();
 		parasiteTakingDamage = isTakingDamage;
-		if (!isTakingDamage && parasiteHealthColourFade != null) {
-			// (Re)setting initial health, so cancel fade
+		if (parasiteHealthColourFade != null) {
+			// Cancel fade
 			StopCoroutine(parasiteHealthColourFade);
 			topRightUiText.color = parasiteHealthStartingColour;
+		}
+		if (isRegainingHealth) {
+			parasiteHealthColourFade = StartCoroutine(FadeParasiteHealthColour(Color.green));
 		}
 	}
 
@@ -221,14 +224,14 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 		if (parasiteHealthColourFade != null) {
 			StopCoroutine(parasiteHealthColourFade);
 		}
-		parasiteHealthColourFade = StartCoroutine(FadeParasiteHealthColour());
+		parasiteHealthColourFade = StartCoroutine(FadeParasiteHealthColour(parasiteHealthColourRotator.GetNextColour()));
 	}
 
-	IEnumerator FadeParasiteHealthColour() {
+	IEnumerator FadeParasiteHealthColour(Color newColour) {
 		float timeElapsed = 0f;
 		float progress = 0f;
 		// Switch to next colour in the map
-		Color parasiteHealthCurrentColour = parasiteHealthColourRotator.GetNextColour();
+		Color parasiteHealthCurrentColour = newColour;
 		// Fade back to starting colour over time
 		while (timeElapsed < PARASITE_HEALTH_COLOUR_FADE_TIME) {
 			timeElapsed += Time.deltaTime;
