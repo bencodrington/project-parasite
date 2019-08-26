@@ -6,6 +6,10 @@ public class ParasiteData
 	
 	public const int STARTING_HEALTH = 100;
 
+	#endregion
+
+    #region [Private Variables]
+
 	int _parasiteHealth;
 	int ParasiteHealth {
 		get { return _parasiteHealth; }
@@ -23,10 +27,6 @@ public class ParasiteData
 		}
 	}
 	
-	#endregion
-
-    #region [Private Variables]
-    
     bool hasHandledDeath;
 
 	CharacterSpawner owner;

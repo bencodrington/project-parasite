@@ -75,6 +75,7 @@ public class TutorialManager
         // Respawn player
         spawner.DestroyCharacter();
         SpawnPlayer();
+        UiManager.Instance.SetCharacterType(characterType);
         // Respawn NPCs
         npcManager.Restart();
     }
