@@ -123,6 +123,10 @@ public class DefaultNpcInput : InputSource
 			MatchManager.Instance.StopCoroutine(alertReaction);
 		}
 		alertReaction = MatchManager.Instance.StartCoroutine(Utility.WaitXSeconds(reflexTime, () => {
+			if (owner == null) {
+				// Owner was destroyed during this delay
+				return;
+			}
 			FleeInDirection(fleeDirection);
 		}));
 	}
