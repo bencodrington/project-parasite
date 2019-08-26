@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class ParasiteData
 {
@@ -6,19 +7,26 @@ public class ParasiteData
 	
 	public const int STARTING_HEALTH = 100;
 
+	public static GameObject RegainedHealthPrefab;
+
 	#endregion
 
     #region [Private Variables]
 
 	const int MAX_HEALTH = 150;
+	Vector2 HEALTH_ALERT_OFFSET = new Vector2(0, 0.5f);
 
-	int _parasiteHealth;
+	int _parasiteHealth = STARTING_HEALTH;
 	int ParasiteHealth {
 		get { return _parasiteHealth; }
 		set {
 			bool isTakingDamage = value < _parasiteHealth;
-			bool isRegainingHealth = value > _parasiteHealth;
+			int oldParasiteHealth = _parasiteHealth;
 			_parasiteHealth = Mathf.Clamp(value, 0, MAX_HEALTH);
+			bool isRegainingHealth = _parasiteHealth > oldParasiteHealth;
+			if (isRegainingHealth) {
+				SpawnHealthRegainedAlert(_parasiteHealth - oldParasiteHealth);
+			}
 			UiManager.Instance.UpdateHealthObject(_parasiteHealth, isTakingDamage, isRegainingHealth);
 			if (value <= 0 && !hasHandledDeath) {
 				deathHandler(owner);
@@ -66,6 +74,20 @@ public class ParasiteData
 
 	void DefaultDeathHandler(CharacterSpawner unused) {
 		EventCodes.RaiseGameOverEvent(CharacterType.Hunter);
+	}
+
+	public void SpawnHealthRegainedAlert(int amountRegained) {
+		if (amountRegained <= 0) { return; }
+		if (RegainedHealthPrefab == null) {
+			// This is the first one to be spawned, so find the prefab
+			RegainedHealthPrefab = Resources.Load("RegainedHealthAlert") as GameObject;
+		}
+		GameObject regainedHealthAlert = GameObject.Instantiate(RegainedHealthPrefab,
+					owner.GetCharacter().transform.position + (Vector3)HEALTH_ALERT_OFFSET,
+					Quaternion.identity);
+		// And set this parasite as it's parent in the hierarchy
+		regainedHealthAlert.transform.SetParent(owner.GetCharacter().transform);
+		regainedHealthAlert.GetComponentInChildren<Text>().text = "+" + amountRegained;
 	}
 	
 	#endregion

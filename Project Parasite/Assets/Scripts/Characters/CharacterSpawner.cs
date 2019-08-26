@@ -71,6 +71,15 @@ public class CharacterSpawner
 			TutorialManager.parasitesStillAlive--;
 		}
     }
+
+	public Character GetCharacter() {
+		if (character != null) {
+			return character;
+		} else {
+			Debug.LogError("CharacterSpawner:GetCharacter:Trying to get a null character");
+			return null;
+		}
+	}
     
     #endregion
 
