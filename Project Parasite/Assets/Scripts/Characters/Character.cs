@@ -339,7 +339,12 @@ public abstract class Character : MonoBehaviourPun {
 		bool _isMovingDown = ((byte) 2 & packedInputs) == 2;
 		bool _isMovingLeft = ((byte) 4 & packedInputs) == 4;
 		bool _isMovingRight = ((byte) 8 & packedInputs) == 8;
-		((RemoteInputSource)input).SetInputState(_isMovingUp, _isMovingDown, _isMovingLeft, _isMovingRight);
+		// Input might not be RemoteInputSource if the client just had authority transferred to it
+		//	e.g. if a parasite infects an npc on a remote client, the packedInputs will get here after the
+		// 	input source has become local
+		if (input is RemoteInputSource) {
+			((RemoteInputSource)input).SetInputState(_isMovingUp, _isMovingDown, _isMovingLeft, _isMovingRight);
+		}
 	}
 
 	void ModifyDebugDrawColour() {
