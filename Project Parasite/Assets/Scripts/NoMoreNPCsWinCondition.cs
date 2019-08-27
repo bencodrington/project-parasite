@@ -11,6 +11,7 @@ public class NoMoreNPCsWinCondition : IOnEventCallback
     
     int npcCount;
     int startingNpcCount = -1;
+    bool hasMutated = false;
     
     #endregion
 
@@ -33,8 +34,10 @@ public class NoMoreNPCsWinCondition : IOnEventCallback
             if (PhotonNetwork.IsMasterClient && npcCount == 0) {
                 OnLastNpcKilled();
             }
-            if (PhotonNetwork.IsMasterClient && npcCount < (0.5f * startingNpcCount)) {
+            if (PhotonNetwork.IsMasterClient && !hasMutated && npcCount <= (0.5f * startingNpcCount)) {
                 EventCodes.RaiseEventAll(EventCodes.Mutation, null);
+                // Don't repeatedly raise the event
+                hasMutated = true;
             }
             break;
         }

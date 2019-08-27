@@ -271,6 +271,10 @@ public abstract class Character : MonoBehaviourPun {
 		}
 	}
 
+	protected bool IsSpriteRendererColour(Color color) {
+		return spriteRenderers[0].color == color;
+	}
+
 	#endregion
 
 	#region [Private Methods]

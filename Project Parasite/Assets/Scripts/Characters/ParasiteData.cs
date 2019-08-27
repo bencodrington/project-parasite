@@ -8,6 +8,7 @@ public class ParasiteData
 	public const int STARTING_HEALTH = 100;
 
 	public static GameObject RegainedHealthPrefab;
+	public bool isVamparasite {get; private set;}
 
 	#endregion
 
@@ -42,7 +43,6 @@ public class ParasiteData
 	}
 	
     bool hasHandledDeath;
-	bool isVamparasite;
 
 	CharacterSpawner owner;
 	DeathHandler deathHandler;
@@ -74,6 +74,10 @@ public class ParasiteData
 
 	public void SetVamparasite() {
 		isVamparasite = true;
+		Parasite parasite = (Parasite)owner.GetCharacter();
+		if (parasite != null) {
+			parasite.ChangeToVampColour();
+		}
 	}
 
 	public void RegainHealthOnKill() {

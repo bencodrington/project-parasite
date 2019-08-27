@@ -21,8 +21,9 @@ public class Parasite : Character {
 
 	AudioSource screechAudioSource;
 	
-	Color IS_ATTEMPTING_INFECTION_COLOUR = new Color(1, 0, 0, 1);
-	Color RESTING_COLOUR = Color.white;
+	Color IS_ATTEMPTING_INFECTION_COLOUR = new Color(1, .5f, 0, 1);
+	Color VAMPARASITE_COLOUR = new Color(0.46f, 0f, 0.17f);
+	Color restingColour = Color.white;
 
 	// Used for cycling colours
 	ColourRotator flashColourRotator;
@@ -56,7 +57,7 @@ public class Parasite : Character {
 		}
 	}
 	void SetIsAttemptingInfectionSprite(bool isAttempting) {
-		SetSpriteRenderersColour(isAttempting ? IS_ATTEMPTING_INFECTION_COLOUR : RESTING_COLOUR);
+		SetSpriteRenderersColour(isAttempting ? IS_ATTEMPTING_INFECTION_COLOUR : restingColour);
 	}
 
 	PounceIndicator pounceIndicator;
@@ -139,6 +140,17 @@ public class Parasite : Character {
 			animator.SetBool("isRunning", shouldRun);
 		}
 	}
+
+	public void ChangeToVampColour(bool fade = false) {
+		if (!fade) {
+			if (IsSpriteRendererColour(restingColour)) {
+				// Not currently animating colour, so update it immediately
+				SetSpriteRenderersColour(VAMPARASITE_COLOUR);
+			}
+			restingColour = VAMPARASITE_COLOUR;
+			return;
+		}
+	}
 	
 	#endregion
 	
@@ -147,6 +159,9 @@ public class Parasite : Character {
 		infectRangeIndicator = GetComponentInChildren<InfectRangeIndicator>();
 		if (HasAuthority()) {
 			infectRangeIndicator.SetOriginTransform(transform);
+			if (CharacterSpawner.parasiteData.isVamparasite) {
+				ChangeToVampColour();
+			}
 		} else {
 			infectRangeIndicator.enabled = false;
 		}
@@ -203,7 +218,7 @@ public class Parasite : Character {
 			yield return null;
 		}
 		// Return to default colour
-		SetSpriteRenderersColour(RESTING_COLOUR);
+		SetSpriteRenderersColour(restingColour);
 
 	}
 
