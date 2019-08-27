@@ -35,6 +35,9 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 					characterSpawner.SpawnPlayerCharacter(assignedCharacterType, spawnPoint, Vector2.zero);
 				}
 				break;
+			case EventCodes.Mutation:
+				characterSpawner.OnMutation();
+				break;
 		}
     }
 

@@ -125,12 +125,6 @@ public class Parasite : Character {
 		}
 	}
 
-	public void RegainHealth(int health) {
-		if (photonView.IsMine) {
-			CharacterSpawner.parasiteData.ParasiteRegainHealth(health);
-		}
-	}
-
 	public override void Update() {
 		HandleInput();
 		// Called once per frame for each Parasite

@@ -80,6 +80,12 @@ public class CharacterSpawner
 			return null;
 		}
 	}
+
+	public void OnMutation() {
+		if (parasiteData != null) {
+			parasiteData.SetVamparasite();
+		}
+	}
     
     #endregion
 

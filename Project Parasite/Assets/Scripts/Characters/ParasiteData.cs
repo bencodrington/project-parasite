@@ -13,8 +13,14 @@ public class ParasiteData
 
     #region [Private Variables]
 
-	const int MAX_HEALTH = 100;
+	int MaxHealth {
+		get {
+			return isVamparasite ? 175 : 100;
+		}
+	}
 	Vector2 HEALTH_ALERT_OFFSET = new Vector2(0, 0.5f);
+	const int HEAL_AMOUNT_DEFAULT = 5;
+	const int HEAL_AMOUNT_VAMPARASITE = 25;
 
 	int _parasiteHealth = STARTING_HEALTH;
 	int ParasiteHealth {
@@ -22,7 +28,7 @@ public class ParasiteData
 		set {
 			bool isTakingDamage = value < _parasiteHealth;
 			int oldParasiteHealth = _parasiteHealth;
-			_parasiteHealth = Mathf.Clamp(value, 0, MAX_HEALTH);
+			_parasiteHealth = Mathf.Clamp(value, 0, MaxHealth);
 			bool isRegainingHealth = _parasiteHealth > oldParasiteHealth;
 			if (isRegainingHealth) {
 				SpawnHealthRegainedAlert(_parasiteHealth - oldParasiteHealth);
@@ -36,6 +42,7 @@ public class ParasiteData
 	}
 	
     bool hasHandledDeath;
+	bool isVamparasite;
 
 	CharacterSpawner owner;
 	DeathHandler deathHandler;
@@ -51,6 +58,7 @@ public class ParasiteData
 		}
 		this.deathHandler = deathHandler;
 		hasHandledDeath = false;
+		isVamparasite = false;
         ParasiteHealth = STARTING_HEALTH;
     }
 	
@@ -59,13 +67,17 @@ public class ParasiteData
 	public void ParasiteTakeDamage(int damage) {
 		ParasiteHealth -= damage;
 	}
-    
-	public void ParasiteRegainHealth(int health) {
-		ParasiteHealth += health;
-	}
 
 	public int GetParasiteHealth() {
 		return ParasiteHealth;
+	}
+
+	public void SetVamparasite() {
+		isVamparasite = true;
+	}
+
+	public void RegainHealthOnKill() {
+		ParasiteRegainHealth(isVamparasite ? HEAL_AMOUNT_VAMPARASITE : HEAL_AMOUNT_DEFAULT);
 	}
     
     #endregion
@@ -76,7 +88,7 @@ public class ParasiteData
 		EventCodes.RaiseGameOverEvent(CharacterType.Hunter);
 	}
 
-	public void SpawnHealthRegainedAlert(int amountRegained) {
+	void SpawnHealthRegainedAlert(int amountRegained) {
 		if (amountRegained <= 0) { return; }
 		if (RegainedHealthPrefab == null) {
 			// This is the first one to be spawned, so find the prefab
@@ -88,6 +100,10 @@ public class ParasiteData
 		// And set this parasite as it's parent in the hierarchy
 		regainedHealthAlert.transform.SetParent(owner.GetCharacter().transform);
 		regainedHealthAlert.GetComponentInChildren<Text>().text = "+" + amountRegained;
+	}
+    
+	void ParasiteRegainHealth(int health) {
+		ParasiteHealth += health;
 	}
 	
 	#endregion

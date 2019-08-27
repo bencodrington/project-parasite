@@ -10,6 +10,7 @@ public class NoMoreNPCsWinCondition : IOnEventCallback
     #region [Private Variables]
     
     int npcCount;
+    int startingNpcCount = -1;
     
     #endregion
 
@@ -32,6 +33,9 @@ public class NoMoreNPCsWinCondition : IOnEventCallback
             if (PhotonNetwork.IsMasterClient && npcCount == 0) {
                 OnLastNpcKilled();
             }
+            if (PhotonNetwork.IsMasterClient && npcCount < (0.5f * startingNpcCount)) {
+                EventCodes.RaiseEventAll(EventCodes.Mutation, null);
+            }
             break;
         }
     }
@@ -48,6 +52,10 @@ public class NoMoreNPCsWinCondition : IOnEventCallback
     #region [Private Methods]
     
     void SetNpcCount(int newNpcCount) {
+        if (startingNpcCount < 0) {
+            // This is the first time npc count is being set
+            startingNpcCount = newNpcCount;
+        }
         npcCount = newNpcCount;
         UiManager.Instance.SetRemainingNpcCount(npcCount);
     }
