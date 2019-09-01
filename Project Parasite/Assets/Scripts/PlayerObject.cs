@@ -36,7 +36,10 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 				}
 				break;
 			case EventCodes.Mutation:
-				characterSpawner.OnMutation();
+				if (characterSpawner != null) {
+					// CharacterSpawner may be null if we're currently in a tutorial
+					characterSpawner.OnMutation();
+				}
 				break;
 		}
     }

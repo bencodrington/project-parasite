@@ -14,7 +14,7 @@ public class TutorialManager
 
     #region [Private Variables]
     
-    Vector2 PARASITE_SPAWN_COORDINATES = new Vector2(113, -56.4f);
+    Vector2 PARASITE_SPAWN_COORDINATES = new Vector2(111.5f, -83.5f);
     Vector2 HUNTER_SPAWN_COORDINATES = new Vector2(-191, -3f);
 
     CharacterSpawner characterSpawner;
