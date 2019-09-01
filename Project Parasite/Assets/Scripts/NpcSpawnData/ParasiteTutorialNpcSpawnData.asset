@@ -16,13 +16,16 @@ MonoBehaviour:
   spawnPoints:
   - isStationary: 1
     isInfected: 0
-    coordinates: {x: 155, y: -56}
+    coordinates: {x: 113, y: -77}
   - isStationary: 1
     isInfected: 0
-    coordinates: {x: 164, y: -56}
+    coordinates: {x: 116.5, y: -77}
   - isStationary: 1
     isInfected: 0
-    coordinates: {x: 180.5, y: -56}
+    coordinates: {x: 120.5, y: -82}
+  - isStationary: 1
+    isInfected: 0
+    coordinates: {x: 124.5, y: -82}
   playableCharacterSpawnPoints:
   - isParasite: 0
-    coordinates: {x: 170, y: -56}
+    coordinates: {x: 126.5, y: -82}

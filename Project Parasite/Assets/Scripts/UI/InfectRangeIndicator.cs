@@ -6,7 +6,7 @@ public class InfectRangeIndicator : RangeIndicator
 {
     #region [Private Variables]
     
-    float infectRadius;
+    const float INFECT_RADIUS = 1f;
     bool isInRange;
     Collider2D npcCollider;
     
@@ -15,17 +15,13 @@ public class InfectRangeIndicator : RangeIndicator
     protected override int IndicatorCount => 3;
 
     #region [Public Variables]
-    
-    public void SetInfectRadius(float _infectRadius) {
-        infectRadius = _infectRadius;
-    }
 
     public Collider2D GetNpcCollider() { return npcCollider; }
     
     #endregion
 
     protected override bool ShouldShowIndicators() {
-        npcCollider = Physics2D.OverlapCircle(transform.position, infectRadius, Utility.GetLayerMask(CharacterType.NPC));
+        npcCollider = Physics2D.OverlapCircle(transform.position, INFECT_RADIUS, Utility.GetLayerMask(CharacterType.NPC));
         if (npcCollider != null) {
             SetTargetPosition(npcCollider.transform.position);
             return true;
