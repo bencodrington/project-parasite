@@ -141,15 +141,8 @@ public class Parasite : Character {
 		}
 	}
 
-	public void ChangeToVampColour(bool fade = false) {
-		if (!fade) {
-			if (IsSpriteRendererColour(restingColour)) {
-				// Not currently animating colour, so update it immediately
-				SetSpriteRenderersColour(VAMPARASITE_COLOUR);
-			}
-			restingColour = VAMPARASITE_COLOUR;
-			return;
-		}
+	public void ChangeToVampColour() {
+		photonView.RPC("RpcChangeToVampColour", RpcTarget.All);
 	}
 	
 	#endregion
@@ -355,6 +348,15 @@ public class Parasite : Character {
 	[PunRPC]
 	void RpcSetRemoteIsChargingPounce(bool isChargingPounce) {
 		remoteIsChargingPounce = isChargingPounce;
+	}
+
+	[PunRPC]
+	void RpcChangeToVampColour() {
+		if (IsSpriteRendererColour(restingColour)) {
+			// Not currently animating colour, so update it immediately
+			SetSpriteRenderersColour(VAMPARASITE_COLOUR);
+		}
+		restingColour = VAMPARASITE_COLOUR;
 	}
 
 }

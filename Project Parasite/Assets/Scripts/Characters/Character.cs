@@ -5,7 +5,13 @@ using UnityEngine;
 
 public abstract class Character : MonoBehaviourPun {
 
-	protected SpriteRenderer[] spriteRenderers;
+	protected SpriteRenderer[] SpriteRenderers {
+		get {
+			if (spriteRenderers == null) {
+				spriteRenderers = GetSpriteRenderers();
+			}
+			return spriteRenderers; }
+	}
 	protected Animator animator;
 	protected PhysicsEntity physicsEntity;
 	// Used for sprite flipping and rotating
@@ -53,6 +59,8 @@ public abstract class Character : MonoBehaviourPun {
 	Vector2 lastSentPosition;
 	byte lastSentInputs;
 	
+	SpriteRenderer[] spriteRenderers;
+	
 	#endregion
 
 	// Only initialized for Character objects on the server
@@ -74,7 +82,6 @@ public abstract class Character : MonoBehaviourPun {
 	}
 
 	void Start() {
-		spriteRenderers = GetSpriteRenderers();
 		spriteTransform = GetComponentInChildren<SpriteTransform>();
 		spriteTransform.SetTargetPhysicsEntity(physicsEntity);
 		animator = spriteTransform.GetComponent<Animator>();
@@ -157,11 +164,7 @@ public abstract class Character : MonoBehaviourPun {
 	}
 
 	public void SetRenderLayer(string renderLayerName = "ClientCharacter") {
-		// CLEANUP: This can be neater
-		if (spriteRenderers == null) {
-			spriteRenderers = GetSpriteRenderers();
-		}
-		foreach (SpriteRenderer sR in spriteRenderers) {
+		foreach (SpriteRenderer sR in SpriteRenderers) {
 			sR.sortingLayerName = renderLayerName;
 		}
 	}
@@ -266,13 +269,13 @@ public abstract class Character : MonoBehaviourPun {
 	}
 
 	protected void SetSpriteRenderersColour(Color color) {
-		foreach (SpriteRenderer sR in spriteRenderers) {
+		foreach (SpriteRenderer sR in SpriteRenderers) {
 			sR.color = color;
 		}
 	}
 
 	protected bool IsSpriteRendererColour(Color color) {
-		return spriteRenderers[0].color == color;
+		return SpriteRenderers[0].color == color;
 	}
 
 	#endregion
