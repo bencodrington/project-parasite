@@ -159,6 +159,7 @@ public class NonPlayerCharacter : Character {
 	void BurstMeatSuit() {
 		DespawnSelf();
 		SpawnParasite();
+		CharacterSpawner.parasiteData.RegainHealthOnKill();
 	}
 
 	void EjectMeatSuit() {
@@ -183,7 +184,6 @@ public class NonPlayerCharacter : Character {
 
 	void SpawnParasite() {
 		CharacterSpawner.SpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY), false, false, input, true);
-		CharacterSpawner.parasiteData.RegainHealthOnKill();
 	}
 
 	void HandleBurstCharging() {
