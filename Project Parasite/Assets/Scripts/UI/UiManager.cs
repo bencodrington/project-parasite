@@ -16,9 +16,11 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	public GameObject GameOverScreenPrefab;
 	public GameObject GameOverScreenServerPrefab;
     
-	public GameObject ParasiteControlsPrefab;
-	public GameObject HunterControlsPrefab;
 	public GameObject NpcCountPrefab;
+
+	public GameObject[] ParasiteControls;
+	public GameObject[] NpcControls;
+	public GameObject[] HunterControls;
 
 	public Color[] flashColours;
     
@@ -27,7 +29,6 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     #region [Private Variables]
 
 	Text npcCountText;
-	GameObject controlsObject;
     
 	GameObject gameOverScreen;
 	Text topRightUiText;
@@ -188,6 +189,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
         readyToggleButton.SetActive(false);
 		randomParasiteToggleButton.SetActive(false);
 		returnToMenuPanel.SetActive(false);
+		DeactivateControls();
 
 		InitializeColourMap();
     }
@@ -274,18 +276,17 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     	switch (characterType) {
     		case CharacterType.Hunter:
     			topRightUiText.enabled = false;
-    			controlsObject = Instantiate(HunterControlsPrefab, Vector3.zero, Quaternion.identity, canvas);
+				ActivateControls(HunterControls);
     			break;
     		case CharacterType.Parasite:
     			topRightUiText.enabled = true;
     			UpdateHealthObject(ParasiteData.STARTING_HEALTH);
-    			controlsObject = Instantiate(ParasiteControlsPrefab, Vector3.zero, Quaternion.identity, canvas);
+				ActivateControls(ParasiteControls);
     			break;
     		default:
     			topRightUiText.enabled = false;
     			break;
     	}
-    	controlsObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(UI_PADDING_DISTANCE, UI_PADDING_DISTANCE);
     	// Display NPC count
     	GameObject npcCountObject = Instantiate(NpcCountPrefab, Vector3.zero, Quaternion.identity, canvas);
     	npcCountObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(UI_PADDING_DISTANCE, -UI_PADDING_DISTANCE);
@@ -302,10 +303,26 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     	if (npcCountText != null) {
     		Destroy(npcCountText.gameObject);
     	}
-    	if (controlsObject != null) {
-    		Destroy(controlsObject);
-    	}
+		DeactivateControls();
     }
+
+	void DeactivateControls() {
+		foreach (GameObject control in ParasiteControls) {
+			control.SetActive(false);
+		}
+		foreach (GameObject control in NpcControls) {
+			control.SetActive(false);
+		}
+		foreach (GameObject control in HunterControls) {
+			control.SetActive(false);
+		}
+	}
+
+	void ActivateControls(GameObject[] controlsGroup) {
+		foreach (GameObject control in ParasiteControls) {
+			control.SetActive(true);
+		}
+	}
     
     #endregion
 }
