@@ -165,6 +165,9 @@ public abstract class Character : MonoBehaviourPun {
 
 	public void SetRenderLayer(string renderLayerName = "ClientCharacter") {
 		foreach (SpriteRenderer sR in SpriteRenderers) {
+			// Need to check if each sR is null, because at the time of caching, there may be additional
+			// 	sRs that have since been destroyed (i.e. NPC exclamation marks)
+			if (sR == null) { continue; }
 			sR.sortingLayerName = renderLayerName;
 		}
 	}
@@ -270,6 +273,9 @@ public abstract class Character : MonoBehaviourPun {
 
 	protected void SetSpriteRenderersColour(Color color) {
 		foreach (SpriteRenderer sR in SpriteRenderers) {
+			// Need to check if each sR is null, because at the time of caching, there may be additional
+			// 	sRs that have since been destroyed (i.e. NPC exclamation marks)
+			if (sR == null) { continue; }
 			sR.color = color;
 		}
 	}

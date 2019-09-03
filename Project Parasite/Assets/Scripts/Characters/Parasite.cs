@@ -226,13 +226,14 @@ public class Parasite : Character {
 	void InfectNpc(NonPlayerCharacter npc) {
 		// Let the npc know it will be controlled by this player from now on
 		npc.photonView.RequestOwnership();
-		// Store playerObject for eventual transfer back to parasite
-		npc.CharacterSpawner = CharacterSpawner;
+		// Store spawner for eventual transfer back to parasite
+		CharacterSpawner.SetCharacter(npc);
 		// Set isInfected to true/update sprite on new authority's client
 		npc.Infect(input);
 		// Update client's camera and render settings to reflect new character
 		npc.SetCameraFollow(false);
 		npc.SetRenderLayer();
+		UiManager.Instance.ActivateControls(CharacterType.NPC);
 	}
 
 	void ResetMovementState() {

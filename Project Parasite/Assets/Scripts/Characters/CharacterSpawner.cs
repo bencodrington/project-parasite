@@ -72,6 +72,11 @@ public class CharacterSpawner
 		}
     }
 
+	public void SetCharacter(Character newCharacter) {
+		this.character = newCharacter;
+		newCharacter.CharacterSpawner = this;
+	}
+
 	public Character GetCharacter() {
 		if (character != null) {
 			return character;

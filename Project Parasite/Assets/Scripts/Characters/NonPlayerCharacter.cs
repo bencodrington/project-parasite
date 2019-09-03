@@ -184,6 +184,7 @@ public class NonPlayerCharacter : Character {
 
 	void SpawnParasite() {
 		CharacterSpawner.SpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY), false, false, input, true);
+		UiManager.Instance.ActivateControls(CharacterType.Parasite); //TODO: make sure this doesn't mess up the hunter one
 	}
 
 	void HandleBurstCharging() {

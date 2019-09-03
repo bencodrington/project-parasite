@@ -154,6 +154,47 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	public void SetReturnToMenuPanelActive(bool isActive) {
 		returnToMenuPanel.SetActive(isActive);
 	}
+
+	public void DeactivateControls() {
+		foreach (GameObject control in ParasiteControls) {
+			control.SetActive(false);
+		}
+		foreach (GameObject control in NpcControls) {
+			control.SetActive(false);
+		}
+		foreach (GameObject control in HunterControls) {
+			control.SetActive(false);
+		}
+	}
+
+	public void ActivateControlAtIndex(int index) {
+		if (characterType == CharacterType.Parasite) {
+			ParasiteControls[index].SetActive(true);
+		} else if (characterType == CharacterType.Hunter) {
+			HunterControls[index].SetActive(true);
+		} else if (characterType == CharacterType.NPC) {
+			NpcControls[index].SetActive(true);
+		}
+	}
+
+	public void ActivateControls(CharacterType characterType) {
+		DeactivateControls();
+		switch (characterType) {
+			case CharacterType.Parasite: 	ActivateControls(ParasiteControls); break;
+			case CharacterType.NPC: 		ActivateControls(NpcControls); 		break;
+			case CharacterType.Hunter: 		ActivateControls(HunterControls); 	break;
+		}
+	}
+
+    public void RemoveHud() {
+    	if (topRightUiText != null) {
+    		topRightUiText.enabled = false;
+    	}
+    	if (npcCountText != null) {
+    		Destroy(npcCountText.gameObject);
+    	}
+		DeactivateControls();
+    }
     
     #endregion
 
@@ -296,30 +337,8 @@ public class UiManager : MonoBehaviour, IOnEventCallback
         EventCodes.RaiseEventAll(EventCodes.RequestNpcCount, null);
     }
 
-    void RemoveHud() {
-    	if (topRightUiText != null) {
-    		topRightUiText.enabled = false;
-    	}
-    	if (npcCountText != null) {
-    		Destroy(npcCountText.gameObject);
-    	}
-		DeactivateControls();
-    }
-
-	void DeactivateControls() {
-		foreach (GameObject control in ParasiteControls) {
-			control.SetActive(false);
-		}
-		foreach (GameObject control in NpcControls) {
-			control.SetActive(false);
-		}
-		foreach (GameObject control in HunterControls) {
-			control.SetActive(false);
-		}
-	}
-
 	void ActivateControls(GameObject[] controlsGroup) {
-		foreach (GameObject control in ParasiteControls) {
+		foreach (GameObject control in controlsGroup) {
 			control.SetActive(true);
 		}
 	}
