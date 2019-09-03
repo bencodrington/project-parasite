@@ -206,8 +206,10 @@ public class Parasite : Character {
 		float timeRemaining = 0.5f;
 		while (timeRemaining > 0) {
 			timeRemaining -= Time.deltaTime;
-			// Switch to next colour and update spriteRenderer
-			SetSpriteRenderersColour(flashColourRotator.GetNextColour());
+			if (flashColourRotator != null) {
+				// Switch to next colour and update spriteRenderer
+				SetSpriteRenderersColour(flashColourRotator.GetNextColour());
+			}
 			yield return null;
 		}
 		// Return to default colour

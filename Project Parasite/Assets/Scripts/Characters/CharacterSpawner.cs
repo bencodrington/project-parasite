@@ -55,8 +55,13 @@ public class CharacterSpawner
 		}
 		// Make the character draw in front of other characters
     	character.SetRenderLayer();
-		if (assignedCharacterType == CharacterType.Parasite && !preserveParasiteHealth) {
-			// This spawner is spawning a parasite for the first time, so initialize its data object
+		// This spawner has already spawned a parasite, but now wants to
+		//	replace it, so initialize its data object
+		bool overwriteParasiteData = assignedCharacterType == CharacterType.Parasite && !preserveParasiteHealth;
+		// This spawner is spawning a parasite for the first time, so
+		//	initialize its data object
+		bool isNewParasite = assignedCharacterType == CharacterType.Parasite && parasiteData == null;
+		if (overwriteParasiteData || isNewParasite) {
             parasiteData = new ParasiteData(this, deathHandler);
 		}
 		character.SetInputSource(inputSource);

@@ -15,7 +15,8 @@ public class ControlInfoZone : MonoBehaviour
         EXECUTE,
         HUNTER_JUMP,
         PLACE_ORB,
-        RECALL_ORB
+        RECALL_ORB,
+        WALL_CLING
     }
 
     public ControlType controlType;
@@ -33,7 +34,8 @@ public class ControlInfoZone : MonoBehaviour
         { ControlType.EXECUTE,      1 },
         { ControlType.HUNTER_JUMP,  0 },
         { ControlType.PLACE_ORB,    1 },
-        { ControlType.RECALL_ORB,   2 }
+        { ControlType.RECALL_ORB,   2 },
+        { ControlType.WALL_CLING,   3 }
     };
     
     Vector2 bottomLeft;

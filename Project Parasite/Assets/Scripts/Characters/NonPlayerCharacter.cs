@@ -183,8 +183,19 @@ public class NonPlayerCharacter : Character {
 	}
 
 	void SpawnParasite() {
-		CharacterSpawner.SpawnPlayerCharacter(CharacterType.Parasite, transform.position, new Vector2(0, PARASITE_LAUNCH_VELOCITY), false, false, input, true);
-		UiManager.Instance.ActivateControls(CharacterType.Parasite); //TODO: make sure this doesn't mess up the hunter one
+		CharacterSpawner.SpawnPlayerCharacter(CharacterType.Parasite,
+					transform.position,
+					new Vector2(0, PARASITE_LAUNCH_VELOCITY),
+					false,	// Force Camera Snap
+					false,	// Should Camera Follow
+					input,
+					true	// Preserve Parasite Health
+					);
+		
+		if (input.ShouldCameraFollowOwner()) {
+			// Only show parasite controls if this client is playing as this parasite
+			UiManager.Instance.ActivateControls(CharacterType.Parasite);
+		}
 	}
 
 	void HandleBurstCharging() {
