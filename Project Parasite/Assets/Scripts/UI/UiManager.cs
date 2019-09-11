@@ -6,6 +6,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class UiManager : MonoBehaviour, IOnEventCallback
 {
@@ -44,6 +45,12 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	Color LOSS_COLOUR = Color.red;
 
 	const int UI_PADDING_DISTANCE = 9;
+	// How long should the highlight animation play for
+	const float CONTROL_HIGHLIGHT_FADE_TIME = 2f;
+	// How long between flipping the control alpha on and off
+	const float CONTROL_HIGHLIGHT_FLASH_LENGTH = 0.1f;
+	// The colour of the control text when highlighted
+	Color CONTROL_HIGHLIGHT_COLOUR = Color.yellow;
 
 	GameObject titleScreen;
 	GameObject mainMenu;
@@ -167,13 +174,20 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 		}
 	}
 
-	public void ActivateControlAtIndex(int index) {
+	public void ActivateControlAtIndex(int index, bool shouldHighlight = false) {
+		GameObject control = null;
 		if (characterType == CharacterType.Parasite) {
-			ParasiteControls[index].SetActive(true);
+			control = ParasiteControls[index];
 		} else if (characterType == CharacterType.Hunter) {
-			HunterControls[index].SetActive(true);
+			control = HunterControls[index];
 		} else if (characterType == CharacterType.NPC) {
-			NpcControls[index].SetActive(true);
+			control = NpcControls[index];
+		}
+		if (control != null) {
+			control.SetActive(true);
+			if (shouldHighlight) {
+				StartCoroutine(HighlightControl(control));
+			}
 		}
 	}
 
@@ -341,6 +355,24 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 		foreach (GameObject control in controlsGroup) {
 			control.SetActive(true);
 		}
+	}
+
+	IEnumerator HighlightControl(GameObject control) {
+		TextMeshProUGUI textMesh = control.GetComponentInChildren<TextMeshProUGUI>();
+		Color originalColour = textMesh.color;
+		textMesh.color = CONTROL_HIGHLIGHT_COLOUR;
+		float timeElapsed = 0;
+		int alphaToggle = 0;
+		while (timeElapsed < CONTROL_HIGHLIGHT_FADE_TIME) {
+			yield return null;
+			timeElapsed += Time.deltaTime;
+			// Every CONTROL_HIGHLIGHT_FLASH_LENGTH, this switches between 1 & 0
+			alphaToggle = ((int)(timeElapsed / CONTROL_HIGHLIGHT_FLASH_LENGTH) % 2);
+			textMesh.color = alphaToggle == 0
+				? Color.Lerp(CONTROL_HIGHLIGHT_COLOUR, originalColour, timeElapsed / CONTROL_HIGHLIGHT_FADE_TIME)
+				: Color.clear;
+		}
+		textMesh.color = originalColour;
 	}
     
     #endregion

@@ -52,7 +52,7 @@ public class ControlInfoZone : MonoBehaviour
         bool within = isPositionWithinBounds(characterPosition);
         if (within) {
             hasBeenTriggered = true;
-            UiManager.Instance.ActivateControlAtIndex(typeToGameObjectIndexMap[controlType]);
+            UiManager.Instance.ActivateControlAtIndex(typeToGameObjectIndexMap[controlType], true);
         }
     }
 
