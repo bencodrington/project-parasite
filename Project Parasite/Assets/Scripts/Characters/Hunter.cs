@@ -134,6 +134,8 @@ public class Hunter : Character {
 		forceDirection *= force;
 		// Transfer this force to the physics entity to handle it
 		physicsEntity.AddVelocity(forceDirection.x, forceDirection.y);
+		// Allow hunters to jump up the same wall
+		mostRecentWallClingDirection = Utility.Directions.Null;
 	}
 	
 	#endregion
