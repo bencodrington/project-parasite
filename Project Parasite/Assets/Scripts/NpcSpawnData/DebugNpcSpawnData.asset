@@ -16,5 +16,5 @@ MonoBehaviour:
   spawnPoints:
   - isStationary: 0
     isInfected: 0
-    coordinates: {x: 0, y: 0}
+    coordinates: {x: 0, y: -64}
   playableCharacterSpawnPoints: []
