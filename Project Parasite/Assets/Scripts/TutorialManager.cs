@@ -73,10 +73,12 @@ public class TutorialManager
         characterSpawner = null;
         npcManager.DespawnNPCs();
         npcManager = null;
+        GameObject.Destroy(pauseOverlay);
+        // OrbManager is used in the parasite tutorial to manage the static
+        //  orbs that are part of the level
         if (orbManager == null) { return; }
         orbManager.DestroyOrbs();
         orbManager = null;
-        GameObject.Destroy(pauseOverlay);
     }
 
     public void Restart(CharacterSpawner spawner) {
