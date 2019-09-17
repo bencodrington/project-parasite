@@ -170,7 +170,7 @@ public class Hunter : Character {
 
 	void DestroyAllOrbs() {
 		while (orbs.Count > 0) {
-			RecallOrb();
+			AttemptToRecallOrb();
 		}
 	}
 
