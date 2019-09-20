@@ -74,10 +74,17 @@ public class ParasiteData
 
 	public void SetVamparasite() {
 		isVamparasite = true;
-		Parasite parasite = (Parasite)owner.GetCharacter();
-		if (parasite != null) {
-			parasite.ChangeToVampColour();
-		}
+		try {
+			Parasite parasite = (Parasite)owner.GetCharacter();
+			if (parasite != null) {
+				parasite.ChangeToVampColour();
+			}
+		} catch {}
+		GameObject mutationAlertPrefab = Resources.Load("MutationAlert") as GameObject;
+		GameObject.Instantiate(mutationAlertPrefab,
+					owner.GetCharacter().transform.position + (Vector3)HEALTH_ALERT_OFFSET,
+					Quaternion.identity);
+		UiManager.Instance.ActivateMutation(0);
 	}
 
 	public void RegainHealthOnKill() {

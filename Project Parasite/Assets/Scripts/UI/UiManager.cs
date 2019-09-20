@@ -22,6 +22,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	public GameObject[] ParasiteControls;
 	public GameObject[] NpcControls;
 	public GameObject[] HunterControls;
+	public GameObject[] ActiveMutations;
 
 	public Color[] flashColours;
     
@@ -208,7 +209,12 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     		Destroy(npcCountText.gameObject);
     	}
 		DeactivateControls();
+		DeactivateMutations();
     }
+
+	public void ActivateMutation(int index) {
+		ActiveMutations[index].SetActive(true);
+	}
     
     #endregion
 
@@ -245,6 +251,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 		randomParasiteToggleButton.SetActive(false);
 		returnToMenuPanel.SetActive(false);
 		DeactivateControls();
+		DeactivateMutations();
 
 		InitializeColourMap();
     }
@@ -373,6 +380,12 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 				: Color.clear;
 		}
 		textMesh.color = originalColour;
+	}
+
+	void DeactivateMutations() {
+		foreach (GameObject activeMutation in ActiveMutations) {
+			activeMutation.SetActive(false);
+		}
 	}
     
     #endregion
