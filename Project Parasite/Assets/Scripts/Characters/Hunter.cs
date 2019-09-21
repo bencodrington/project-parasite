@@ -2,6 +2,7 @@
 using UnityEngine;
 using System;
 using Photon.Pun;
+using System.Collections;
 
 public class Hunter : Character {
 
@@ -9,9 +10,11 @@ public class Hunter : Character {
 
 	public AudioClip cantPlaceOrbSound;
 	public AudioClip placeOrbSound;
+	public AudioClip throwOrbSound;
 	public GameObject orbPrefab;
 	public GameObject orbBeamPrefab;
 	public GameObject orbUiManagerPrefab;
+	public GameObject orbInactivePrefab;
 	public bool isNpcControlled = false;
 	
 	#endregion
@@ -23,6 +26,10 @@ public class Hunter : Character {
 	const int MAX_ORB_COUNT = 4;
 	// The amount of time a hunter will cling to a wall for if they collide at maximum speed
 	const float MAX_CLING_TIME = 1.5f;
+	// After this distance from the hunter, the orb will take MAX_ORB_THROW_DELAY to get to its destination
+	const float ORB_THROW_DELAY_CAP_DISTANCE = 5f;
+	// How long the orb will take to get to its destination at ORB_THROW_DELAY_CAP_DISTANCE or farther
+	const float MAX_ORB_THROW_DELAY = 0.3f;
 
 	// The size of the box around newly-placed orbs, inside of which
 	// 	NPCs will be alerted to run away
@@ -32,6 +39,7 @@ public class Hunter : Character {
 	OrbBeamRangeManager orbBeamRangeManager;
 	AudioSource cantPlaceOrbAudioSource;
 	AudioSource placeOrbAudioSource;
+	AudioSource throwOrbAudioSource;
 
 	Queue<Orb> orbs;
 
@@ -68,6 +76,7 @@ public class Hunter : Character {
 			orbBeamRangeManager.shouldShowMarkers = false;
 		}
 		placeOrbAudioSource = Utility.AddAudioSource(gameObject, placeOrbSound);
+		throwOrbAudioSource = Utility.AddAudioSource(gameObject, throwOrbSound);
 	}
 
 	protected override void HandleInput()  {
@@ -234,11 +243,8 @@ public class Hunter : Character {
 			animator.SetBool("isClingingToWall", false);
 		}
 	}
-	
-	#endregion
 
-	[PunRPC]
-	void RpcSpawnOrb(Vector2 atPosition) {
+	void SpawnOrb(Vector2 atPosition) {
 		Vector2 beamSpawnPosition;
 		// Create orb game object
 		GameObject orbGameObject = Instantiate(orbPrefab, atPosition, Quaternion.identity);
@@ -272,6 +278,26 @@ public class Hunter : Character {
 			}
 
 		}
+	}
+
+	IEnumerator StartThrowingOrb(Vector2 atPosition) {
+		// TODO: play arm swing animation
+		// Play orb throw sound
+		throwOrbAudioSource.Play();
+		// Delay based on distance
+		float percentOfMaxRange = Mathf.Clamp01(Vector2.Distance(transform.position, atPosition) / ORB_THROW_DELAY_CAP_DISTANCE);
+		float delayLength = Mathf.Lerp(0f, MAX_ORB_THROW_DELAY, percentOfMaxRange);
+		OrbInactive inactiveOrb = Instantiate(orbInactivePrefab, transform.position, Quaternion.identity).GetComponent<OrbInactive>();
+		inactiveOrb.StartMoving(atPosition, delayLength);
+		yield return new WaitForSeconds(delayLength);
+		SpawnOrb(atPosition);
+	}
+	
+	#endregion
+
+	[PunRPC]
+	void RpcSpawnOrb(Vector2 atPosition) {
+		StartCoroutine(StartThrowingOrb(atPosition));
 	}
 
 	[PunRPC]

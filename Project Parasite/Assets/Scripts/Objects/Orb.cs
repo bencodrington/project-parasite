@@ -13,8 +13,6 @@ public class Orb : MonoBehaviour {
 
 	#endregion
 
-	public SpriteRenderer burstSprite;
-
 	OrbBeam beam;
 
 	#region [MonoBehaviour Callbacks]
