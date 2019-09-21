@@ -289,9 +289,31 @@ public class Hunter : Character {
 		float percentOfMaxRange = Mathf.Clamp01(Vector2.Distance(transform.position, atPosition) / ORB_THROW_DELAY_CAP_DISTANCE);
 		float delayLength = Mathf.Lerp(0f, MAX_ORB_THROW_DELAY, percentOfMaxRange);
 		OrbInactive inactiveOrb = Instantiate(orbInactivePrefab, transform.position, Quaternion.identity).GetComponent<OrbInactive>();
-		inactiveOrb.StartMoving(atPosition, delayLength);
+		inactiveOrb.SetDestinationAndStartMoving(atPosition, delayLength);
 		yield return new WaitForSeconds(delayLength);
 		ActivateOrb(newOrb);
+	}
+
+	IEnumerator StartRecallingOrb() {
+		// TODO: play recall sound
+		// Delay based on distance
+		Orb orbToRecall = orbs.Dequeue();
+		Destroy(orbToRecall.gameObject);
+		float percentOfMaxRange = Mathf.Clamp01(Vector2.Distance(transform.position, orbToRecall.transform.position) / ORB_THROW_DELAY_CAP_DISTANCE);
+		float delayLength = Mathf.Lerp(0f, MAX_ORB_THROW_DELAY, percentOfMaxRange);
+		OrbInactive inactiveOrb = Instantiate(orbInactivePrefab, orbToRecall.transform.position, Quaternion.identity).GetComponent<OrbInactive>();
+		inactiveOrb.SetDestinationAndStartMoving(transform, delayLength);
+		yield return new WaitForSeconds(delayLength);
+		OnOrbReturned();
+	}
+
+	void OnOrbReturned() {
+		if (!isNpcControlled && HasAuthority()) {
+			// Update the number of remaining orbs currently displayed onscreen
+			orbUiManager.OnOrbCountChange(orbs.Count);
+			// User can definitely place at least one orb, so show markers
+			orbBeamRangeManager.shouldShowMarkers = true;
+		}
 	}
 	
 	#endregion
@@ -303,7 +325,7 @@ public class Hunter : Character {
 
 	[PunRPC]
 	void RpcRecallOrb() {
-		RecallOrb();
+		StartCoroutine(StartRecallingOrb());
 	}
 
 	[PunRPC]
