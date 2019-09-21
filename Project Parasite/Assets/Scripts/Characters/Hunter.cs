@@ -271,9 +271,11 @@ public class Hunter : Character {
 	}
 
 	void ActivateOrb(Orb orb) {
+		// Make sure orb hasn't been recalled already
+		if (orb == null) { return; }
 		orb.gameObject.SetActive(true);
 		placeOrbAudioSource.Play();
-		FindObjectOfType<CameraFollow>().ShakeScreen(0.1f, 0.1f);
+		FindObjectOfType<CameraFollow>().ShakeScreen(0.3f, 0.1f);
 		AlertNpcsInRange(orb.transform.position);
 		orb.SetActive();
 	}
