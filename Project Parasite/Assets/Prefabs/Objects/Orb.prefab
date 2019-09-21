@@ -127,7 +127,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6af4392f9fd429b4d9f9d3f400369cba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  burstSprite: {fileID: 4860421659051191303}
+  orbBeamPrefab: {fileID: 1599698830328778, guid: b0848c3b199306745aa91255602825d2,
+    type: 3}
 --- !u!95 &7040926609946446802
 Animator:
   serializedVersion: 3

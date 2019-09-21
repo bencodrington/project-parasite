@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class Orb : MonoBehaviour {
 
+	#region [Public Variables]
+	
+	public GameObject orbBeamPrefab;
+	
+	#endregion
+
 	#region [Private Variables]
 	
 	const float FORCE = 35f;
@@ -11,15 +17,16 @@ public class Orb : MonoBehaviour {
 	const float FULL_FORCE_CUTOFF_RADIUS = 2f;
 	bool isActive;
 
+	// The beam connecting this orb to the next
+	// 	this orb will destroy this beam when it is recalled
+	OrbBeam beam;
+	// The beam connecting the previous orb to this one
+	//	- stored so that this orb can activate it when this orb is activated
+	OrbBeam previousBeam;
+
 	#endregion
 
-	OrbBeam beam;
-
 	#region [MonoBehaviour Callbacks]
-	
-	void Start() {
-		isActive = true;
-	}
 
 	void FixedUpdate() {
 		if (!isActive) { return; }
@@ -45,9 +52,29 @@ public class Orb : MonoBehaviour {
 	#endregion
 
 	#region [Public Methods]
+
+	public void SpawnBeamToPreviousOrb(Orb previousOrb) {
+		Vector2 beamSpawnPosition;
+		// Spawn beam halfway between orbs
+		beamSpawnPosition = Vector2.Lerp(previousOrb.transform.position, transform.position, 0.5f);
+		previousBeam = Instantiate(orbBeamPrefab, beamSpawnPosition, Quaternion.identity).GetComponent<OrbBeam>();
+		// Store beam in most recent orb so when the orb is destroyed it can take the beam with it
+		previousOrb.AttachBeam(previousBeam);
+		previousBeam.Initialize(previousOrb.transform.position, transform.position);
+		// Deactivate previous beam
+		previousBeam.gameObject.SetActive(false);
+	}
 	
 	public void AttachBeam(OrbBeam beam) {
 		this.beam = beam;
+	}
+
+	public void SetActive() {
+		isActive = true;
+		// Activate previous beam if it exists
+		if (previousBeam != null) {
+			previousBeam.gameObject.SetActive(true);
+		}
 	}
 	
 	#endregion

@@ -156,8 +156,6 @@ MonoBehaviour:
   placeOrbSound: {fileID: 8300000, guid: e583325b967bb484c9481567d04c8396, type: 3}
   throwOrbSound: {fileID: 8300000, guid: 60b40c86ddeb0d340bc83624f6d53ff9, type: 3}
   orbPrefab: {fileID: 1696299247839064, guid: df2278ddd67e6bf47ac0529308af2ee1, type: 3}
-  orbBeamPrefab: {fileID: 1599698830328778, guid: b0848c3b199306745aa91255602825d2,
-    type: 3}
   orbUiManagerPrefab: {fileID: 1009069422560828, guid: 6e19b3cf438c2fe4baa425b29810bea5,
     type: 3}
   orbInactivePrefab: {fileID: 2322067859187784291, guid: 270597ffd891764429ed6d12b6361fd9,

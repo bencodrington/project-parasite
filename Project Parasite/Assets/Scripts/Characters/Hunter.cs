@@ -12,7 +12,6 @@ public class Hunter : Character {
 	public AudioClip placeOrbSound;
 	public AudioClip throwOrbSound;
 	public GameObject orbPrefab;
-	public GameObject orbBeamPrefab;
 	public GameObject orbUiManagerPrefab;
 	public GameObject orbInactivePrefab;
 	public bool isNpcControlled = false;
@@ -244,24 +243,14 @@ public class Hunter : Character {
 		}
 	}
 
-	void SpawnOrb(Vector2 atPosition) {
-		Vector2 beamSpawnPosition;
+	Orb SpawnOrb(Vector2 atPosition) {
 		// Create orb game object
 		GameObject orbGameObject = Instantiate(orbPrefab, atPosition, Quaternion.identity);
 		Orb orb = orbGameObject.GetComponent<Orb>();
-		placeOrbAudioSource.Play();
-		FindObjectOfType<CameraFollow>().ShakeScreen(0.1f, 0.1f);
-
-		AlertNpcsInRange(atPosition);
 
 		// If new orb is within "beaming" range of most recently placed orb
 		if (orbBeamRangeManager.isInRange(atPosition)) {
-			// Spawn beam halfway between orbs
-			beamSpawnPosition = Vector2.Lerp(orbBeamRangeManager.MostRecentOrb.transform.position, atPosition, 0.5f);
-			OrbBeam orbBeam = Instantiate(orbBeamPrefab, beamSpawnPosition, Quaternion.identity).GetComponent<OrbBeam>();
-			// Store beam in most recent orb so when the orb is destroyed it can take the beam with it
-			orbBeamRangeManager.MostRecentOrb.AttachBeam(orbBeam);
-			orbBeam.Initialize(orbBeamRangeManager.MostRecentOrb.transform.position, atPosition);
+			orb.SpawnBeamToPreviousOrb(orbBeamRangeManager.MostRecentOrb);
 		}
 
 		// Add to queue
@@ -276,21 +265,31 @@ public class Hunter : Character {
 			if (orbs.Count == MAX_ORB_COUNT) {
 				orbBeamRangeManager.shouldShowMarkers = false;
 			}
-
 		}
+		orb.gameObject.SetActive(false);
+		return orb;
+	}
+
+	void ActivateOrb(Orb orb) {
+		orb.gameObject.SetActive(true);
+		placeOrbAudioSource.Play();
+		FindObjectOfType<CameraFollow>().ShakeScreen(0.1f, 0.1f);
+		AlertNpcsInRange(orb.transform.position);
+		orb.SetActive();
 	}
 
 	IEnumerator StartThrowingOrb(Vector2 atPosition) {
 		// TODO: play arm swing animation
 		// Play orb throw sound
 		throwOrbAudioSource.Play();
+		Orb newOrb = SpawnOrb(atPosition);
 		// Delay based on distance
 		float percentOfMaxRange = Mathf.Clamp01(Vector2.Distance(transform.position, atPosition) / ORB_THROW_DELAY_CAP_DISTANCE);
 		float delayLength = Mathf.Lerp(0f, MAX_ORB_THROW_DELAY, percentOfMaxRange);
 		OrbInactive inactiveOrb = Instantiate(orbInactivePrefab, transform.position, Quaternion.identity).GetComponent<OrbInactive>();
 		inactiveOrb.StartMoving(atPosition, delayLength);
 		yield return new WaitForSeconds(delayLength);
-		SpawnOrb(atPosition);
+		ActivateOrb(newOrb);
 	}
 	
 	#endregion
