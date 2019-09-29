@@ -281,7 +281,8 @@ public class Hunter : Character {
 	}
 
 	IEnumerator StartThrowingOrb(Vector2 atPosition) {
-		// TODO: play arm swing animation
+		// Play arm swing animation
+		PlayOrbPlaceAnimation(atPosition);
 		// Play orb throw sound
 		throwOrbAudioSource.Play();
 		Orb newOrb = SpawnOrb(atPosition);
@@ -314,6 +315,22 @@ public class Hunter : Character {
 			// User can definitely place at least one orb, so show markers
 			orbBeamRangeManager.shouldShowMarkers = true;
 		}
+	}
+
+	void PlayOrbPlaceAnimation(Vector2 orbPosition) {
+		float angle = Vector2.SignedAngle(Vector2.up, orbPosition - (Vector2)transform.position);
+		string trigger = "";
+		// angle is 0 for up, 90 for left, 180 for down, -90 for right
+		if (angle > 0 && angle < 160) {
+			trigger = "isPlacingOrbBehind";
+		} else if (angle >= 160 || angle <= -120) {
+			trigger = "isPlacingOrbLower";
+		} else if (angle <= 0 && angle > -45) {
+			trigger = "isPlacingOrbUpper";
+		} else { // angle <= -45 && angle > -120
+			trigger = "isPlacingOrb";
+		}
+		animator.SetTrigger(trigger);
 	}
 	
 	#endregion
