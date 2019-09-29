@@ -104,4 +104,20 @@ public static class Utility {
 	public static T GetRandom<T>(T[] array) {
 		return array[UnityEngine.Random.Range(0, array.Length)];
 	}
+
+	public static GameObject GetChildWithTag(string tag, GameObject parent) {
+		if (parent.tag == tag) {
+			return parent;
+		}
+		Transform t = parent.transform;
+		if (t.childCount == 0) {
+			return null;
+		}
+		GameObject result;
+		for (int i = 0; i < t.childCount; i++) {
+			result = GetChildWithTag(tag, t.GetChild(i).gameObject);
+			if (result != null) { return result; }
+		}
+		return null;
+	}
 }

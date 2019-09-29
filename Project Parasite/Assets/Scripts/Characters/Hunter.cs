@@ -39,6 +39,9 @@ public class Hunter : Character {
 	AudioSource cantPlaceOrbAudioSource;
 	AudioSource placeOrbAudioSource;
 	AudioSource throwOrbAudioSource;
+	// Backpack's transform is cached so that orbs can be sent and recalled
+	// 	from/to its position
+	Transform backpackTransform;
 
 	Queue<Orb> orbs;
 
@@ -76,6 +79,7 @@ public class Hunter : Character {
 		}
 		placeOrbAudioSource = Utility.AddAudioSource(gameObject, placeOrbSound);
 		throwOrbAudioSource = Utility.AddAudioSource(gameObject, throwOrbSound);
+		backpackTransform = Utility.GetChildWithTag("OrbDestination", gameObject).transform;
 	}
 
 	protected override void HandleInput()  {
@@ -287,9 +291,9 @@ public class Hunter : Character {
 		throwOrbAudioSource.Play();
 		Orb newOrb = SpawnOrb(atPosition);
 		// Delay based on distance
-		float percentOfMaxRange = Mathf.Clamp01(Vector2.Distance(transform.position, atPosition) / ORB_THROW_DELAY_CAP_DISTANCE);
+		float percentOfMaxRange = Mathf.Clamp01(Vector2.Distance(backpackTransform.position, atPosition) / ORB_THROW_DELAY_CAP_DISTANCE);
 		float delayLength = Mathf.Lerp(0f, MAX_ORB_THROW_DELAY, percentOfMaxRange);
-		OrbInactive inactiveOrb = Instantiate(orbInactivePrefab, transform.position, Quaternion.identity).GetComponent<OrbInactive>();
+		OrbInactive inactiveOrb = Instantiate(orbInactivePrefab, backpackTransform.position, Quaternion.identity).GetComponent<OrbInactive>();
 		inactiveOrb.SetDestinationAndStartMoving(atPosition, delayLength);
 		yield return new WaitForSeconds(delayLength);
 		ActivateOrb(newOrb);
@@ -300,10 +304,10 @@ public class Hunter : Character {
 		// Delay based on distance
 		Orb orbToRecall = orbs.Dequeue();
 		Destroy(orbToRecall.gameObject);
-		float percentOfMaxRange = Mathf.Clamp01(Vector2.Distance(transform.position, orbToRecall.transform.position) / ORB_THROW_DELAY_CAP_DISTANCE);
+		float percentOfMaxRange = Mathf.Clamp01(Vector2.Distance(backpackTransform.position, orbToRecall.transform.position) / ORB_THROW_DELAY_CAP_DISTANCE);
 		float delayLength = Mathf.Lerp(0f, MAX_ORB_THROW_DELAY, percentOfMaxRange);
 		OrbInactive inactiveOrb = Instantiate(orbInactivePrefab, orbToRecall.transform.position, Quaternion.identity).GetComponent<OrbInactive>();
-		inactiveOrb.SetDestinationAndStartMoving(transform, delayLength);
+		inactiveOrb.SetDestinationAndStartMoving(backpackTransform, delayLength);
 		yield return new WaitForSeconds(delayLength);
 		OnOrbReturned();
 	}
