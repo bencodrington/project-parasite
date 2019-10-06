@@ -64,6 +64,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 1f29613adcaffd143a832d487ddfc8d1, type: 3}
   - {fileID: 8300000, guid: 55dd0a9a58cf04144a3eee90f4c6f5b2, type: 3}
   - {fileID: 8300000, guid: 86d5f8d986a9a96478a287bf564a849b, type: 3}
+  popSound: {fileID: 8300000, guid: 9e95c270274fda843b2d5234eba4b633, type: 3}
 --- !u!114 &520
 MonoBehaviour:
   m_ObjectHideFlags: 0

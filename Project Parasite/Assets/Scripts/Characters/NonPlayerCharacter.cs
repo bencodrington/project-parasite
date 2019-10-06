@@ -14,6 +14,7 @@ public class NonPlayerCharacter : Character {
 	public GameObject alertIconPrefab;
 	// One of these sound clips is selected to play when an orb is placed nearby
 	public AudioClip[] alertSounds;
+	public AudioClip popSound;
 
 	#endregion
 
@@ -149,6 +150,7 @@ public class NonPlayerCharacter : Character {
 		}
 		isChargingForBurst = false;
 		burstIndicator.StopFilling();
+		PlayPopSound();
 		if (timeChargingForBurst > MIN_BURST_TIME) {
 			BurstMeatSuit();
 		} else {
@@ -210,6 +212,20 @@ public class NonPlayerCharacter : Character {
 			alertSource.clip = alertSounds[UnityEngine.Random.Range(0, alertSounds.Length)];
 			alertSource.PlayDelayed(UnityEngine.Random.Range(0, 0.5f));
 		}
+	}
+
+	void PlayPopSound() {
+		// Create gameobject to host the sound
+		// 	If we use the NPC, the sound will be cut off immediately since the NPC is destroyed
+		GameObject soundObject = new GameObject();
+		soundObject.transform.position = transform.position;
+		soundObject.name = "NPC Pop Sound";
+		Utility.AddAudioSource(soundObject, popSound).Play();
+		// Destroy soundObject once the sound is done playing
+		// 	Attach this coroutine to MatchManager since this NPC will be destroyed
+		MatchManager.Instance.StartCoroutine(Utility.WaitXSeconds(popSound.length, () => {
+			Destroy(soundObject);
+		}));
 	}
 	
 	#endregion
