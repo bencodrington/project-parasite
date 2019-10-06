@@ -10,6 +10,7 @@ TagManager:
   - IgnoreComponent
   - Main Menu
   - Lobby
+  - OrbDestination
   layers:
   - Default
   - TransparentFX

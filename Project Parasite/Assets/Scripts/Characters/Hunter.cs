@@ -11,6 +11,8 @@ public class Hunter : Character {
 	public AudioClip cantPlaceOrbSound;
 	public AudioClip placeOrbSound;
 	public AudioClip throwOrbSound;
+	public AudioClip recallSound;
+	public AudioClip backpackSound;
 	public GameObject orbPrefab;
 	public GameObject orbUiManagerPrefab;
 	public GameObject orbInactivePrefab;
@@ -39,6 +41,8 @@ public class Hunter : Character {
 	AudioSource cantPlaceOrbAudioSource;
 	AudioSource placeOrbAudioSource;
 	AudioSource throwOrbAudioSource;
+	AudioSource recallOrbAudioSource;
+	AudioSource backpackAudioSource;
 	// Backpack's transform is cached so that orbs can be sent and recalled
 	// 	from/to its position
 	Transform backpackTransform;
@@ -79,6 +83,8 @@ public class Hunter : Character {
 		}
 		placeOrbAudioSource = Utility.AddAudioSource(gameObject, placeOrbSound);
 		throwOrbAudioSource = Utility.AddAudioSource(gameObject, throwOrbSound);
+		recallOrbAudioSource = Utility.AddAudioSource(gameObject, recallSound);
+		backpackAudioSource = Utility.AddAudioSource(gameObject, backpackSound);
 		backpackTransform = Utility.GetChildWithTag("OrbDestination", gameObject).transform;
 	}
 
@@ -300,7 +306,8 @@ public class Hunter : Character {
 	}
 
 	IEnumerator StartRecallingOrb() {
-		// TODO: play recall sound
+		// Play recall sound
+		recallOrbAudioSource.Play();
 		// Delay based on distance
 		Orb orbToRecall = orbs.Dequeue();
 		Destroy(orbToRecall.gameObject);
@@ -308,6 +315,8 @@ public class Hunter : Character {
 		float delayLength = Mathf.Lerp(0f, MAX_ORB_THROW_DELAY, percentOfMaxRange);
 		OrbInactive inactiveOrb = Instantiate(orbInactivePrefab, orbToRecall.transform.position, Quaternion.identity).GetComponent<OrbInactive>();
 		inactiveOrb.SetDestinationAndStartMoving(backpackTransform, delayLength);
+		// Start playing sound slightly before it arrives
+		backpackAudioSource.PlayDelayed(delayLength * 0.75f);
 		yield return new WaitForSeconds(delayLength);
 		OnOrbReturned();
 	}

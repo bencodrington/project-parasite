@@ -155,6 +155,8 @@ MonoBehaviour:
   cantPlaceOrbSound: {fileID: 8300000, guid: 980db2cf9a9bcd147a027697d6d9fc80, type: 3}
   placeOrbSound: {fileID: 8300000, guid: e583325b967bb484c9481567d04c8396, type: 3}
   throwOrbSound: {fileID: 8300000, guid: 0a0e925578ec6374287ca0fcca9b6e2a, type: 3}
+  recallSound: {fileID: 8300000, guid: fb431dddb64a67e4ea9e25e25d0920f6, type: 3}
+  backpackSound: {fileID: 8300000, guid: c4283c37e0ae4a24e8ec971db7267321, type: 3}
   orbPrefab: {fileID: 1696299247839064, guid: df2278ddd67e6bf47ac0529308af2ee1, type: 3}
   orbUiManagerPrefab: {fileID: 1009069422560828, guid: 6e19b3cf438c2fe4baa425b29810bea5,
     type: 3}
