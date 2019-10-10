@@ -14,6 +14,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     #region [Public Variables]
     
     public static UiManager Instance;
+	public OrbUiManager orbUiManager {get; private set;}
 	public GameObject GameOverScreenPrefab;
 	public GameObject GameOverScreenServerPrefab;
     
@@ -244,6 +245,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 				selectHunterButton = selectButton.gameObject;
 			}
 		}
+		orbUiManager = FindObjectOfType<OrbUiManager>();
 		mainMenu.SetActive(false);
 		lobby.SetActive(false);
 		startGameButton.SetActive(false);

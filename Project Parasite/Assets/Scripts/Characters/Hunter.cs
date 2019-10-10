@@ -66,15 +66,10 @@ public class Hunter : Character {
 		// Cache reference to orb beam range manager
 		orbBeamRangeManager = GetComponentInChildren<OrbBeamRangeManager>();
 		if (!isNpcControlled && HasAuthority()) {
-			// Spawn orb UI manager to display how many orbs are remaining
-			orbUiManager = Instantiate(orbUiManagerPrefab,
-										Vector3.zero,
-										Quaternion.identity,
-										// Anchor it to the canvas
-										UiManager.Instance.GetCanvas()
-			).GetComponent<OrbUiManager>();
-			// Initialize it with the maximum orbs to spawn
-			orbUiManager.setMaxOrbCount(MAX_ORB_COUNT);
+			// Show orb UI manager to display how many orbs are remaining
+			orbUiManager = UiManager.Instance.orbUiManager;
+			orbUiManager.gameObject.SetActive(true);
+			orbUiManager.Initialize();
 
 			cantPlaceOrbAudioSource = Utility.AddAudioSource(gameObject, cantPlaceOrbSound);
 
@@ -163,7 +158,7 @@ public class Hunter : Character {
 	protected override void OnCharacterDestroy() {
 		DestroyAllOrbs();
 		if (!isNpcControlled && HasAuthority()) {
-			Destroy(orbUiManager.gameObject);
+			orbUiManager.gameObject.SetActive(false);
 		}
 	}
 
