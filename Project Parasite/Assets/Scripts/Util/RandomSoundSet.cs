@@ -7,6 +7,8 @@ public class RandomSoundSet : MonoBehaviour
     #region [Public Variables]
     
     public AudioClip[] sounds;
+    [Range(0, 1)]
+    public float volume;
     
     #endregion
 
@@ -28,7 +30,7 @@ public class RandomSoundSet : MonoBehaviour
     #region [MonoBehaviour Callbacks]
     
     void Start() {
-        audioSource = Utility.AddAudioSource(gameObject);
+        audioSource = Utility.AddAudioSource(gameObject, null, volume);
     }
     
     #endregion

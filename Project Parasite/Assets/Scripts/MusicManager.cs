@@ -8,6 +8,7 @@ public class MusicManager : MonoBehaviour
     #region [Public Variables]
     
     public AudioClip introSong;
+    public AudioClip menuSong;
     
     #endregion
 
@@ -21,7 +22,9 @@ public class MusicManager : MonoBehaviour
     
     void Start() {
         audioSource = GetComponent<AudioSource>();
-        audioSource.clip = introSong;
+        audioSource.clip = menuSong;
+        audioSource.loop = true;
+        audioSource.volume = 0.1f;
         audioSource.Play();
     }
     

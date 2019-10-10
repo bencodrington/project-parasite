@@ -104684,7 +104684,7 @@ AudioSource:
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -104805,6 +104805,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   introSong: {fileID: 8300000, guid: 91d889b8948d90c42839ea06994f6791, type: 3}
+  menuSong: {fileID: 8300000, guid: 6505634615a38014aaaeeeb57ffea960, type: 3}
 --- !u!1 &1092527282
 GameObject:
   m_ObjectHideFlags: 0

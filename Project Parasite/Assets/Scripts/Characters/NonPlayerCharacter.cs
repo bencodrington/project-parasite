@@ -220,7 +220,7 @@ public class NonPlayerCharacter : Character {
 		GameObject soundObject = new GameObject();
 		soundObject.transform.position = transform.position;
 		soundObject.name = "NPC Pop Sound";
-		Utility.AddAudioSource(soundObject, popSound).Play();
+		Utility.AddAudioSource(soundObject, popSound, 0.5f).Play();
 		// Destroy soundObject once the sound is done playing
 		// 	Attach this coroutine to MatchManager since this NPC will be destroyed
 		MatchManager.Instance.StartCoroutine(Utility.WaitXSeconds(popSound.length, () => {
