@@ -99,11 +99,13 @@ public class Hunter : Character {
 		bool wasClingingToWall = IsClingingToWall;
 		if (input.isDown(PlayerInput.Key.right) && !input.isDown(PlayerInput.Key.left)) {
 			isMovingRight = true;
-			isClingingToRightWall = physicsEntity.IsOnRightWall();
+			// Can't cling to wall if we're on the ground and not adjacent to a wall
+			isClingingToRightWall = !physicsEntity.IsOnGround() && physicsEntity.IsOnRightWall();
 			isClingingToLeftWall = false;
 		} else if (input.isDown(PlayerInput.Key.left) && !input.isDown(PlayerInput.Key.right)) {
 			isMovingLeft = true;
-			isClingingToLeftWall = physicsEntity.IsOnLeftWall();
+			// Can't cling to wall if we're on the ground and not adjacent to a wall
+			isClingingToLeftWall = !physicsEntity.IsOnGround() && physicsEntity.IsOnLeftWall();
 			isClingingToRightWall = false;
 		} else {
 			isClingingToLeftWall = false;
