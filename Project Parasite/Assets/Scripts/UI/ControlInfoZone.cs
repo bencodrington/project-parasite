@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ControlInfoZone : MonoBehaviour
+public class ControlInfoZone : TriggerZone
 {
     #region [Public Variables]
     
@@ -38,47 +38,10 @@ public class ControlInfoZone : MonoBehaviour
         { ControlType.WALL_CLING,   3 }
     };
     
-    Vector2 bottomLeft;
-    Vector2 topRight;
-
-    bool hasBeenTriggered = false;
-    
     #endregion
 
-    #region [Public Methods]
-
-    public void OnUpdate(Vector2 characterPosition) {
-        if (hasBeenTriggered) { return; }
-        bool within = isPositionWithinBounds(characterPosition);
-        if (within) {
-            hasBeenTriggered = true;
-            UiManager.Instance.ActivateControlAtIndex(typeToGameObjectIndexMap[controlType], true);
-        }
+    protected override void OnTrigger() {
+        UiManager.Instance.ActivateControlAtIndex(typeToGameObjectIndexMap[controlType], true);
     }
 
-    public void Reset() {
-        hasBeenTriggered = false;
-    }
-
-    #endregion
-
-    #region [MonoBehaviour Callbacks]
-    
-    void Awake() {
-        bottomLeft = transform.position - transform.localScale / 2;
-        topRight = transform.position + transform.localScale / 2;
-    }
-    
-    #endregion
-
-    #region [Private Methods]
-    
-    bool isPositionWithinBounds(Vector2 position) {
-        return bottomLeft.x < position.x
-            && position.x < topRight.x
-            && bottomLeft.y < position.y
-            && position.y < topRight.y;
-    }
-    
-    #endregion
 }

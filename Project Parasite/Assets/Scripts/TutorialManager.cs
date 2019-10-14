@@ -26,7 +26,7 @@ public class TutorialManager
     CharacterType characterType;
 
     GameObject pauseOverlay;
-    ControlInfoZone[] controlInfoZones;
+    TriggerZone[] triggerZones;
     
     #endregion
 
@@ -39,7 +39,7 @@ public class TutorialManager
         SpawnPlayer();
         UiManager.Instance.SetCharacterType(type);
         UiManager.Instance.DeactivateControls();
-        controlInfoZones = GameObject.FindObjectsOfType<ControlInfoZone>();
+        triggerZones = GameObject.FindObjectsOfType<TriggerZone>();
 
         if (spawnData != null) {
             npcManager = new NpcManager(spawnData);
@@ -63,7 +63,7 @@ public class TutorialManager
 			character.PhysicsUpdate();
 		}
         Vector2 characterPosition = characterSpawner.GetCharacter().transform.position;
-        foreach(ControlInfoZone zone in controlInfoZones) {
+        foreach(TriggerZone zone in triggerZones) {
             zone.OnUpdate(characterPosition);
         }
 	}
@@ -88,7 +88,7 @@ public class TutorialManager
         UiManager.Instance.RemoveHud();
         UiManager.Instance.SetCharacterType(characterType);
         UiManager.Instance.DeactivateControls();
-        foreach(ControlInfoZone zone in controlInfoZones) {
+        foreach(TriggerZone zone in triggerZones) {
             zone.Reset();
         }
         // Respawn NPCs
