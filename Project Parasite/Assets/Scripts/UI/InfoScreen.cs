@@ -22,7 +22,18 @@ public class InfoScreen : MonoBehaviour
 
     Coroutine printing;
 
-    const float TIME_BETWEEN_LETTERS = 0.1f;
+    const float TIME_BETWEEN_LETTERS = 0.025f;
+    
+    #endregion
+
+    #region [Public Methods]
+    
+    public void Reset() {
+        if (printing != null) {
+            StopCoroutine(printing);
+        }
+        textMesh.text = "";
+    }
     
     #endregion
 
@@ -42,7 +53,6 @@ public class InfoScreen : MonoBehaviour
     #region [Private Methods]
     
     void StartPrinting() {
-        Debug.Log(fullString);
         if (printing != null) {
             StopCoroutine(printing);
             textMesh.text = "";
@@ -51,11 +61,11 @@ public class InfoScreen : MonoBehaviour
     }
 
     IEnumerator Printing() {
-        float timeElapsed = 0;
-        while (timeElapsed < fullString.Length * TIME_BETWEEN_LETTERS) {
-            textMesh.text += fullString[(int)Mathf.Floor(timeElapsed / TIME_BETWEEN_LETTERS)];
+        int charactersShown = 0;
+        while (charactersShown < fullString.Length) {
+            textMesh.text += fullString[charactersShown];
             yield return new WaitForSeconds(TIME_BETWEEN_LETTERS);
-            timeElapsed += TIME_BETWEEN_LETTERS;
+            charactersShown++;
         }
         textMesh.text = fullString;
     }

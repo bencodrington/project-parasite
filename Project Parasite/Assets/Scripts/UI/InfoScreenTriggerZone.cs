@@ -21,6 +21,7 @@ public class InfoScreenTriggerZone : TriggerZone
     #endregion
 
     protected override void OnTrigger() {
+        if (triggerHandlers == null) { return; }
         triggerHandlers();
     }
 }

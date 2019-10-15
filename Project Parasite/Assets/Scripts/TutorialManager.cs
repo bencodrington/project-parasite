@@ -14,7 +14,7 @@ public class TutorialManager
 
     #region [Private Variables]
     
-    Vector2 PARASITE_SPAWN_COORDINATES = new Vector2(111.5f, -83.5f);
+    Vector2 PARASITE_SPAWN_COORDINATES = new Vector2(81.5f, -66.25f);
     Vector2 HUNTER_SPAWN_COORDINATES = new Vector2(-198, -58f);
 
     CharacterSpawner characterSpawner;
@@ -27,6 +27,7 @@ public class TutorialManager
 
     GameObject pauseOverlay;
     TriggerZone[] triggerZones;
+    InfoScreen[] infoScreens;
     
     #endregion
 
@@ -40,6 +41,7 @@ public class TutorialManager
         UiManager.Instance.SetCharacterType(type);
         UiManager.Instance.DeactivateControls();
         triggerZones = GameObject.FindObjectsOfType<TriggerZone>();
+        infoScreens = GameObject.FindObjectsOfType<InfoScreen>();
 
         if (spawnData != null) {
             npcManager = new NpcManager(spawnData);
@@ -79,6 +81,12 @@ public class TutorialManager
         if (orbManager == null) { return; }
         orbManager.DestroyOrbs();
         orbManager = null;
+        foreach(TriggerZone zone in triggerZones) {
+            zone.Reset();
+        }
+        foreach(InfoScreen screen in infoScreens) {
+            screen.Reset();
+        }
     }
 
     public void Restart(CharacterSpawner spawner) {
@@ -90,6 +98,9 @@ public class TutorialManager
         UiManager.Instance.DeactivateControls();
         foreach(TriggerZone zone in triggerZones) {
             zone.Reset();
+        }
+        foreach(InfoScreen screen in infoScreens) {
+            screen.Reset();
         }
         // Respawn NPCs
         npcManager.Restart();
