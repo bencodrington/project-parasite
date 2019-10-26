@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   orbChains:
   - positions:
-    - {x: 124, y: -59.25}
-    - {x: 125, y: -56.75}
-    - {x: 125, y: -59.25}
-    - {x: 124, y: -56.75}
+    - {x: 124.5, y: -59.75}
+    - {x: 125.5, y: -57.25}
+    - {x: 125.5, y: -59.75}
+    - {x: 124.5, y: -57.25}

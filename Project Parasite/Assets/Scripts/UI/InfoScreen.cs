@@ -10,6 +10,7 @@ public class InfoScreen : MonoBehaviour
     
     // Will start displaying message when the player enters this zone
     public InfoScreenTriggerZone triggerZone;
+    public Animator exclamationAnimator;
     
     #endregion
 
@@ -58,6 +59,7 @@ public class InfoScreen : MonoBehaviour
             textMesh.text = "";
         }
         printing = StartCoroutine(Printing());
+        exclamationAnimator.SetTrigger("Triggered");
     }
 
     IEnumerator Printing() {
