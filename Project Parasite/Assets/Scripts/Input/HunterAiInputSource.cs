@@ -7,7 +7,7 @@ public class HunterAiInputSource : InputSource
 
     #region [Private Variables]
     // How long to wait (in seconds) between placing/recalling each orb
-    const float TIME_BETWEEN_ORBS = 0.1f;
+    const float TIME_BETWEEN_ORBS = 0.3f;
     // The box size (in game units) centered around the hunter, in which it
     //  can detect a parasite
     Vector2 AWARENESS_ZONE_SIZE = new Vector2(16, 1);
@@ -23,6 +23,9 @@ public class HunterAiInputSource : InputSource
     OrbSetData orbData;
     int numOrbsInData;
     int numOrbsPlaced = 0;
+
+    // Used for the hack that ensures we are always facing left
+    Transform spriteTransform;
     
     #endregion
 
@@ -38,6 +41,7 @@ public class HunterAiInputSource : InputSource
 
     public override void UpdateInputState() {
         base.UpdateInputState();
+        FaceLeft();
         LookForParasite();
         if (!isWaiting) {
             OnReadyToPerformNextAction();
@@ -123,6 +127,15 @@ public class HunterAiInputSource : InputSource
             } else {
                 TryRecallingOrb();
             }
+        }
+    }
+
+    // CLEANUP: this is a relatively hacky way of making sure the only hunter AI currently in the game
+    //  is always facing left
+    void FaceLeft() {
+        spriteTransform = owner.transform.GetComponentInChildren<SpriteTransform>().transform;
+        if (spriteTransform.eulerAngles.y == 0) {
+            state.keyState[Key.left] = true;
         }
     }
     
