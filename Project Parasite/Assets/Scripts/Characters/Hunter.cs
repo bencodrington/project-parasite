@@ -329,11 +329,16 @@ public class Hunter : Character {
 
 	void PlayOrbPlaceAnimation(Vector2 orbPosition) {
 		float angle = Vector2.SignedAngle(Vector2.up, orbPosition - (Vector2)transform.position);
+		if (spriteTransform.IsFlipped()) {
+			// We're facing left, take this into account when deciding
+			// 	which animation to play
+			angle *= -1;
+		}
 		string trigger = "";
 		// angle is 0 for up, 90 for left, 180 for down, -90 for right
-		if (angle > 0 && angle < 160) {
+		if (angle > 0 && angle < 90) {
 			trigger = "isPlacingOrbBehind";
-		} else if (angle >= 160 || angle <= -120) {
+		} else if (angle >= 90 || angle <= -120) {
 			trigger = "isPlacingOrbLower";
 		} else if (angle <= 0 && angle > -45) {
 			trigger = "isPlacingOrbUpper";

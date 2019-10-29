@@ -43,6 +43,10 @@ public class SpriteTransform : MonoBehaviour
     public void DontFlipThisFrame() {
         canFlipThisFrame = false;
     }
+
+    public bool IsFlipped() {
+        return isFlipped;
+    }
     
     #endregion
 

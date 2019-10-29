@@ -5,6 +5,13 @@ using UnityEngine;
 
 public abstract class Character : MonoBehaviourPun {
 
+	#region [Public Variables]
+	
+	// Used for sprite flipping and rotating
+	public SpriteTransform spriteTransform {get; private set;}
+	
+	#endregion
+	
 	protected SpriteRenderer[] SpriteRenderers {
 		get {
 			if (spriteRenderers == null) {
@@ -14,8 +21,6 @@ public abstract class Character : MonoBehaviourPun {
 	}
 	protected Animator animator;
 	protected PhysicsEntity physicsEntity;
-	// Used for sprite flipping and rotating
-	protected SpriteTransform spriteTransform;
 
 	protected List<InteractableObject> objectsInRange = new List<InteractableObject>();
 

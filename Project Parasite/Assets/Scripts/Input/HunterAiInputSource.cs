@@ -130,11 +130,9 @@ public class HunterAiInputSource : InputSource
         }
     }
 
-    // CLEANUP: this is a relatively hacky way of making sure the only hunter AI currently in the game
-    //  is always facing left
+    // CLEANUP: this is a hack because the only hunter AI currently in the game always faces left
     void FaceLeft() {
-        spriteTransform = owner.transform.GetComponentInChildren<SpriteTransform>().transform;
-        if (spriteTransform.eulerAngles.y == 0) {
+        if (!owner.spriteTransform.IsFlipped()) {
             state.keyState[Key.left] = true;
         }
     }
