@@ -23,3 +23,5 @@ MonoBehaviour:
   playableCharacterSpawnPoints:
   - isParasite: 1
     coordinates: {x: -172, y: -50.75}
+  - isParasite: 1
+    coordinates: {x: -190, y: -36.75}
