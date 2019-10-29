@@ -112,7 +112,7 @@ public class NonPlayerCharacter : Character {
 	protected override void OnStart() {
 		burstIndicator = GetComponentInChildren<BurstIndicator>();
 		burstIndicator.SetTimeToFill(MIN_BURST_TIME);
-		alertSource = Utility.AddAudioSource(gameObject);
+		alertSource = Utility.AddAudioSource(gameObject, null, 1, true);
 	}
 
 	#region [MonoBehaviour Callbacks]
@@ -151,6 +151,7 @@ public class NonPlayerCharacter : Character {
 		isChargingForBurst = false;
 		burstIndicator.StopFilling();
 		PlayPopSound();
+		Destroy(gameObject.GetComponent<AudioListener>());
 		if (timeChargingForBurst > MIN_BURST_TIME) {
 			BurstMeatSuit();
 		} else {
@@ -185,7 +186,7 @@ public class NonPlayerCharacter : Character {
 	}
 
 	void SpawnParasite() {
-		CharacterSpawner.SpawnPlayerCharacter(CharacterType.Parasite,
+		Character newParasite = CharacterSpawner.SpawnPlayerCharacter(CharacterType.Parasite,
 					transform.position,
 					new Vector2(0, PARASITE_LAUNCH_VELOCITY),
 					false,	// Force Camera Snap
@@ -197,6 +198,7 @@ public class NonPlayerCharacter : Character {
 		if (input.ShouldCameraFollowOwner()) {
 			// Only show parasite controls if this client is playing as this parasite
 			UiManager.Instance.ActivateControls(CharacterType.Parasite);
+			newParasite.gameObject.AddComponent<AudioListener>();
 		}
 	}
 
@@ -220,7 +222,7 @@ public class NonPlayerCharacter : Character {
 		GameObject soundObject = new GameObject();
 		soundObject.transform.position = transform.position;
 		soundObject.name = "NPC Pop Sound";
-		Utility.AddAudioSource(soundObject, popSound, 0.5f).Play();
+		Utility.AddAudioSource(soundObject, popSound, 0.5f, true).Play();
 		// Destroy soundObject once the sound is done playing
 		// 	Attach this coroutine to MatchManager since this NPC will be destroyed
 		MatchManager.Instance.StartCoroutine(Utility.WaitXSeconds(popSound.length, () => {

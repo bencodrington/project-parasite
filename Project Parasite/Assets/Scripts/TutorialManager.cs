@@ -125,7 +125,7 @@ public class TutorialManager
     
     void SpawnPlayer() {
         Vector2 spawnCoords = characterType == CharacterType.Parasite ? PARASITE_SPAWN_COORDINATES : HUNTER_SPAWN_COORDINATES;
-        characterSpawner.SpawnPlayerCharacter(characterType, spawnCoords, Vector2.zero);
+        characterSpawner.SpawnPlayerCharacter(characterType, spawnCoords, Vector2.zero).gameObject.AddComponent<AudioListener>();
     }
 
     void InstantiatePauseOverlay() {

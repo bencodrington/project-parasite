@@ -5,6 +5,7 @@ public class AnimationEventHandler: MonoBehaviour
     #region [Public Variables]
     
     public AudioClip clip;
+    public bool rolloff;
     
     #endregion
 
@@ -17,7 +18,7 @@ public class AnimationEventHandler: MonoBehaviour
     #region [MonoBehaviour Callbacks]
     
     void Start() {
-        source = Utility.AddAudioSource(gameObject, clip);
+        source = Utility.AddAudioSource(gameObject, clip, 1, rolloff);
     }
     
     #endregion

@@ -148,7 +148,7 @@ public class Parasite : Character {
 	#endregion
 	
 	protected override void OnStart() {
-		screechAudioSource = Utility.AddAudioSource(gameObject, screechSound, .2f);
+		screechAudioSource = Utility.AddAudioSource(gameObject, screechSound, .2f, true);
 		infectRangeIndicator = GetComponentInChildren<InfectRangeIndicator>();
 		if (HasAuthority()) {
 			infectRangeIndicator.SetOriginTransform(transform);
@@ -236,6 +236,7 @@ public class Parasite : Character {
 		npc.SetCameraFollow(false);
 		npc.SetRenderLayer();
 		UiManager.Instance.ActivateControls(CharacterType.NPC);
+		npc.gameObject.AddComponent<AudioListener>();
 	}
 
 	void ResetMovementState() {
