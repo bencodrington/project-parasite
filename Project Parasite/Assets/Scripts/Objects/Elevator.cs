@@ -86,7 +86,7 @@ public class Elevator : MonoBehaviourPun {
 	
 	void Awake() {
 		callFields = new List<ElevatorCallField>();
-		elevatorArrivedSource = Utility.AddAudioSource(gameObject, elevatorArrivedSound, 1, true);
+		elevatorArrivedSource = AudioManager.AddAudioSource(gameObject, elevatorArrivedSound, 1, true);
 		Transform floorTransform = GetComponentInChildren<BoxCollider2D>().transform;
         physicsEntity = new PlatformPhysicsEntity(floorTransform, .05f, 1f);
 	}

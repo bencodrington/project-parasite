@@ -18,7 +18,7 @@ public class AnimationEventHandler: MonoBehaviour
     #region [MonoBehaviour Callbacks]
     
     void Start() {
-        source = Utility.AddAudioSource(gameObject, clip, 1, rolloff);
+        source = AudioManager.AddAudioSource(gameObject, clip, 1, rolloff);
     }
     
     #endregion

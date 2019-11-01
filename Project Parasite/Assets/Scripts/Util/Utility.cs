@@ -87,20 +87,6 @@ public static class Utility {
 				bottomLeft.y <= point.y && point.y <= topRight.y);
 	}
 
-	public static AudioSource AddAudioSource(GameObject gameObject, AudioClip clip = null, float volume = 1f, bool rollOff = false) {
-		AudioSource newSource;
-		newSource = gameObject.AddComponent<AudioSource>();
-		newSource.clip = clip;
-		newSource.volume = volume;
-		newSource.playOnAwake = false;
-		if (rollOff) {
-			newSource.rolloffMode = AudioRolloffMode.Linear;
-			newSource.minDistance = 3;
-			newSource.maxDistance = 15;
-		}
-		return newSource;
-	}
-
 	public static Character GetCharacterFromCollider(Collider2D collider) {
 		return collider.GetComponentInParent<Character>();
 	}

@@ -31,7 +31,7 @@ public class RandomSoundSet : MonoBehaviour
     #region [MonoBehaviour Callbacks]
     
     void Start() {
-        audioSource = Utility.AddAudioSource(gameObject, null, volume, rolloff);
+        audioSource = AudioManager.AddAudioSource(gameObject, null, volume, rolloff);
     }
     
     #endregion

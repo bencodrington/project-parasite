@@ -71,15 +71,15 @@ public class Hunter : Character {
 			orbUiManager.gameObject.SetActive(true);
 			orbUiManager.Initialize();
 
-			cantPlaceOrbAudioSource = Utility.AddAudioSource(gameObject, cantPlaceOrbSound);
+			cantPlaceOrbAudioSource = AudioManager.AddAudioSource(gameObject, cantPlaceOrbSound);
 
 		} else {
 			orbBeamRangeManager.shouldShowMarkers = false;
 		}
-		placeOrbAudioSource = Utility.AddAudioSource(gameObject, placeOrbSound, 1, true);
-		throwOrbAudioSource = Utility.AddAudioSource(gameObject, throwOrbSound, 1, true);
-		recallOrbAudioSource = Utility.AddAudioSource(gameObject, recallSound, 1, true);
-		backpackAudioSource = Utility.AddAudioSource(gameObject, backpackSound, 1, true);
+		placeOrbAudioSource = AudioManager.AddAudioSource(gameObject, placeOrbSound, 1, true);
+		throwOrbAudioSource = AudioManager.AddAudioSource(gameObject, throwOrbSound, 1, true);
+		recallOrbAudioSource = AudioManager.AddAudioSource(gameObject, recallSound, 1, true);
+		backpackAudioSource = AudioManager.AddAudioSource(gameObject, backpackSound, 1, true);
 		backpackTransform = Utility.GetChildWithTag("OrbDestination", gameObject).transform;
 	}
 

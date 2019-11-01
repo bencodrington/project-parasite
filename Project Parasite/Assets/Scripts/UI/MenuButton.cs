@@ -36,8 +36,8 @@ public class MenuButton : MonoBehaviour, IPointerEnterHandler, IPointerClickHand
     #region [MonoBehaviour Callbacks]
     
     void Start() {
-        hoverAudioSource = Utility.AddAudioSource(gameObject, hoverSound, 0.25f);
-        clickAudioSource = Utility.AddAudioSource(gameObject, clickSound, 0.75f);
+        hoverAudioSource = AudioManager.AddAudioSource(gameObject, hoverSound, 0.25f);
+        clickAudioSource = AudioManager.AddAudioSource(gameObject, clickSound, 0.75f);
     }
     
     #endregion

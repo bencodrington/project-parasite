@@ -148,7 +148,7 @@ public class Parasite : Character {
 	#endregion
 	
 	protected override void OnStart() {
-		screechAudioSource = Utility.AddAudioSource(gameObject, screechSound, .2f, true);
+		screechAudioSource = AudioManager.AddAudioSource(gameObject, screechSound, .2f, true);
 		infectRangeIndicator = GetComponentInChildren<InfectRangeIndicator>();
 		if (HasAuthority()) {
 			infectRangeIndicator.SetOriginTransform(transform);

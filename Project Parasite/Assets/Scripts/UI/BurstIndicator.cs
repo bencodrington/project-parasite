@@ -59,8 +59,8 @@ public class BurstIndicator : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
         // Hide at start
         spriteRenderer.color = Color.clear;
-        burstChargeAudioSource = Utility.AddAudioSource(gameObject, burstChargeSound);
-        burstReadyAudioSource = Utility.AddAudioSource(gameObject, burstReadySound);
+        burstChargeAudioSource = AudioManager.AddAudioSource(gameObject, burstChargeSound);
+        burstReadyAudioSource = AudioManager.AddAudioSource(gameObject, burstReadySound);
     }
 
     void Update() {

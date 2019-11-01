@@ -115657,6 +115657,7 @@ GameObject:
   - component: {fileID: 1092008075}
   - component: {fileID: 1092008079}
   - component: {fileID: 1092008077}
+  - component: {fileID: 1092008080}
   m_Layer: 0
   m_Name: MatchManager
   m_TagString: Untagged
@@ -115851,6 +115852,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   introSong: {fileID: 8300000, guid: 91d889b8948d90c42839ea06994f6791, type: 3}
   menuSong: {fileID: 8300000, guid: 6505634615a38014aaaeeeb57ffea960, type: 3}
+--- !u!114 &1092008080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1092008074}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0fc3f1100f77014680c2b295a254273, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  master: {fileID: 24300002, guid: 56d7620afbf3a784dbdf7c734622ce0b, type: 2}
 --- !u!1 &1092527282
 GameObject:
   m_ObjectHideFlags: 0
