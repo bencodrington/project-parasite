@@ -153,7 +153,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stats: {fileID: 11400000, guid: 17a6e983b5d887a43b32bc85976f87f7, type: 2}
   cantPlaceOrbSound: {fileID: 8300000, guid: 980db2cf9a9bcd147a027697d6d9fc80, type: 3}
-  placeOrbSound: {fileID: 8300000, guid: e583325b967bb484c9481567d04c8396, type: 3}
   throwOrbSound: {fileID: 8300000, guid: 0a0e925578ec6374287ca0fcca9b6e2a, type: 3}
   recallSound: {fileID: 8300000, guid: fb431dddb64a67e4ea9e25e25d0920f6, type: 3}
   backpackSound: {fileID: 8300000, guid: c4283c37e0ae4a24e8ec971db7267321, type: 3}

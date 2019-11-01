@@ -7,6 +7,7 @@ public class Orb : MonoBehaviour {
 	#region [Public Variables]
 	
 	public GameObject orbBeamPrefab;
+	public AudioSource audioSource;
 	
 	#endregion
 
@@ -75,6 +76,7 @@ public class Orb : MonoBehaviour {
 		if (previousBeam != null) {
 			previousBeam.gameObject.SetActive(true);
 		}
+		audioSource.Play();
 	}
 	
 	#endregion

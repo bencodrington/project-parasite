@@ -9,7 +9,6 @@ public class Hunter : Character {
 	#region [Public Variables]
 
 	public AudioClip cantPlaceOrbSound;
-	public AudioClip placeOrbSound;
 	public AudioClip throwOrbSound;
 	public AudioClip recallSound;
 	public AudioClip backpackSound;
@@ -76,7 +75,6 @@ public class Hunter : Character {
 		} else {
 			orbBeamRangeManager.shouldShowMarkers = false;
 		}
-		placeOrbAudioSource = AudioManager.AddAudioSource(gameObject, placeOrbSound, 1, true);
 		throwOrbAudioSource = AudioManager.AddAudioSource(gameObject, throwOrbSound, 1, true);
 		recallOrbAudioSource = AudioManager.AddAudioSource(gameObject, recallSound, 1, true);
 		backpackAudioSource = AudioManager.AddAudioSource(gameObject, backpackSound, 1, true);
@@ -281,7 +279,6 @@ public class Hunter : Character {
 		// Make sure orb hasn't been recalled already
 		if (orb == null) { return; }
 		orb.gameObject.SetActive(true);
-		placeOrbAudioSource.Play();
 		FindObjectOfType<CameraFollow>().ShakeScreen(0.3f, 0.1f);
 		AlertNpcsInRange(orb.transform.position);
 		orb.SetActive();
