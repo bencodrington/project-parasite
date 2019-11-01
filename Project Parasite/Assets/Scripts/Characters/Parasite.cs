@@ -146,6 +146,13 @@ public class Parasite : Character {
 	}
 	
 	#endregion
+
+	protected override void OnAwake() {
+		// If this is the local player, don't make footsteps play spatially relative to the parasite's listener
+		if (HasAuthority()) {
+			GetComponentInChildren<RandomSoundSet>().rolloff = false;
+		}
+	}
 	
 	protected override void OnStart() {
 		screechAudioSource = AudioManager.AddAudioSource(gameObject, screechSound, .2f, true);

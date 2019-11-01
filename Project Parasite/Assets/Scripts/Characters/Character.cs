@@ -84,6 +84,7 @@ public abstract class Character : MonoBehaviourPun {
 
 	void Awake() {
 		GeneratePhysicsEntity();
+		OnAwake();
 	}
 
 	void Start() {
@@ -240,6 +241,8 @@ public abstract class Character : MonoBehaviourPun {
 
 	protected abstract void HandleInput();
 
+	// Overridden by child classes to be called by the base Awake() method
+	protected virtual void OnAwake() {}
 	// Overridden by child classes to be called by the base Start() method
 	protected virtual void OnStart() {}
 	// Overridden by child classes to be called by the base Update() method
