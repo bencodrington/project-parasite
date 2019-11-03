@@ -34,6 +34,7 @@ public class InfoScreen : MonoBehaviour
             StopCoroutine(printing);
         }
         textMesh.text = "";
+        exclamationAnimator.SetTrigger("Reset");
     }
     
     public void StartPrinting() {
@@ -43,6 +44,7 @@ public class InfoScreen : MonoBehaviour
         }
         printing = StartCoroutine(Printing());
         exclamationAnimator.SetTrigger("Triggered");
+        Debug.Log(exclamationAnimator);
     }
     
     #endregion
