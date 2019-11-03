@@ -1,0 +1,25 @@
+fileFormatVersion: 2
+guid: 9ec74280dbbe4c748bb6d793e72c4031
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Laconic
+  fontNames:
+  - Laconic
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 89c2c4f44295aca41887cc07e190ab52, type: 3}
+  - {fileID: 12800000, guid: 3a5b450b369adf1479551b40d14a1c2e, type: 3}
+  - {fileID: 12800000, guid: 4f4eb99c2ed549e49acdb17e1ba1f983, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
