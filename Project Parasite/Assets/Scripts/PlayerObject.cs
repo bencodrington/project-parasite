@@ -32,7 +32,15 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 					Vector3 spawnPoint = (Vector2)EventCodes.GetEventContentAtPosition(photonEvent, 2);
 					characterSpawner = new CharacterSpawner();
 					// Spawn Character of type `assignedCharacterType` across clients
-					Character character = characterSpawner.SpawnPlayerCharacter(assignedCharacterType, spawnPoint, Vector2.zero);
+					Character character = characterSpawner.SpawnPlayerCharacter(
+												assignedCharacterType,
+												spawnPoint,
+												Vector2.zero,
+												true,
+												true,
+												null,
+												false,
+												PhotonNetwork.LocalPlayer.NickName);
 					character.gameObject.AddComponent<AudioListener>();
 				}
 				break;

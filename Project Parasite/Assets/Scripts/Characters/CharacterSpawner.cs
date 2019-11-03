@@ -36,7 +36,8 @@ public class CharacterSpawner
 					bool forceCameraSnap = true,
 					bool shouldCameraFollow = true,
 					InputSource inputSource = null,
-					bool preserveParasiteHealth = false) {
+					bool preserveParasiteHealth = false,
+					string name = null) {
 		if (inputSource == null) {
 			inputSource = new PlayerInput();
 		}
@@ -65,6 +66,7 @@ public class CharacterSpawner
             parasiteData = new ParasiteData(this, deathHandler);
 		}
 		character.SetInputSource(inputSource);
+		character.characterName = name;
 		return character;
 	}
 

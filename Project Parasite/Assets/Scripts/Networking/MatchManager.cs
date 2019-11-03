@@ -12,6 +12,8 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
     #region [Public Variables]
 
+    public const string DEFAULT_PLAYER_NAME = "Anonymous Player";
+
     // Use the singleton pattern, as there should only ever
     //  be one MatchManager per client
     public static MatchManager Instance;
@@ -47,13 +49,14 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     Dictionary<int, bool> playersReady;
     bool isRandomParasite = false;
     TutorialManager tutorialManager;
+    GameObject localPlayerObject;
 
     #endregion
 
     #region [Public Methods]
 
     public void Connect() {
-        StoreClientName("Anonymous Player");
+        StoreClientName(DEFAULT_PLAYER_NAME);
         // Entry point of all networking
         if (PhotonNetwork.IsConnected) {
             PhotonNetwork.JoinRandomRoom();
@@ -84,13 +87,14 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     }
 
     public void StartTutorial(CharacterType type) {
+        StoreClientName(DEFAULT_PLAYER_NAME);
         // NOTE: photon network must be set to offline mode BEFORE hiding
         //  the menu, as doing so counts as 'joining a room' which will show
         //  the lobby
         PhotonNetwork.OfflineMode = true;
         UiManager.Instance.HideMenu();
         NpcSpawnData spawnData = type == CharacterType.Parasite ? parasiteTutorialNpcSpawnData : hunterTutorialNpcSpawnData;
-        tutorialManager = new TutorialManager(type, spawnData);
+        tutorialManager = new TutorialManager(type, spawnData, PhotonNetwork.LocalPlayer.NickName);
     }
 
     public void EndTutorial() {
@@ -231,7 +235,8 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     }
 
     void InstantiatePlayerObject() {
-        Instantiate(playerObjectPrefab, Vector3.zero, Quaternion.identity);
+        if (localPlayerObject != null) { return; }
+        localPlayerObject = Instantiate(playerObjectPrefab, Vector3.zero, Quaternion.identity);
     }
 
     void StartGame() {

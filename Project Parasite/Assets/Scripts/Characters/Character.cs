@@ -9,6 +9,13 @@ public abstract class Character : MonoBehaviourPun {
 	
 	// Used for sprite flipping and rotating
 	public SpriteTransform spriteTransform {get; private set;}
+	// Used for displaying the player's name above the character, set in the inspector
+	public Nametag nametag;
+	// Used for updating the associated nametag
+	public string characterName {
+		get { return nametag.fullName; }
+		set { nametag.SetName(value); }
+	}
 	
 	#endregion
 	

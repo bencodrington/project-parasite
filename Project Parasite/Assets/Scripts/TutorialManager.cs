@@ -29,15 +29,18 @@ public class TutorialManager
     TriggerZone[] triggerZones;
     InfoScreen[] infoScreens;
     NPCInfectionDetector detector;
+
+    string localName;
     
     #endregion
 
     #region [Public Methods]
 
-    public TutorialManager(CharacterType type, NpcSpawnData spawnData = null) {
+    public TutorialManager(CharacterType type, NpcSpawnData spawnData = null, string nickname = "") {
         parasitesStillAlive = 0;
         characterSpawner = type == CharacterType.Parasite ? new CharacterSpawner(Restart) : new CharacterSpawner();
         characterType = type;
+        localName = nickname;
         SpawnPlayer();
         UiManager.Instance.SetCharacterType(type);
         UiManager.Instance.DeactivateControls();
@@ -129,7 +132,16 @@ public class TutorialManager
     
     void SpawnPlayer() {
         Vector2 spawnCoords = characterType == CharacterType.Parasite ? PARASITE_SPAWN_COORDINATES : HUNTER_SPAWN_COORDINATES;
-        characterSpawner.SpawnPlayerCharacter(characterType, spawnCoords, Vector2.zero).gameObject.AddComponent<AudioListener>();
+        characterSpawner.SpawnPlayerCharacter(
+            characterType,
+            spawnCoords,
+            Vector2.zero,
+            true,
+            true,
+            null,
+            false,
+            localName
+            ).gameObject.AddComponent<AudioListener>();
     }
 
     void InstantiatePauseOverlay() {

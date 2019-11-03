@@ -107,6 +107,8 @@ public class NpcManager : IOnEventCallback {
 			//	gets fried
 			npc.CharacterSpawner = new CharacterSpawner(TutorialManager.OnParasiteKilled);
 		}
+		// Hide default "[Player Name]" nametag text
+		npc.characterName = null;
 		NpcList.Add(npc);
 	}
 
