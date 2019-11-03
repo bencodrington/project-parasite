@@ -44,7 +44,6 @@ public class InfoScreen : MonoBehaviour
         }
         printing = StartCoroutine(Printing());
         exclamationAnimator.SetTrigger("Triggered");
-        Debug.Log(exclamationAnimator);
     }
     
     #endregion
