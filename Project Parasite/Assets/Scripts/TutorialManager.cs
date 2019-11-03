@@ -84,9 +84,10 @@ public class TutorialManager
         GameObject.Destroy(pauseOverlay);
         // OrbManager is used in the parasite tutorial to manage the static
         //  orbs that are part of the level
-        if (orbManager == null) { return; }
-        orbManager.DestroyOrbs();
-        orbManager = null;
+        if (orbManager != null) {
+            orbManager.DestroyOrbs();
+            orbManager = null;
+        }
         foreach(TriggerZone zone in triggerZones) {
             zone.Reset();
         }
