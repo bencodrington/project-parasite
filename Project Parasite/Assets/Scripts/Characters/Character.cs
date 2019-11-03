@@ -11,11 +11,6 @@ public abstract class Character : MonoBehaviourPun {
 	public SpriteTransform spriteTransform {get; private set;}
 	// Used for displaying the player's name above the character, set in the inspector
 	public Nametag nametag;
-	// Used for updating the associated nametag
-	public string characterName {
-		get { return nametag.fullName; }
-		set { nametag.SetName(value); }
-	}
 	
 	#endregion
 	
@@ -37,6 +32,7 @@ public abstract class Character : MonoBehaviourPun {
 	protected bool isMovingDown;
 
     protected InputSource input;
+	protected string characterName;
 
 	#region [Private Variables]
 	
@@ -241,6 +237,16 @@ public abstract class Character : MonoBehaviourPun {
 		OnCharacterDestroy();
 		PhotonNetwork.Destroy(gameObject);
 	}
+
+	public void SetName(string newName, bool broadcastUpdate = true) {
+		if (broadcastUpdate) {
+			photonView.RPC("RpcSetName", RpcTarget.All ,newName);
+		} else {
+			// This occurs when parasites infect NPC's, we don't need to let hunter clients know
+			nametag.SetName(newName);
+		}
+		characterName = newName;
+	}
 	
 	#endregion
 
@@ -439,6 +445,11 @@ public abstract class Character : MonoBehaviourPun {
 	[PunRPC]
 	protected void AddRemoteInputSource() {
 		input = new RemoteInputSource();
+	}
+
+	[PunRPC]
+	protected void RpcSetName(string newName) {
+		nametag.SetName(newName);
 	}
 
 	protected void InteractWithObjectsInRange() {

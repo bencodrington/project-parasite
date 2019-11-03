@@ -177,6 +177,8 @@ public class NonPlayerCharacter : Character {
 		// Return npc to the same render layer as the other NPCs
 		SetRenderLayer("Characters");
 		SetInputSource(originalInputSource != null ? originalInputSource : input);
+		// Remove Parasite player's name
+		SetName(null);
 	}
 
 	void DespawnSelf() {
@@ -192,7 +194,8 @@ public class NonPlayerCharacter : Character {
 					false,	// Force Camera Snap
 					false,	// Should Camera Follow
 					input,
-					true	// Preserve Parasite Health
+					true,	// Preserve Parasite Health
+					characterName
 					);
 		
 		if (input.ShouldCameraFollowOwner()) {

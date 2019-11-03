@@ -66,7 +66,7 @@ public class CharacterSpawner
             parasiteData = new ParasiteData(this, deathHandler);
 		}
 		character.SetInputSource(inputSource);
-		character.characterName = name;
+		character.SetName(name);
 		return character;
 	}
 

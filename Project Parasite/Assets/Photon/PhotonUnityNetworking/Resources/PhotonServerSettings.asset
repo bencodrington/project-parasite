@@ -44,5 +44,6 @@ MonoBehaviour:
   - AddRemoteInputSource
   - RpcSetRemoteIsChargingPounce
   - RpcChangeToVampColour
+  - RpcSetName
   DisableAutoOpenWizard: 1
   ShowSettings: 1

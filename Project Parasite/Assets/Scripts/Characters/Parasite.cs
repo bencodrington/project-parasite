@@ -237,6 +237,7 @@ public class Parasite : Character {
 		npc.photonView.RequestOwnership();
 		// Store spawner for eventual transfer back to parasite
 		CharacterSpawner.SetCharacter(npc);
+		npc.SetName(characterName, false);
 		// Set isInfected to true/update sprite on new authority's client
 		npc.Infect(input);
 		// Update client's camera and render settings to reflect new character
