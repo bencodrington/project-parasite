@@ -6,8 +6,8 @@ using Photon.Pun;
 
 public class ClientName : MonoBehaviour {
 	void Start () {
-		if (PhotonNetwork.NickName != null) {
-			GetComponent<Text>().text = "Name: " + PhotonNetwork.NickName;
+		if (PhotonNetwork.LocalPlayer.NickName != null) {
+			GetComponent<Text>().text = "Name: " + PhotonNetwork.LocalPlayer.NickName;
 		}
 	}
 }
