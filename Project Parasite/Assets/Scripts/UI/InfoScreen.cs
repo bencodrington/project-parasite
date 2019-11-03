@@ -36,6 +36,15 @@ public class InfoScreen : MonoBehaviour
         textMesh.text = "";
     }
     
+    public void StartPrinting() {
+        if (printing != null) {
+            StopCoroutine(printing);
+            textMesh.text = "";
+        }
+        printing = StartCoroutine(Printing());
+        exclamationAnimator.SetTrigger("Triggered");
+    }
+    
     #endregion
 
     #region [MonoBehaviour Callbacks]
@@ -52,15 +61,6 @@ public class InfoScreen : MonoBehaviour
     #endregion
 
     #region [Private Methods]
-    
-    void StartPrinting() {
-        if (printing != null) {
-            StopCoroutine(printing);
-            textMesh.text = "";
-        }
-        printing = StartCoroutine(Printing());
-        exclamationAnimator.SetTrigger("Triggered");
-    }
 
     IEnumerator Printing() {
         int charactersShown = 0;

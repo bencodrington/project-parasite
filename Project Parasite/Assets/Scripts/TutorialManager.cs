@@ -28,6 +28,7 @@ public class TutorialManager
     GameObject pauseOverlay;
     TriggerZone[] triggerZones;
     InfoScreen[] infoScreens;
+    NPCInfectionDetector detector;
     
     #endregion
 
@@ -42,9 +43,11 @@ public class TutorialManager
         UiManager.Instance.DeactivateControls();
         triggerZones = GameObject.FindObjectsOfType<TriggerZone>();
         infoScreens = GameObject.FindObjectsOfType<InfoScreen>();
+        detector = GameObject.FindObjectOfType<NPCInfectionDetector>();
 
         if (spawnData != null) {
             npcManager = new NpcManager(spawnData);
+            detector.ScanForNPCs();
         }
         if (type == CharacterType.Parasite) {
             // Spawn static orbs
@@ -104,6 +107,7 @@ public class TutorialManager
         }
         // Respawn NPCs
         npcManager.Restart();
+        detector.Reset();
     }
 
     // CLEANUP: this and its associated variables should probably be extracted
