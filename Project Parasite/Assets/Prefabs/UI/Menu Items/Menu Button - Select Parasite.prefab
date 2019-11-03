@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterType: 0
-  isSelected: 0
 --- !u!1001 &4609671994955672221
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -24,16 +23,6 @@ PrefabInstance:
     - target: {fileID: 1241366077115434, guid: 7840b311f3c7ef84b9843a9bd4f084fc, type: 3}
       propertyPath: m_Name
       value: Menu Button - Select Parasite
-      objectReference: {fileID: 0}
-    - target: {fileID: 114481709472682086, guid: 7840b311f3c7ef84b9843a9bd4f084fc,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 6294934809579675586}
-    - target: {fileID: 114481709472682086, guid: 7840b311f3c7ef84b9843a9bd4f084fc,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OnClick
       objectReference: {fileID: 0}
     - target: {fileID: 224020933962203252, guid: 7840b311f3c7ef84b9843a9bd4f084fc,
         type: 3}
@@ -140,10 +129,50 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 114481709472682086, guid: 7840b311f3c7ef84b9843a9bd4f084fc,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 6294934809579675586}
+    - target: {fileID: 114481709472682086, guid: 7840b311f3c7ef84b9843a9bd4f084fc,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnClick
+      objectReference: {fileID: 0}
     - target: {fileID: 114576027907151308, guid: 7840b311f3c7ef84b9843a9bd4f084fc,
         type: 3}
       propertyPath: m_Text
       value: Play as Parasite
+      objectReference: {fileID: 0}
+    - target: {fileID: 2463725499078285900, guid: 7840b311f3c7ef84b9843a9bd4f084fc,
+        type: 3}
+      propertyPath: m_text
+      value: Play as Parasite
+      objectReference: {fileID: 0}
+    - target: {fileID: 2463725499078285900, guid: 7840b311f3c7ef84b9843a9bd4f084fc,
+        type: 3}
+      propertyPath: m_havePropertiesChanged
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2463725499078285900, guid: 7840b311f3c7ef84b9843a9bd4f084fc,
+        type: 3}
+      propertyPath: m_isInputParsingRequired
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2463725499078285900, guid: 7840b311f3c7ef84b9843a9bd4f084fc,
+        type: 3}
+      propertyPath: m_textInfo.characterCount
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 2463725499078285900, guid: 7840b311f3c7ef84b9843a9bd4f084fc,
+        type: 3}
+      propertyPath: m_textInfo.spaceCount
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2463725499078285900, guid: 7840b311f3c7ef84b9843a9bd4f084fc,
+        type: 3}
+      propertyPath: m_textInfo.wordCount
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7840b311f3c7ef84b9843a9bd4f084fc, type: 3}

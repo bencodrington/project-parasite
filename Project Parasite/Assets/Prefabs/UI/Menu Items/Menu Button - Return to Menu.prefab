@@ -140,6 +140,38 @@ PrefabInstance:
 
 '
       objectReference: {fileID: 0}
+    - target: {fileID: 2463725499078285900, guid: 7840b311f3c7ef84b9843a9bd4f084fc,
+        type: 3}
+      propertyPath: m_text
+      value: 'Return to Menu
+
+'
+      objectReference: {fileID: 0}
+    - target: {fileID: 2463725499078285900, guid: 7840b311f3c7ef84b9843a9bd4f084fc,
+        type: 3}
+      propertyPath: m_havePropertiesChanged
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2463725499078285900, guid: 7840b311f3c7ef84b9843a9bd4f084fc,
+        type: 3}
+      propertyPath: m_isInputParsingRequired
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2463725499078285900, guid: 7840b311f3c7ef84b9843a9bd4f084fc,
+        type: 3}
+      propertyPath: m_textInfo.characterCount
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 2463725499078285900, guid: 7840b311f3c7ef84b9843a9bd4f084fc,
+        type: 3}
+      propertyPath: m_textInfo.spaceCount
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2463725499078285900, guid: 7840b311f3c7ef84b9843a9bd4f084fc,
+        type: 3}
+      propertyPath: m_textInfo.wordCount
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7840b311f3c7ef84b9843a9bd4f084fc, type: 3}
 --- !u!1 &8253447678094191999 stripped
