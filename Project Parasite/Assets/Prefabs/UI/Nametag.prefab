@@ -57,7 +57,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 21815569476386912, guid: 0874b82a288339641bd2491e59b4e723, type: 2}
+  - {fileID: 2100000, guid: a9c3fd8ada6fd284488d5df1d0213a92, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -74,8 +74,8 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -167223097
+  m_SortingLayer: 2
   m_SortingOrder: 0
 --- !u!33 &5140722829341880257
 MeshFilter:
@@ -116,8 +116,7 @@ MonoBehaviour:
   m_text: '[Player Name]'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0874b82a288339641bd2491e59b4e723, type: 2}
-  m_sharedMaterial: {fileID: 21815569476386912, guid: 0874b82a288339641bd2491e59b4e723,
-    type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: a9c3fd8ada6fd284488d5df1d0213a92, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -191,11 +190,11 @@ MonoBehaviour:
     lineCount: 1
     pageCount: 1
     materialCount: 1
-  m_havePropertiesChanged: 0
+  m_havePropertiesChanged: 1
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_spriteAnimator: {fileID: 0}
-  m_isInputParsingRequired: 0
+  m_isInputParsingRequired: 1
   m_inputSource: 0
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 8613200508851007495}

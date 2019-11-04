@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4228094797779830519}
   - component: {fileID: 4594031062278196731}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -89,7 +89,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1519516873328611695}
   - component: {fileID: 1964176731014175162}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Exclamation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -145,7 +145,7 @@ GameObject:
   - component: {fileID: 6737470980654368112}
   - component: {fileID: 6737470980654368113}
   - component: {fileID: 6737470980654368140}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Info Screen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -206,8 +206,8 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1112558215
+  m_SortingLayer: -1
   m_SortingOrder: 0
 --- !u!33 &6737470980654368115
 MeshFilter:
@@ -323,11 +323,11 @@ MonoBehaviour:
     lineCount: 1
     pageCount: 1
     materialCount: 1
-  m_havePropertiesChanged: 0
+  m_havePropertiesChanged: 1
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_spriteAnimator: {fileID: 0}
-  m_isInputParsingRequired: 0
+  m_isInputParsingRequired: 1
   m_inputSource: 0
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 6737470980654368114}
@@ -365,7 +365,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2791460103105875733}
   - component: {fileID: 8140870337515979731}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Rectangle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
