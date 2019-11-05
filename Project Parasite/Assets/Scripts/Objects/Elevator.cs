@@ -28,7 +28,8 @@ public class Elevator : MonoBehaviourPun {
 	const float BUTTON_SPACING = 0.6f;
 	Vector2 SIZE = new Vector2(2, 3);
 	float[] stopYCoordinates;
-	int targetStop;
+	// The index of the stop this elevator is currently heading to
+	int targetStop = -1;
 	Vector3 estimatedServerPosition;
 	bool isMoving = false;
 	
@@ -86,7 +87,8 @@ public class Elevator : MonoBehaviourPun {
 	
 	void Awake() {
 		callFields = new List<ElevatorCallField>();
-		elevatorArrivedSource = AudioManager.AddAudioSource(gameObject, elevatorArrivedSound, 1, true);
+		elevatorArrivedSource = AudioManager.AddAudioSource(gameObject, elevatorArrivedSound, .5f, true, AudioManager.Instance.sfxGroup);
+		elevatorArrivedSource.dopplerLevel = 0; // Sounds weird and low quality with doppler
 		Transform floorTransform = GetComponentInChildren<BoxCollider2D>().transform;
         physicsEntity = new PlatformPhysicsEntity(floorTransform, .05f, 1f);
 	}
@@ -151,10 +153,13 @@ public class Elevator : MonoBehaviourPun {
 	}
 
 	void DisableButton(int index) {
+		if (index < 0) { return; }
 		buttons[index].isDisabled = true;
 	}
 
 	void EnableButton(int index) {
+		// This occurs if targetStop hasn't been set to a real value yet
+		if (index < 0) { return; }
 		buttons[index].isDisabled = false;
 	}
 
@@ -216,6 +221,9 @@ public class Elevator : MonoBehaviourPun {
 
 	[PunRPC]
 	public void RpcCallToStop(int indexOfStop) {
+		// If we're already going there, don't change anything
+		// 	this also stops the 'arrived!' ding from playing if we're already at a stop
+		if (targetStop == indexOfStop) { return; }
 		EnableButton(targetStop);
 		targetStop = indexOfStop;
 		isMoving = true;

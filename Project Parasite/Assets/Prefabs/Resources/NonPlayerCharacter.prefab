@@ -1937,11 +1937,6 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 5140722829341880257, guid: d593eac8cdfdeb44ca06e94681023e96,
-        type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 1397539869597304405, guid: d593eac8cdfdeb44ca06e94681023e96,
         type: 3}
       propertyPath: m_havePropertiesChanged
@@ -1951,6 +1946,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_isInputParsingRequired
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5140722829341880257, guid: d593eac8cdfdeb44ca06e94681023e96,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d593eac8cdfdeb44ca06e94681023e96, type: 3}

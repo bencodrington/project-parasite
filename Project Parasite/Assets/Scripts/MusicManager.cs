@@ -24,7 +24,6 @@ public class MusicManager : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         audioSource.clip = menuSong;
         audioSource.loop = true;
-        audioSource.volume = 0.1f;
         audioSource.Play();
     }
     

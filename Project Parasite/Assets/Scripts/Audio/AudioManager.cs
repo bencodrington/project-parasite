@@ -8,13 +8,17 @@ public class AudioManager : MonoBehaviour {
     #region [Public Variables]
     
     public AudioMixerGroup master;
+    public AudioMixerGroup sfxGroup;
+    public AudioMixerGroup ungrouped;
+    public AudioMixerGroup sidechainGroup;
+    public AudioMixerGroup heartbeatGroup;
     public static AudioManager Instance {get; private set;}
     
     #endregion
 
     #region [Public Methods]
     
-	public static AudioSource AddAudioSource(GameObject gameObject, AudioClip clip = null, float volume = 1f, bool rollOff = false) {
+	public static AudioSource AddAudioSource(GameObject gameObject, AudioClip clip = null, float volume = 1f, bool rollOff = false, AudioMixerGroup group = null) {
 		AudioSource newSource;
 		newSource = gameObject.AddComponent<AudioSource>();
 		newSource.clip = clip;
@@ -26,7 +30,7 @@ public class AudioManager : MonoBehaviour {
 			newSource.maxDistance = 15;
 			newSource.spatialBlend = 1; // Necessary for volume rolloff to take effect
 		}
-		newSource.outputAudioMixerGroup = Instance.master;
+		newSource.outputAudioMixerGroup = group == null ? Instance.ungrouped : group;
 		return newSource;
 	}
     

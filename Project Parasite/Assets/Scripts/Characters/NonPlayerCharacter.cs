@@ -112,7 +112,7 @@ public class NonPlayerCharacter : Character {
 	protected override void OnStart() {
 		burstIndicator = GetComponentInChildren<BurstIndicator>();
 		burstIndicator.SetTimeToFill(MIN_BURST_TIME);
-		alertSource = AudioManager.AddAudioSource(gameObject, null, 1, true);
+		alertSource = AudioManager.AddAudioSource(gameObject, null, 1, true, AudioManager.Instance.sfxGroup);
 	}
 
 	#region [MonoBehaviour Callbacks]

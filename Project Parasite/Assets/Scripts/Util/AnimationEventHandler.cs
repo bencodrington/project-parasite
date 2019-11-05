@@ -18,7 +18,8 @@ public class AnimationEventHandler: MonoBehaviour
     #region [MonoBehaviour Callbacks]
     
     void Start() {
-        source = AudioManager.AddAudioSource(gameObject, clip, 1, rolloff);
+        // CLEANUP: specific to burst indicator drops
+        source = AudioManager.AddAudioSource(gameObject, clip, 1, rolloff, AudioManager.Instance.heartbeatGroup);
     }
     
     #endregion
