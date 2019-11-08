@@ -8,6 +8,7 @@ public class ParasiteData
 	public const int STARTING_HEALTH = 100;
 
 	public static GameObject RegainedHealthPrefab;
+	public static GameObject LostHealthPrefab;
 	public bool isVamparasite {get; private set;}
 
 	#endregion
@@ -19,7 +20,7 @@ public class ParasiteData
 			return isVamparasite ? 175 : 100;
 		}
 	}
-	Vector2 HEALTH_ALERT_OFFSET = new Vector2(0, 0.5f);
+	Vector2 HEALTH_ALERT_OFFSET = new Vector2(0, 0.75f);
 	const int HEAL_AMOUNT_DEFAULT = 5;
 	const int HEAL_AMOUNT_VAMPARASITE = 25;
 
@@ -27,14 +28,11 @@ public class ParasiteData
 	int ParasiteHealth {
 		get { return _parasiteHealth; }
 		set {
-			bool isTakingDamage = value < _parasiteHealth;
 			int oldParasiteHealth = _parasiteHealth;
 			_parasiteHealth = Mathf.Clamp(value, 0, MaxHealth);
-			bool isRegainingHealth = _parasiteHealth > oldParasiteHealth;
-			if (isRegainingHealth) {
-				SpawnHealthRegainedAlert(_parasiteHealth - oldParasiteHealth);
-			}
-			UiManager.Instance.UpdateHealthObject(_parasiteHealth, isTakingDamage, isRegainingHealth);
+			if (_parasiteHealth == oldParasiteHealth) { return; }
+			OnHealthChanged(_parasiteHealth - oldParasiteHealth);
+			UiManager.Instance.UpdateHealthObject(_parasiteHealth, _parasiteHealth < oldParasiteHealth, _parasiteHealth > oldParasiteHealth);
 			if (value <= 0 && !hasHandledDeath) {
 				deathHandler(owner);
 				hasHandledDeath = true;
@@ -46,6 +44,9 @@ public class ParasiteData
 
 	CharacterSpawner owner;
 	DeathHandler deathHandler;
+	// CLEANUP: update name to reflect that it's more generic now
+	PlatformCalledAlert lostHealthAlert;
+	int lostHealthAlertValue;
     
     #endregion
 
@@ -99,22 +100,44 @@ public class ParasiteData
 		EventCodes.RaiseGameOverEvent(CharacterType.Hunter);
 	}
 
-	void SpawnHealthRegainedAlert(int amountRegained) {
-		if (amountRegained <= 0) { return; }
+	PlatformCalledAlert SpawnHealthChangedAlert(int difference) {
+		if (difference == 0) { return null; }
 		if (RegainedHealthPrefab == null) {
 			// This is the first one to be spawned, so find the prefab
 			RegainedHealthPrefab = Resources.Load("RegainedHealthAlert") as GameObject;
 		}
-		GameObject regainedHealthAlert = GameObject.Instantiate(RegainedHealthPrefab,
+		if (LostHealthPrefab == null) {
+			// This is the first one to be spawned, so find the prefab
+			LostHealthPrefab = Resources.Load("LostHealthAlert") as GameObject;
+		}
+		GameObject healthAlertObject = GameObject.Instantiate(difference > 0 ? RegainedHealthPrefab : LostHealthPrefab,
 					owner.GetCharacter().transform.position + (Vector3)HEALTH_ALERT_OFFSET,
 					Quaternion.identity);
 		// And set this parasite as it's parent in the hierarchy
-		regainedHealthAlert.transform.SetParent(owner.GetCharacter().transform);
-		regainedHealthAlert.GetComponentInChildren<Text>().text = "+" + amountRegained;
+		healthAlertObject.transform.SetParent(owner.GetCharacter().transform);
+		PlatformCalledAlert healthAlert = healthAlertObject.GetComponentInChildren<PlatformCalledAlert>();
+		// Show a '+' if the parasite is regaining health
+		healthAlertObject.GetComponentInChildren<Text>().text = (difference > 0 ? "+" : "") + difference + " HP";
+		return healthAlert;
 	}
     
 	void ParasiteRegainHealth(int health) {
 		ParasiteHealth += health;
+	}
+
+	void OnHealthChanged(int difference) {
+		if (difference > 0) {
+			SpawnHealthChangedAlert(difference);
+		} else if (difference < 0) {
+			if (lostHealthAlert == null) {
+				lostHealthAlert = SpawnHealthChangedAlert(difference);
+				lostHealthAlertValue = difference;
+			} else {
+				lostHealthAlertValue += difference;
+				lostHealthAlert.text.text = (lostHealthAlertValue) + " HP";
+				lostHealthAlert.Restart();
+			}
+		}
 	}
 	
 	#endregion

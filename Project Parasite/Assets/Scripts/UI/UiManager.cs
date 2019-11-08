@@ -134,7 +134,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	}
 
 	public void UpdateHealthObject(int newValue, bool isTakingDamage = false, bool isRegainingHealth = false) {
-		topRightUiText.text = newValue.ToString();
+		topRightUiText.text = newValue.ToString() + " HP";
 		parasiteTakingDamage = isTakingDamage;
 		if (parasiteHealthColourFade != null) {
 			// Cancel fade

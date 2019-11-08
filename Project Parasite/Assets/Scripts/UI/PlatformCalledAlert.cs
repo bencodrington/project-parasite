@@ -8,12 +8,21 @@ public class PlatformCalledAlert : MonoBehaviour
     #region [Public Variables]
     
     public float totalLifetime = .5f;
+    // How far the alert moves over its lifetime
+    public Vector2 displacement = new Vector2(0, .125f);
+    public Text text {get {
+        if (_text == null) {
+            // Cache reference to the text on this object
+            _text = GetComponentInChildren<Text>();
+        }
+        return _text;
+    } private set { _text = value; }
+    }
     
     #endregion
 
     #region [Private Variables]
     
-    Text text;
     Color startingColour;
     Color fadeColour;
     float remainingLifetime;
@@ -22,13 +31,19 @@ public class PlatformCalledAlert : MonoBehaviour
     //  the alert's transform when it is spawned
     // If not, this value is the alert's position when it is spawned
     Vector2 startingOffset;
-    // How far the alert moves over its lifetime
-    Vector2 displacement = new Vector2(0, .125f);
+    Text _text;
     
     #endregion
+
+    #region [Public Methods]
+    
+    public void Restart() {
+        remainingLifetime = totalLifetime;
+    }
+    
+    #endregion
+
     void Start() {
-        // Cache reference to the text on this object
-        text = GetComponentInChildren<Text>();
         // Cache the starting colour
         startingColour = text.color;
         // Fade out and turn bluish over time

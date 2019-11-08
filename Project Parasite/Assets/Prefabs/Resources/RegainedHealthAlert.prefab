@@ -12,6 +12,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: RegainedHealthAlert
       objectReference: {fileID: 0}
+    - target: {fileID: 8237305144963805104, guid: 5b34039ecfeed844aadb625f77ffa998,
+        type: 3}
+      propertyPath: totalLifetime
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 296580648822321041, guid: 5b34039ecfeed844aadb625f77ffa998,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -67,11 +72,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8237305144963805104, guid: 5b34039ecfeed844aadb625f77ffa998,
-        type: 3}
-      propertyPath: totalLifetime
-      value: 0.5
-      objectReference: {fileID: 0}
     - target: {fileID: 296580648554022629, guid: 5b34039ecfeed844aadb625f77ffa998,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -85,7 +85,7 @@ PrefabInstance:
     - target: {fileID: 296580648852816469, guid: 5b34039ecfeed844aadb625f77ffa998,
         type: 3}
       propertyPath: m_Text
-      value: +25
+      value: +25 HP
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5b34039ecfeed844aadb625f77ffa998, type: 3}
