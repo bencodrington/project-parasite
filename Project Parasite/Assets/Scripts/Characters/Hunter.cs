@@ -42,6 +42,7 @@ public class Hunter : Character {
 	AudioSource throwOrbAudioSource;
 	AudioSource recallOrbAudioSource;
 	AudioSource backpackAudioSource;
+	HunterAnimationSounds animationSounds;
 	// Backpack's transform is cached so that orbs can be sent and recalled
 	// 	from/to its position
 	Transform backpackTransform;
@@ -76,8 +77,9 @@ public class Hunter : Character {
 			orbBeamRangeManager.shouldShowMarkers = false;
 		}
 		throwOrbAudioSource = AudioManager.AddAudioSource(gameObject, throwOrbSound, 1, true, AudioManager.Instance.sfxGroup);
-		recallOrbAudioSource = AudioManager.AddAudioSource(gameObject, recallSound, 1, true, AudioManager.Instance.sfxGroup);
+		recallOrbAudioSource = AudioManager.AddAudioSource(gameObject, recallSound, 0.5f, true, AudioManager.Instance.sfxGroup);
 		backpackAudioSource = AudioManager.AddAudioSource(gameObject, backpackSound, 1, true, AudioManager.Instance.sfxGroup);
+		animationSounds = GetComponentInChildren<HunterAnimationSounds>();
 		backpackTransform = Utility.GetChildWithTag("OrbDestination", gameObject).transform;
 	}
 
@@ -230,6 +232,10 @@ public class Hunter : Character {
 		bool isFirstClingOnThisWall = wallClingDirection != mostRecentWallClingDirection;
 		// Whether or not this is the first frame we've grabbed this wall
 		bool didJustGrabWall = !wasClingingToWall && IsClingingToWall;
+		if (didJustGrabWall) {
+			// Play wall cling sound
+			animationSounds.PlayWallClingSound();
+		}
 		if (isFirstClingOnThisWall && didJustGrabWall) {
 			// Reset cling time
 			timeSpentClinging = 0;
