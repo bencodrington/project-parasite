@@ -232,6 +232,13 @@ MonoBehaviour:
   nametag: {fileID: 6853035318214026512}
   stats: {fileID: 11400000, guid: d8e7f79a48638e44a891f27cd0c71354, type: 2}
   screechSound: {fileID: 8300000, guid: 4f1d4314cd5fb68469745854852dc50c, type: 3}
+  jumpSound: {fileID: 8300000, guid: 4343ea61f492cc14a8c09c7eb52ded68, type: 3}
+  pounceSound: {fileID: 8300000, guid: 0676491275bd2574fbab5567c7b45e46, type: 3}
+  pounceSecondarySounds:
+  - {fileID: 8300000, guid: 79d2e19c368b9a7478de97d5709a5890, type: 3}
+  - {fileID: 8300000, guid: 189891f874b1bc0448470bb72088f526, type: 3}
+  - {fileID: 8300000, guid: ab53bd498fc70cb498dbd2e6d2a3ebcc, type: 3}
+  - {fileID: 8300000, guid: 5e0ffc383007643408123327d97c27e7, type: 3}
   flashColours:
   - {r: 0.38431373, g: 0.9137255, b: 0.49411765, a: 1}
   - {r: 1, g: 0.34509805, b: 0.93333334, a: 1}

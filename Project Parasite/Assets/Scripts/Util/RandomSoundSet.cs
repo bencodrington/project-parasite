@@ -21,7 +21,7 @@ public class RandomSoundSet : MonoBehaviour
 
     #region [Public Methods]
     
-    void PlayRandom() {
+    public void PlayRandom() {
         audioSource.clip = sounds[Random.Range(0, sounds.Length - 1)];
         audioSource.Play();
     }
@@ -31,7 +31,7 @@ public class RandomSoundSet : MonoBehaviour
     #region [MonoBehaviour Callbacks]
     
     void Start() {
-        audioSource = AudioManager.AddAudioSource(gameObject, null, volume, rolloff);
+        audioSource = AudioManager.AddAudioSource(gameObject, null, volume, rolloff, AudioManager.Instance.sfxGroup);
     }
     
     #endregion

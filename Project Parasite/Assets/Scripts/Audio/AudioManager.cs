@@ -12,6 +12,7 @@ public class AudioManager : MonoBehaviour {
     public AudioMixerGroup ungrouped;
     public AudioMixerGroup sidechainGroup;
     public AudioMixerGroup heartbeatGroup;
+    public AudioMixerGroup uiGroup;
     public static AudioManager Instance {get; private set;}
     
     #endregion

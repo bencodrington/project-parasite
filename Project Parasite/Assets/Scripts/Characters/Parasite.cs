@@ -9,6 +9,9 @@ public class Parasite : Character {
 	#region [Public Variables]
 	
 	public AudioClip screechSound;
+	public AudioClip jumpSound;
+	public AudioClip pounceSound;
+	public AudioClip[] pounceSecondarySounds;
 
 	public Color[] flashColours;
 	
@@ -20,6 +23,9 @@ public class Parasite : Character {
 	const float INFECT_RADIUS = 1f;
 
 	AudioSource screechAudioSource;
+	AudioSource jumpAudioSource;
+	AudioSource pounceAudioSource;
+	RandomSoundSet pounceSecondarySoundSet;
 	
 	Color IS_ATTEMPTING_INFECTION_COLOUR = new Color(1, .5f, 0, 1);
 	Color VAMPARASITE_COLOUR = new Color(0.46f, 0f, 0.17f);
@@ -155,7 +161,13 @@ public class Parasite : Character {
 	}
 	
 	protected override void OnStart() {
-		screechAudioSource = AudioManager.AddAudioSource(gameObject, screechSound, .2f, true);
+		screechAudioSource = AudioManager.AddAudioSource(gameObject, screechSound, .2f, true, AudioManager.Instance.sfxGroup);
+		jumpAudioSource = AudioManager.AddAudioSource(gameObject, jumpSound, 1, true, AudioManager.Instance.sfxGroup);
+		pounceAudioSource = AudioManager.AddAudioSource(gameObject, pounceSound, 0.5f, true, AudioManager.Instance.sfxGroup);
+		pounceSecondarySoundSet = gameObject.AddComponent<RandomSoundSet>();
+		pounceSecondarySoundSet.sounds = pounceSecondarySounds;
+		pounceSecondarySoundSet.rolloff = true;
+		pounceSecondarySoundSet.volume = 0.25f;
 		infectRangeIndicator = GetComponentInChildren<InfectRangeIndicator>();
 		if (HasAuthority()) {
 			infectRangeIndicator.SetOriginTransform(transform);
@@ -226,6 +238,7 @@ public class Parasite : Character {
 
 	void Jump() {
 		physicsEntity.AddVelocity(0, jumpVelocity);
+		jumpAudioSource.Play();
 	}
 
 	void DestroySelf() {
@@ -324,6 +337,8 @@ public class Parasite : Character {
 				// Pounce
 				physicsEntity.AddVelocity(CalculatePounceVelocity());
 				attachedDirection = Utility.Directions.Null;
+				pounceAudioSource.Play();
+				pounceSecondarySoundSet.PlayRandom();
 			}
 			ResetPounceCharge();
 			PounceIndicator.Hide();

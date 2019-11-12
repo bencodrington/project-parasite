@@ -15,6 +15,7 @@ public class NonPlayerCharacter : Character {
 	// One of these sound clips is selected to play when an orb is placed nearby
 	public AudioClip[] alertSounds;
 	public AudioClip popSound;
+	public AudioClip infectSound;
 
 	#endregion
 
@@ -39,6 +40,7 @@ public class NonPlayerCharacter : Character {
 	InputSource originalInputSource;
 
 	AudioSource alertSource;
+	AudioSource infectSource;
 	
 	#endregion
 
@@ -88,6 +90,7 @@ public class NonPlayerCharacter : Character {
 			SetSpriteRenderersColour(Color.red);
 		}
 		isInfected = true;
+		infectSource.Play();
 	}
 
 	public void NearbyOrbAlert(Vector2 atPosition) {
@@ -113,6 +116,7 @@ public class NonPlayerCharacter : Character {
 		burstIndicator = GetComponentInChildren<BurstIndicator>();
 		burstIndicator.SetTimeToFill(MIN_BURST_TIME);
 		alertSource = AudioManager.AddAudioSource(gameObject, null, 1, true, AudioManager.Instance.sfxGroup);
+		infectSource = AudioManager.AddAudioSource(gameObject, infectSound, 0.6f, true, AudioManager.Instance.sfxGroup);
 	}
 
 	#region [MonoBehaviour Callbacks]
