@@ -182,7 +182,7 @@ PrefabInstance:
     - target: {fileID: 6737470980654368141, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 15.93
+      value: 16.65
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368141, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
@@ -247,29 +247,29 @@ PrefabInstance:
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_text
-      value: '[LEFT CLICK] to place a POWER ORB.
+      value: '[LEFT CLICK] in the dotted circle to
 
-        Your suit will REPEL you the HECK away from it.'
+        ORB JUMP up this humongous wall.'
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_textInfo.characterCount
-      value: 82
+      value: 69
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_textInfo.spaceCount
-      value: 16
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_textInfo.wordCount
-      value: 17
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_textInfo.lineCount
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
@@ -5062,12 +5062,12 @@ PrefabInstance:
       propertyPath: m_text
       value: 'RECALL thrown orbs
 
-        with [RIGHT CLICK]'
+        with [RIGHT CLICK].'
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_textInfo.characterCount
-      value: 37
+      value: 38
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
@@ -8102,19 +8102,21 @@ PrefabInstance:
       propertyPath: m_text
       value: 'Welcome aboard, hunter.
 
+
         Time to save some grandpappies.
+
 
         Try RUNNING with [A] & [D].'
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_textInfo.characterCount
-      value: 83
+      value: 85
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_textInfo.spaceCount
-      value: 13
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
@@ -8124,7 +8126,7 @@ PrefabInstance:
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_textInfo.lineCount
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
@@ -8321,19 +8323,22 @@ PrefabInstance:
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_text
-      value: 'Placing TWO OR MORE orbs will create a BEAM.
+      value: 'Placing TWO OR MORE orbs
+
+        will create a BEAM.
+
 
         Good for zapping pesky parasites.'
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_textInfo.characterCount
-      value: 78
+      value: 79
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_textInfo.spaceCount
-      value: 13
+      value: 14
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
@@ -8343,7 +8348,7 @@ PrefabInstance:
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_textInfo.lineCount
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
@@ -125047,7 +125052,7 @@ PrefabInstance:
     - target: {fileID: 6737470980654368141, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 45.33
+      value: 45.05
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368141, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
@@ -125112,7 +125117,10 @@ PrefabInstance:
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_text
-      value: 'GRAB WALLS with [A] & [D].
+      value: 'GRAB WALLS in mid-air with
+
+        [A] & [D].
+
 
         Orb jump off of them to
 
@@ -125121,22 +125129,22 @@ PrefabInstance:
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_textInfo.characterCount
-      value: 76
+      value: 88
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_textInfo.spaceCount
-      value: 15
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_textInfo.wordCount
-      value: 15
+      value: 17
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_textInfo.lineCount
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
@@ -125939,17 +125947,18 @@ PrefabInstance:
 
         can hide INSIDE the seniors.
 
+
         Gross, I know.'
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_textInfo.characterCount
-      value: 68
+      value: 69
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_textInfo.spaceCount
-      value: 12
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
@@ -125959,7 +125968,7 @@ PrefabInstance:
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_textInfo.lineCount
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
