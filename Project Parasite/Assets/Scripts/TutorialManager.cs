@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class TutorialManager
 {
@@ -14,7 +11,8 @@ public class TutorialManager
 
     #region [Private Variables]
     
-    Vector2 PARASITE_SPAWN_COORDINATES = new Vector2(81.5f, -66.25f);
+    // Parasite tutorial, checkpoint right before first NPC: new Vector2(109, -59);
+    Vector2 PARASITE_SPAWN_COORDINATES = new Vector2(81.5f, -66.75f);
     Vector2 HUNTER_SPAWN_COORDINATES = new Vector2(-198, -58f);
 
     CharacterSpawner characterSpawner;
@@ -67,6 +65,7 @@ public class TutorialManager
 	public void PhysicsUpdate() {
 		// Update all characters in the scene
 		// OPTIMIZE: (maybe by going through the cached players and calling PhysicsUpdate for them?)
+        // Note: when caching characters, account for new characters spawning (e.g. parasite disinfect)
 		foreach(Character character in GameObject.FindObjectsOfType<Character>()) {
 			character.PhysicsUpdate();
 		}
