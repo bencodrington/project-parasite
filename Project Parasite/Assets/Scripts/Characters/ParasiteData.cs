@@ -134,7 +134,7 @@ public class ParasiteData
 				lostHealthAlertValue = difference;
 			} else {
 				lostHealthAlertValue += difference;
-				lostHealthAlert.text.text = (lostHealthAlertValue) + " HP";
+				lostHealthAlert.SetText((lostHealthAlertValue) + " HP");
 				lostHealthAlert.Restart();
 			}
 		}

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class PlatformCalledAlert : MonoBehaviour
 {
@@ -10,14 +11,6 @@ public class PlatformCalledAlert : MonoBehaviour
     public float totalLifetime = .5f;
     // How far the alert moves over its lifetime
     public Vector2 displacement = new Vector2(0, .125f);
-    public Text text {get {
-        if (_text == null) {
-            // Cache reference to the text on this object
-            _text = GetComponentInChildren<Text>();
-        }
-        return _text;
-    } private set { _text = value; }
-    }
     
     #endregion
 
@@ -32,6 +25,7 @@ public class PlatformCalledAlert : MonoBehaviour
     // If not, this value is the alert's position when it is spawned
     Vector2 startingOffset;
     Text _text;
+    TextMeshPro _textMeshPro;
     
     #endregion
 
@@ -40,12 +34,21 @@ public class PlatformCalledAlert : MonoBehaviour
     public void Restart() {
         remainingLifetime = totalLifetime;
     }
+
+    public void SetText(string text) {
+        if (_text != null) {
+            _text.text = text;
+        } else {
+            _textMeshPro.text = text;
+        }
+    }
     
     #endregion
 
     void Start() {
+        CacheTextComponent();
         // Cache the starting colour
-        startingColour = text.color;
+        startingColour = GetTextColour();
         // Fade out and turn bluish over time
         fadeColour = new Color(startingColour.r, startingColour.g, 1, 0f);
         remainingLifetime = totalLifetime;
@@ -61,7 +64,7 @@ public class PlatformCalledAlert : MonoBehaviour
             Destroy(gameObject);
         } else {
             // Update colour and position
-            text.color = Color.Lerp(fadeColour, startingColour, remainingLifetime / totalLifetime);
+            SetTextColour(Color.Lerp(fadeColour, startingColour, remainingLifetime / totalLifetime));
             offset = (1 - remainingLifetime / totalLifetime) * displacement;
             transform.position = transform.parent != null
                 ? (Vector2)transform.parent.position + startingOffset + offset
@@ -70,4 +73,34 @@ public class PlatformCalledAlert : MonoBehaviour
             remainingLifetime -= Time.deltaTime;
         }
     }
+    
+    #region [Private Methods]
+    
+    void CacheTextComponent() {
+        if (_text == null && _textMeshPro == null) {
+            // Cache reference to the text on this object
+            _text = GetComponentInChildren<Text>();
+            if (_text == null) {
+                // This prefab variant is using TextMeshPro
+                _textMeshPro = GetComponentInChildren<TextMeshPro>();
+            }
+        }
+    }
+
+    Color GetTextColour() {
+        if (_text != null) {
+            return _text.color;
+        }
+        return _textMeshPro.color;
+    }
+
+    void SetTextColour(Color colour) {
+        if (_text != null) {
+            _text.color = colour;
+            return;
+        }
+        _textMeshPro.color = colour;
+    }
+    
+    #endregion
 }

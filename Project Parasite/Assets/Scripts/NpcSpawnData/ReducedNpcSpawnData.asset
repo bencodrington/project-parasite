@@ -20,10 +20,4 @@ MonoBehaviour:
   - isStationary: 0
     isInfected: 0
     coordinates: {x: -30, y: -45}
-  - isStationary: 0
-    isInfected: 0
-    coordinates: {x: -50, y: -59}
-  - isStationary: 0
-    isInfected: 0
-    coordinates: {x: -32, y: -79}
   playableCharacterSpawnPoints: []
