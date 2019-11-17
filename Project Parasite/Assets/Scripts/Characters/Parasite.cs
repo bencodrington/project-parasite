@@ -353,6 +353,11 @@ public class Parasite : Character {
 			if (npc != null) {
 				InfectNpc(npc.transform.parent.GetComponent<NonPlayerCharacter>());
 				DestroySelf();
+			} else if (input.isJustPressed(PlayerInput.Key.action2) && infectRangeIndicator.InRangeOfHunter()) {
+				Instantiate(Resources.Load("CantInfectHunterAlert") as GameObject,
+					transform.position,
+					Quaternion.identity)
+				.transform.SetParent(transform);
 			}
 		} else {
 			IsAttemptingInfection = false;

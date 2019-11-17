@@ -17,6 +17,14 @@ public class InfectRangeIndicator : RangeIndicator
     #region [Public Variables]
 
     public Collider2D GetNpcCollider() { return npcCollider; }
+
+    public bool InRangeOfHunter() {
+        return (Physics2D.OverlapCircle(transform.position,
+                INFECT_RADIUS,
+                Utility.GetLayerMask(CharacterType.Hunter)
+            ) != null
+        );
+    }
     
     #endregion
 

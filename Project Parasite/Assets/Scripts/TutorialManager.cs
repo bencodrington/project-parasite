@@ -11,7 +11,9 @@ public class TutorialManager
 
     #region [Private Variables]
     
-    // Parasite tutorial, checkpoint right before first NPC: new Vector2(109, -59);
+    // Parasite tutorial, checkpoint right before first NPC: 
+    // Vector2 PARASITE_SPAWN_COORDINATES = new Vector2(109, -59);
+    // Actual spawn coordinates:
     Vector2 PARASITE_SPAWN_COORDINATES = new Vector2(81.5f, -66.75f);
     Vector2 HUNTER_SPAWN_COORDINATES = new Vector2(-198, -58f);
 

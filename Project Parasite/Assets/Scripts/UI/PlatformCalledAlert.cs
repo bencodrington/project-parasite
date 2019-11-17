@@ -36,6 +36,7 @@ public class PlatformCalledAlert : MonoBehaviour
     }
 
     public void SetText(string text) {
+        CacheTextComponent();
         if (_text != null) {
             _text.text = text;
         } else {
