@@ -77,11 +77,6 @@ PrefabInstance:
       propertyPath: displacement.y
       value: 0.25
       objectReference: {fileID: 0}
-    - target: {fileID: 5233409681234123258, guid: 4df0483cd63136e4fa77ad54a976f7a3,
-        type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 6949823853380070660, guid: 4df0483cd63136e4fa77ad54a976f7a3,
         type: 3}
       propertyPath: m_text
@@ -142,17 +137,22 @@ PrefabInstance:
     - target: {fileID: 6949823853380070660, guid: 4df0483cd63136e4fa77ad54a976f7a3,
         type: 3}
       propertyPath: m_fontColor.g
-      value: 0.3537736
+      value: 0.55984706
       objectReference: {fileID: 0}
     - target: {fileID: 6949823853380070660, guid: 4df0483cd63136e4fa77ad54a976f7a3,
         type: 3}
       propertyPath: m_fontColor.b
-      value: 0.3537736
+      value: 0.36320752
       objectReference: {fileID: 0}
     - target: {fileID: 6949823853380070660, guid: 4df0483cd63136e4fa77ad54a976f7a3,
         type: 3}
       propertyPath: m_fontColor32.rgba
-      value: 4284111615
+      value: 4284255999
+      objectReference: {fileID: 0}
+    - target: {fileID: 5233409681234123258, guid: 4df0483cd63136e4fa77ad54a976f7a3,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 2485455673269737652, guid: 4df0483cd63136e4fa77ad54a976f7a3,
         type: 3}

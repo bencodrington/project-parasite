@@ -14,6 +14,8 @@ public class Parasite : Character {
 	public AudioClip[] pounceSecondarySounds;
 
 	public Color[] flashColours;
+	public Color IS_ATTEMPTING_INFECTION_COLOUR;
+	public Color VAMPARASITE_COLOUR = new Color(0.46f, 0f, 0.17f);
 	
 	#endregion
 
@@ -27,8 +29,6 @@ public class Parasite : Character {
 	AudioSource pounceAudioSource;
 	RandomSoundSet pounceSecondarySoundSet;
 	
-	Color IS_ATTEMPTING_INFECTION_COLOUR = new Color(1, .5f, 0, 1);
-	Color VAMPARASITE_COLOUR = new Color(0.46f, 0f, 0.17f);
 	Color restingColour = Color.white;
 
 	// Used for cycling colours
