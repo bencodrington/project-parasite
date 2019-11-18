@@ -144,6 +144,11 @@ public class Parasite : Character {
 				shouldRun = isMovingLeft || isMovingRight;
 			}
 			animator.SetBool("isRunning", shouldRun);
+			animator.SetBool("isOnGround",
+				attachedDirection != Utility.Directions.Null || physicsEntity.IsOnGround()
+			);
+			animator.SetBool("isAscending", physicsEntity.IsAscending());
+			animator.SetFloat("xSpeed", physicsEntity.GetVelocity().x);
 		}
 	}
 
