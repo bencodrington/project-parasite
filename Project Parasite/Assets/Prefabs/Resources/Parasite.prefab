@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef12b756327c1af4b809b4c1191d0526, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pounceChargeSound: {fileID: 8300000, guid: f789460ca290d344cb41c6e270825da3, type: 3}
 --- !u!1 &133
 GameObject:
   m_ObjectHideFlags: 0
