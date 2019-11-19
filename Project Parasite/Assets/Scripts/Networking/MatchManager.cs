@@ -188,6 +188,9 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
             SetActorReady(actorNumber, isReady);
         } else if (photonEvent.Code == EventCodes.StartGame) {
             if (PhotonNetwork.IsMasterClient) {
+                // Close room to external clients, then start game
+                PhotonNetwork.CurrentRoom.IsOpen = false;
+                PhotonNetwork.CurrentRoom.IsVisible = false;
                 StartGame();
             }
         } else if (photonEvent.Code == EventCodes.ToggleRandomParasite) {
