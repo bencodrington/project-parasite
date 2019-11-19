@@ -42,6 +42,7 @@ public class DefaultNpcInput : InputSource
     }
 
 	public virtual void StartIdling() {
+		hasTarget = false;
 		if (idle != null) {
 			MatchManager.Instance.StopCoroutine(idle);
 		}
@@ -95,7 +96,7 @@ public class DefaultNpcInput : InputSource
 
 	float ModifyTargetToAvoidObstacles(float target) {
 		float pathHitboxHeight = owner.stats.height * 2;
-		// TODO: the below can cause npcs to walk into beams at head height,
+		// The below can cause npcs to walk into beams at head height,
 		//  but also stops the hitbox from being triggered by the floor
 		pathHitboxHeight -= 0.1f;
 		// Calculate corners of hitbox
@@ -142,7 +143,7 @@ public class DefaultNpcInput : InputSource
 	float FindTargetBeforeObstacle(float target) {
 		// Size of box that will be cast to look for obstacles
 		Vector2 size = new Vector2(owner.stats.width * 2, owner.stats.height * 2);
-		// TODO: the below can cause npcs to walk into beams at head height,
+		// The below can cause npcs to walk into beams at head height,
 		//  but also stops the hitbox from being triggered by the floor
 		size.y -= 0.1f;
 		// If we're pressed against a wall, don't let that count as an obstacle
@@ -162,7 +163,6 @@ public class DefaultNpcInput : InputSource
 
 	IEnumerator Idle() {
 		yield return new WaitForSeconds(Random.Range(minTimeUntilNewPath, maxTimeUntilNewPath));
-		// CLEANUP: StopCoroutine() should be called when the NPC is destroyed
 		if (owner != null && owner.IsUninfectedNpc()) { 
 			FindNewPath();
 		}

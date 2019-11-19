@@ -17,6 +17,8 @@ public class NonPlayerCharacter : Character {
 	public AudioClip popSound;
 	public AudioClip infectSound;
 
+	public Color INFECTED_COLOUR;
+
 	#endregion
 
 	#region [Private Variables]
@@ -87,7 +89,7 @@ public class NonPlayerCharacter : Character {
 			// We're being infected by a player parasite
 			SetInputSource(parasiteInputSource);
 			// We're on the parasite's client, so update sprite
-			SetSpriteRenderersColour(Color.red);
+			SetSpriteRenderersColour(INFECTED_COLOUR);
 		}
 		isInfected = true;
 		infectSource.Play();
@@ -181,6 +183,11 @@ public class NonPlayerCharacter : Character {
 		// Return npc to the same render layer as the other NPCs
 		SetRenderLayer("Characters");
 		SetInputSource(originalInputSource != null ? originalInputSource : input);
+		if (input is DefaultNpcInput) {
+			// Don't keep target from before we were infected,
+			// 	restart the idle cycle instead
+			((DefaultNpcInput)input).StartIdling();
+		}
 		// Remove Parasite player's name
 		SetName(null);
 	}

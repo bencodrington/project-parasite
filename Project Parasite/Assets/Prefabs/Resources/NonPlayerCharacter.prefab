@@ -68,6 +68,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 86d5f8d986a9a96478a287bf564a849b, type: 3}
   popSound: {fileID: 8300000, guid: 9e95c270274fda843b2d5234eba4b633, type: 3}
   infectSound: {fileID: 8300000, guid: dd2378b356e32df4a8577d89d6c0e3fb, type: 3}
+  INFECTED_COLOUR: {r: 1, g: 0.55984706, b: 0.36320752, a: 1}
 --- !u!114 &574
 MonoBehaviour:
   m_ObjectHideFlags: 0
