@@ -12,6 +12,7 @@ public class Parasite : Character {
 	public AudioClip jumpSound;
 	public AudioClip pounceSound;
 	public AudioClip[] pounceSecondarySounds;
+	public AudioClip wallClingSound;
 
 	public Color[] flashColours;
 	public Color IS_ATTEMPTING_INFECTION_COLOUR;
@@ -27,6 +28,7 @@ public class Parasite : Character {
 	AudioSource screechAudioSource;
 	AudioSource jumpAudioSource;
 	AudioSource pounceAudioSource;
+	AudioSource wallClingAudioSource;
 	RandomSoundSet pounceSecondarySoundSet;
 	
 	Color restingColour = Color.white;
@@ -169,6 +171,7 @@ public class Parasite : Character {
 		screechAudioSource = AudioManager.AddAudioSource(gameObject, screechSound, .2f, true, AudioManager.Instance.sfxGroup);
 		jumpAudioSource = AudioManager.AddAudioSource(gameObject, jumpSound, 1, true, AudioManager.Instance.sfxGroup);
 		pounceAudioSource = AudioManager.AddAudioSource(gameObject, pounceSound, 0.5f, true, AudioManager.Instance.sfxGroup);
+		wallClingAudioSource = AudioManager.AddAudioSource(gameObject, wallClingSound, .5f, true, AudioManager.Instance.sfxGroup);
 		pounceSecondarySoundSet = gameObject.AddComponent<RandomSoundSet>();
 		pounceSecondarySoundSet.sounds = pounceSecondarySounds;
 		pounceSecondarySoundSet.rolloff = true;
@@ -315,6 +318,7 @@ public class Parasite : Character {
 		// Don't update the attached direction if we're charging a pounce
 		// 	(could be stuck to a wall or ceiling, shouldn't have to hold down the button)
 		if (IsChargingPounce()) { return; }
+		Utility.Directions oldDirection = attachedDirection;
 		attachedDirection = Utility.Directions.Null;
 		if (input.isDown(PlayerInput.Key.left) && physicsEntity.IsOnLeftWall()) {
 			attachedDirection = Utility.Directions.Left;
@@ -322,6 +326,9 @@ public class Parasite : Character {
 			attachedDirection = Utility.Directions.Right;
 		} else if (input.isDown(PlayerInput.Key.up) && physicsEntity.IsOnCeiling()) {
 			attachedDirection = Utility.Directions.Up;
+		}
+		if (oldDirection == Utility.Directions.Null && attachedDirection != Utility.Directions.Null) {
+			wallClingAudioSource.Play();
 		}
 	}
 

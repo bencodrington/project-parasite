@@ -240,6 +240,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 189891f874b1bc0448470bb72088f526, type: 3}
   - {fileID: 8300000, guid: ab53bd498fc70cb498dbd2e6d2a3ebcc, type: 3}
   - {fileID: 8300000, guid: 5e0ffc383007643408123327d97c27e7, type: 3}
+  wallClingSound: {fileID: 8300000, guid: 4e435271a9ca34c478652a504f77005f, type: 3}
   flashColours:
   - {r: 0.38431373, g: 0.9137255, b: 0.49411765, a: 1}
   - {r: 1, g: 0.34509805, b: 0.93333334, a: 1}
