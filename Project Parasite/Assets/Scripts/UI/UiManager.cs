@@ -63,6 +63,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	GameObject selectParasiteButton;
 	GameObject selectHunterButton;
 	GameObject returnToMenuPanel;
+	GameObject someoneLeftPanel;
 
 	// Used for cycling parasite health colours
 	Coroutine parasiteHealthColourFade;
@@ -118,6 +119,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	public void ShowMainMenu() {
 		SetTitleScreenActive(true);
 		mainMenu.SetActive(true);
+		lobby.SetActive(false);
 		RemoveHud();
 	}
 
@@ -216,6 +218,11 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	public void ActivateMutation(int index) {
 		ActiveMutations[index].SetActive(true);
 	}
+
+	public void OnSomeoneLeft(string playername) {
+		someoneLeftPanel.SetActive(true);
+		someoneLeftPanel.GetComponentInChildren<TextMeshProUGUI>().text = playername + " left the game.";
+	}
     
     #endregion
 
@@ -238,6 +245,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
         readyToggleButton = FindObjectOfType<ReadyButton>().gameObject;
         randomParasiteToggleButton = FindObjectOfType<RandomParasiteButton>().gameObject;
 		returnToMenuPanel = FindObjectOfType<ReturnToMenuButton>().transform.parent.gameObject;
+		someoneLeftPanel = FindObjectOfType<SomeoneLeftButton>().transform.parent.gameObject;
 		foreach (CharacterSelectButton selectButton in FindObjectsOfType<CharacterSelectButton>()) {
 			if (selectButton.characterType == CharacterType.Parasite) {
 				selectParasiteButton = selectButton.gameObject;
@@ -252,6 +260,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
         readyToggleButton.SetActive(false);
 		randomParasiteToggleButton.SetActive(false);
 		returnToMenuPanel.SetActive(false);
+		someoneLeftPanel.SetActive(false);
 		DeactivateControls();
 		DeactivateMutations();
 

@@ -46,6 +46,10 @@ public class CharacterSelectionManager : IOnEventCallback
         bool exactlyOneParasite = IsExactlyOneParasite();
         return everyoneHasSelected && exactlyOneParasite;
     }
+
+    public void Destroy() {
+        PhotonNetwork.RemoveCallbackTarget(this);
+    }
     
     #endregion
 

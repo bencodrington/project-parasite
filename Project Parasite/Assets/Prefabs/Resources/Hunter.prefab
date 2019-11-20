@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &138
+--- !u!1 &158
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,8 +8,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 300}
-  - component: {fileID: 577}
+  - component: {fileID: 330}
+  - component: {fileID: 631}
   m_Layer: 0
   m_Name: OrbBeamRangeManager
   m_TagString: Untagged
@@ -17,27 +17,27 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &300
+--- !u!4 &330
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 138}
+  m_GameObject: {fileID: 158}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 301}
+  m_Father: {fileID: 331}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &577
+--- !u!114 &631
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 138}
+  m_GameObject: {fileID: 158}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 295af49870b08614cbfe1da1b6c18eaa, type: 3}
@@ -46,7 +46,7 @@ MonoBehaviour:
   indicatorPrefab: {fileID: 1560553297825558, guid: da9a392ec156b834f818186a3b8c48a0,
     type: 3}
   shouldShowMarkers: 1
---- !u!1 &139
+--- !u!1 &159
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -54,8 +54,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 303}
-  - component: {fileID: 447}
+  - component: {fileID: 334}
+  - component: {fileID: 489}
   m_Layer: 12
   m_Name: EnergyCenter
   m_TagString: Untagged
@@ -63,27 +63,27 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &303
+--- !u!4 &334
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 139}
+  m_GameObject: {fileID: 159}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 301}
+  m_Father: {fileID: 331}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!61 &447
+--- !u!61 &489
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 139}
+  m_GameObject: {fileID: 159}
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
@@ -103,7 +103,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.05, y: 0.05}
   m_EdgeRadius: 0
---- !u!1 &140
+--- !u!1 &160
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -111,9 +111,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 301}
-  - component: {fileID: 576}
-  - component: {fileID: 578}
+  - component: {fileID: 331}
+  - component: {fileID: 630}
+  - component: {fileID: 632}
   m_Layer: 11
   m_Name: Hunter
   m_TagString: Untagged
@@ -121,32 +121,32 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &301
+--- !u!4 &331
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 140}
+  m_GameObject: {fileID: 160}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 302}
-  - {fileID: 303}
-  - {fileID: 300}
+  - {fileID: 332}
+  - {fileID: 334}
+  - {fileID: 330}
   - {fileID: 3587286540031416102}
   - {fileID: 221782139955546362}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &576
+--- !u!114 &630
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 140}
+  m_GameObject: {fileID: 160}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6cfb78c37c38843438c58c467e3ed257, type: 3}
@@ -164,13 +164,13 @@ MonoBehaviour:
   orbInactivePrefab: {fileID: 2322067859187784291, guid: 270597ffd891764429ed6d12b6361fd9,
     type: 3}
   isNpcControlled: 0
---- !u!114 &578
+--- !u!114 &632
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 140}
+  m_GameObject: {fileID: 160}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
@@ -186,7 +186,7 @@ MonoBehaviour:
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!1 &141
+--- !u!1 &161
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -194,9 +194,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 302}
-  - component: {fileID: 463}
-  - component: {fileID: 446}
+  - component: {fileID: 332}
+  - component: {fileID: 505}
+  - component: {fileID: 488}
   m_Layer: 11
   m_Name: Sprite
   m_TagString: Untagged
@@ -204,27 +204,27 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &302
+--- !u!4 &332
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 141}
+  m_GameObject: {fileID: 161}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.5, y: 2, z: 1}
   m_Children: []
-  m_Father: {fileID: 301}
+  m_Father: {fileID: 331}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &463
+--- !u!212 &505
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 141}
+  m_GameObject: {fileID: 161}
   m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -266,13 +266,13 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!61 &446
+--- !u!61 &488
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 141}
+  m_GameObject: {fileID: 161}
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
@@ -292,7 +292,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!1 &165
+--- !u!1 &185
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -300,7 +300,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 327}
+  - component: {fileID: 357}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: OrbDestination
@@ -308,13 +308,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &327
+--- !u!4 &357
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 165}
+  m_GameObject: {fileID: 185}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.63, y: -3.71, z: -0.009076461}
   m_LocalScale: {x: 3.333333, y: 3.333333, z: 1}
@@ -322,7 +322,7 @@ Transform:
   m_Father: {fileID: 3587286540031416116}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &454
+--- !u!95 &496
 Animator:
   serializedVersion: 3
   m_ObjectHideFlags: 0
@@ -341,7 +341,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &580
+--- !u!114 &634
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -353,7 +353,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82a3481f0634b26419713e95e305bc39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &6723398362242333703
+--- !u!114 &691
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -368,7 +368,7 @@ MonoBehaviour:
   jumpSound: {fileID: 8300000, guid: 43fe13054d102d7458c23951333e0059, type: 3}
   wallClingSound: {fileID: 8300000, guid: ccd5932cf111b1c4485e1a87ac627015, type: 3}
   wallSlipSound: {fileID: 8300000, guid: 47e30e0b50f8e2e4b93172a36bb71357, type: 3}
---- !u!114 &8863065038137626408
+--- !u!114 &706
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -392,7 +392,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 301}
+    m_TransformParent: {fileID: 331}
     m_Modifications:
     - target: {fileID: 2525532435042078744, guid: d593eac8cdfdeb44ca06e94681023e96,
         type: 3}
@@ -544,7 +544,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 301}
+    m_TransformParent: {fileID: 331}
     m_Modifications:
     - target: {fileID: 100000, guid: 28f8a041f0061bd4b97015ec6ff91987, type: 3}
       propertyPath: m_Name

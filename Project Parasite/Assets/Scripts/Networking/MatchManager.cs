@@ -159,12 +159,27 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     }
 
     public override void OnDisconnected(DisconnectCause cause) {
-        // TODO:
+        Debug.LogWarningFormat("MatchManager: OnDisconnected() was called by PUN with reason: {0}", cause);
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message) {
         Debug.Log("MatchManager:OnJoinRandomFailed(). No random room available, creating one.");
         PhotonNetwork.CreateRoom(null, new RoomOptions { MaxPlayers = MAX_PLAYERS_PER_ROOM });
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer) {
+        // Boot to main menu
+        UiManager.Instance.ShowMainMenu();
+        // If roundmanager exists, end round
+        if (roundManager != null) {
+            roundManager.EndRound();
+        }
+        // Forget previous character selections
+        characterSelectionManager.Destroy();
+        characterSelectionManager = null;
+        PhotonNetwork.Disconnect();
+        // Show message saying who left   
+        UiManager.Instance.OnSomeoneLeft(otherPlayer.NickName);
     }
 
     public override void OnJoinedRoom() {
@@ -188,9 +203,6 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
             SetActorReady(actorNumber, isReady);
         } else if (photonEvent.Code == EventCodes.StartGame) {
             if (PhotonNetwork.IsMasterClient) {
-                // Close room to external clients, then start game
-                PhotonNetwork.CurrentRoom.IsOpen = false;
-                PhotonNetwork.CurrentRoom.IsVisible = false;
                 StartGame();
             }
         } else if (photonEvent.Code == EventCodes.ToggleRandomParasite) {
@@ -243,7 +255,11 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     }
 
     void StartGame() {
+        // Should only called by the master client
         GameObject roundManagerGameObject;
+        // Close room to external clients
+        PhotonNetwork.CurrentRoom.IsOpen = false;
+        PhotonNetwork.CurrentRoom.IsVisible = false;
         // If roundmanager exists, end round
         if (roundManager != null) {
             roundManager.EndRound();
@@ -276,7 +292,6 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
             AreAllPlayersReady() :
             characterSelectionManager.IsValidComposition();
         UiManager.Instance.SetStartGameButtonActive(shouldShow);
-
     }
 
     #endregion
