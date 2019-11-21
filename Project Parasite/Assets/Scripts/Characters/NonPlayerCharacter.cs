@@ -92,7 +92,10 @@ public class NonPlayerCharacter : Character {
 			SetSpriteRenderersColour(INFECTED_COLOUR);
 		}
 		isInfected = true;
-		infectSource.Play();
+		if (infectSource != null) {
+			// When NpcManager spawns infected NPCs, it will infect them before the sound can (or should) be played
+			infectSource.Play();
+		}
 	}
 
 	public void NearbyOrbAlert(Vector2 atPosition) {
