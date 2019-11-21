@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RestartGameButton : MonoBehaviour
+public class LeaveGameButton : MonoBehaviour
 {
-
+    
     #region [Public Methods]
     
-    public void RestartGame() {
-        MatchManager.Instance.SendStartGameEvent();
+    public void OnClick() {
+        MatchManager.Instance.LeaveGame();
     }
     
     #endregion
-    
+
 }

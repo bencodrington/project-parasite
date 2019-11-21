@@ -108,6 +108,18 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         UiManager.Instance.ShowMainMenu();
         UiManager.Instance.SetReturnToMenuPanelActive(false);
     }
+
+    public void LeaveGame() {
+        PhotonNetwork.Disconnect();
+        // Boot to main menu
+        UiManager.Instance.ShowMainMenu();
+        // If roundmanager exists, end round
+        if (roundManager != null) {
+            roundManager.EndRound();
+        }
+        // Forget previous character selections
+        characterSelectionManager.Reset();
+    }
     
     #endregion
 
@@ -285,7 +297,6 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     }
 
     void SetIsRandomParasite(bool isRandom) {
-        Debug.Log("SET IS RANDOM: " + isRandom);
         isRandomParasite = isRandom;
         // Let characterSelectionManager know if it should be active
         characterSelectionManager.SetEnabled(!isRandom);

@@ -120,6 +120,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 		SetTitleScreenActive(true);
 		mainMenu.SetActive(true);
 		lobby.SetActive(false);
+		DestroyGameOverScreen();
 		RemoveHud();
 	}
 
