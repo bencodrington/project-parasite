@@ -121997,7 +121997,7 @@ PrefabInstance:
     - target: {fileID: 6129429194994853348, guid: dd31f1ef052b85f4bb6faa71af07995c,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 31.16
+      value: 28.63
       objectReference: {fileID: 0}
     - target: {fileID: 6129429194994853348, guid: dd31f1ef052b85f4bb6faa71af07995c,
         type: 3}
@@ -128147,24 +128147,24 @@ PrefabInstance:
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_text
-      value: 'INFECTED seniors WON''T FLEE from
+      value: 'Any senior who DOESN''T FLEE from
 
-        your orbs! ZAP ''EM.'
+        your orbs is INFECTED! ZAP ''EM.'
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_textInfo.characterCount
-      value: 52
+      value: 64
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_textInfo.spaceCount
-      value: 8
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
       propertyPath: m_textInfo.wordCount
-      value: 9
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 6737470980654368113, guid: bc967e87642328447a59835dcd3683ad,
         type: 3}
