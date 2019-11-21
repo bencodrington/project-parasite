@@ -14,6 +14,8 @@ public class EventCodes
     public const byte SelectCharacter               = 7;
     public const byte ToggleRandomParasite          = 8;
     public const byte Mutation                      = 9;
+    public const byte RequestCharacterSelections    = 10;
+    public const byte SendCharacterSelections       = 11;
 
     public static void RaiseEventAll(byte eventCode, object[] content) {
         RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };

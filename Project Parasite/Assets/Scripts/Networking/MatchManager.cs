@@ -175,8 +175,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
             roundManager.EndRound();
         }
         // Forget previous character selections
-        characterSelectionManager.Destroy();
-        characterSelectionManager = null;
+        characterSelectionManager.Reset();
         PhotonNetwork.Disconnect();
         // Show message saying who left   
         UiManager.Instance.OnSomeoneLeft(otherPlayer.NickName);
@@ -189,6 +188,10 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
             UiManager.Instance.OnJoinedRoom();
         }
         InstantiatePlayerObject();
+        if (!PhotonNetwork.IsMasterClient) {
+            // We're not the first (master) client, so see what we've missed
+            characterSelectionManager.RequestUpdate();
+        }
     }
 
     #endregion
@@ -207,6 +210,11 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
             }
         } else if (photonEvent.Code == EventCodes.ToggleRandomParasite) {
             SetIsRandomParasite((bool)EventCodes.GetFirstEventContent(photonEvent));
+        } else if (photonEvent.Code == EventCodes.RequestCharacterSelections) {
+            if (!PhotonNetwork.IsMasterClient) { return; }
+            // We're the master client, so re-broadcast whether we're in 'Random Parasite' mode or not
+            object[] content = { isRandomParasite };
+            EventCodes.RaiseEventAll(EventCodes.ToggleRandomParasite, content);
         }
     }
 
@@ -277,6 +285,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     }
 
     void SetIsRandomParasite(bool isRandom) {
+        Debug.Log("SET IS RANDOM: " + isRandom);
         isRandomParasite = isRandom;
         // Let characterSelectionManager know if it should be active
         characterSelectionManager.SetEnabled(!isRandom);

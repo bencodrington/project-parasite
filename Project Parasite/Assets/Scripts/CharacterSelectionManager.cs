@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
@@ -24,8 +25,7 @@ public class CharacterSelectionManager : IOnEventCallback
     public CharacterSelectionManager() {
         // Register to receive events
         PhotonNetwork.AddCallbackTarget(this);
-        // Initialize dictionary of character selections
-        characterSelections = new Dictionary<int, CharacterType>();
+        Reset();
     }
     
     public void SetEnabled(bool newValue) {
@@ -47,8 +47,13 @@ public class CharacterSelectionManager : IOnEventCallback
         return everyoneHasSelected && exactlyOneParasite;
     }
 
-    public void Destroy() {
-        PhotonNetwork.RemoveCallbackTarget(this);
+    public void Reset() {
+        // Initialize dictionary of character selections
+        characterSelections = new Dictionary<int, CharacterType>();
+    }
+
+    public void RequestUpdate() {
+        EventCodes.RaiseEventAll(EventCodes.RequestCharacterSelections, null);
     }
     
     #endregion
@@ -61,6 +66,27 @@ public class CharacterSelectionManager : IOnEventCallback
             CharacterType selectedCharacter  = (CharacterType)content[1];
             // Update characterSelections dictionary
             SetCharacterSelected(actorNumber, selectedCharacter);
+        } else if (photonEvent.Code == EventCodes.RequestCharacterSelections) {
+            if (!PhotonNetwork.IsMasterClient) { return; }
+            // We're the master client, so send the character selections dictionary
+            int[] keys = characterSelections.Keys.ToArray();
+            int[] values = new int[keys.Length];
+            for (int i=0; i < keys.Length; i++) {
+                values[i] = (int)characterSelections[keys[i]];
+            }
+            object[] content = { keys, values };
+            EventCodes.RaiseEventAll(EventCodes.SendCharacterSelections, content);
+        } else if (photonEvent.Code == EventCodes.SendCharacterSelections) {
+            if (PhotonNetwork.IsMasterClient) { return; }
+            // We're not the master client, so in case we were the one who sent the request,
+            //  overwrite our set of character selections with the master's copy
+            Reset();
+            object[] content = (object[])photonEvent.CustomData;
+            int[] keys = (int[])content[0];
+            CharacterType[] values = (CharacterType[])content[1];
+            for (int i = 0; i < keys.Length; i++) {
+                SetCharacterSelected(keys[i], values[i]);
+            }
         }
     }
 
