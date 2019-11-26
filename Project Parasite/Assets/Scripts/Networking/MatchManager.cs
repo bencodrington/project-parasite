@@ -111,6 +111,8 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
     public void LeaveGame() {
         PhotonNetwork.Disconnect();
+        // Stop player from toggling the Escape Menu
+        UiManager.Instance.SetEscMenuValid(false);
         // Boot to main menu
         UiManager.Instance.ShowMainMenu();
         // If roundmanager exists, end round
@@ -180,6 +182,8 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer) {
+        // Stop player from toggling the Escape Menu
+        UiManager.Instance.SetEscMenuValid(false);
         // Boot to main menu
         UiManager.Instance.ShowMainMenu();
         // If roundmanager exists, end round
@@ -217,6 +221,8 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
             // Update playersReady dictionary
             SetActorReady(actorNumber, isReady);
         } else if (photonEvent.Code == EventCodes.StartGame) {
+            // Allow player to toggle the Escape Menu
+            UiManager.Instance.SetEscMenuValid(true);
             if (PhotonNetwork.IsMasterClient) {
                 StartGame();
             }

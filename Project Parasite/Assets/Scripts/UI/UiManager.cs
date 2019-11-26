@@ -65,6 +65,8 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	GameObject returnToMenuPanel;
 	GameObject someoneLeftPanel;
 
+	EscMenu escMenu;
+
 	// Used for cycling parasite health colours
 	Coroutine parasiteHealthColourFade;
 	bool parasiteTakingDamage = false;
@@ -224,6 +226,10 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 		someoneLeftPanel.SetActive(true);
 		someoneLeftPanel.GetComponentInChildren<TextMeshProUGUI>().text = playername + " left the game.";
 	}
+
+	public void SetEscMenuValid(bool isValid) {
+		escMenu.SetValid(isValid);
+	}
     
     #endregion
 
@@ -247,6 +253,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
         randomParasiteToggleButton = FindObjectOfType<RandomParasiteButton>().gameObject;
 		returnToMenuPanel = FindObjectOfType<ReturnToMenuButton>().transform.parent.gameObject;
 		someoneLeftPanel = FindObjectOfType<SomeoneLeftButton>().transform.parent.gameObject;
+		escMenu = FindObjectOfType<EscMenu>();
 		foreach (CharacterSelectButton selectButton in FindObjectsOfType<CharacterSelectButton>()) {
 			if (selectButton.characterType == CharacterType.Parasite) {
 				selectParasiteButton = selectButton.gameObject;
@@ -363,6 +370,8 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     	}
     	// Display NPC count
     	GameObject npcCountObject = Instantiate(NpcCountPrefab, Vector3.zero, Quaternion.identity, canvas);
+		// Draw it underneath the pause menu
+		npcCountObject.transform.SetAsFirstSibling();
     	npcCountObject.GetComponentInChildren<RectTransform>().anchoredPosition = new Vector2(UI_PADDING_DISTANCE, -UI_PADDING_DISTANCE);
         npcCountText = npcCountObject.GetComponentInChildren<Text>();
         // The original SetNpcCount event has likely already happened, so request
