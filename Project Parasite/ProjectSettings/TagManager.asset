@@ -60,6 +60,9 @@ TagManager:
   - name: ClientCharacter
     uniqueID: 1974396419
     locked: 0
+  - name: Foreground
+    uniqueID: 2942377275
+    locked: 0
   - name: Scanners
     uniqueID: 10905597
     locked: 0
