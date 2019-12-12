@@ -11,6 +11,7 @@ TagManager:
   - Main Menu
   - Lobby
   - OrbDestination
+  - Title
   layers:
   - Default
   - TransparentFX
