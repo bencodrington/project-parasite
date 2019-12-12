@@ -55,6 +55,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	Color CONTROL_HIGHLIGHT_COLOUR = Color.yellow;
 
 	GameObject titleScreen;
+	GameObject title;
 	GameObject mainMenu;
 	GameObject lobby;
 	GameObject startGameButton;
@@ -246,6 +247,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
         }
         Instance = this;
 		titleScreen = GameObject.FindWithTag("TitleScreen");
+		title = GameObject.FindWithTag("Title");
 		mainMenu = GameObject.FindGameObjectWithTag("Main Menu");
 		lobby = GameObject.FindGameObjectWithTag("Lobby");
 		startGameButton = GameObject.FindObjectOfType<StartGameButton>().gameObject;
@@ -327,6 +329,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 
     void SetTitleScreenActive(bool isActive) {
         titleScreen.SetActive(isActive);
+        title.SetActive(isActive);
     }
 
     void ShowGameOverScreen(CharacterType victorType) {
