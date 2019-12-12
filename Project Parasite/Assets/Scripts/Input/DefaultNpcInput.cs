@@ -104,8 +104,12 @@ public class DefaultNpcInput : InputSource
 					owner.transform.position.x,
 					owner.transform.position.y + pathHitboxHeight / 2
 				);
+		// Include the space that the npc will take up once they've reached
+		//	their destination, taking into account which direction the NPC is
+		//	trying to move.
+		float npcWidth = target < owner.transform.position.x ? -owner.stats.width : owner.stats.width;
 		Vector2 pathHitboxBottomEnd = new Vector2(
-					target + owner.stats.width, // Include the space that the npc will take up once they've reached their destination
+					target + npcWidth,
 					owner.transform.position.y - pathHitboxHeight / 2
 				);
 		bool isObstacleInTheWay = Physics2D.OverlapArea(pathHitboxTopStart, pathHitboxBottomEnd, Utility.GetLayerMask("npcPathObstacle"));
