@@ -17,8 +17,18 @@ public class BingoScreen : MonoBehaviour
     #region [Private Variables]
     
     string[] PHRASES = new string[]{
+        "bingo bingo bingo",
+        "bingo your face",
+        "heck yeah bingo",
+        "fruity bingo blast",
+        "juicy bingo prizes",
+        "watch your back",
+        "start a riot",
+        "edna you fraud",
+        "bingo never ends",
+        "edna [BLANK] cheats",
         "it's bingo time",
-        "grab your card",
+        "grab your cards",
         "crave that rush",
         "ohana means bingo",
         "yeah baby yeah",
@@ -50,7 +60,7 @@ public class BingoScreen : MonoBehaviour
         }
         // Update textMeshPro components
         leftText.text   = newWords[0];
-        centerText.text = newWords[1];
+        centerText.text = newWords[1] == "[BLANK]" ? "" : newWords[1];
         rightText.text  = newWords[2];
     }
     
