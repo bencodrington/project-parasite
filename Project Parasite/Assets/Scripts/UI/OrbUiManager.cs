@@ -58,21 +58,24 @@ public class OrbUiManager : MonoBehaviour {
 	}
 
 	public void Initialize() {
+		gameObject.SetActive(true);
 		// Reset state of orb UI
 		UpdateOrbSpriteCount(0);
+	}
+
+	public void Deactivate() {
+		gameObject.SetActive(false);
 	}
 	
 	#endregion
 
 	#region [MonoBehaviour Callbacks]
 	
-	void Start() {
+	void Awake() {
 		maxOrbCount = orbSprites.Length;
 		numOrbSpritesEnabled = maxOrbCount;
 		placeholderDefaultColour = orbSpritePlaceholders[0].color;
-		Initialize();
-		// Deactivate self
-		gameObject.SetActive(false);
+		Deactivate();
 	}
 	
 	#endregion

@@ -217,6 +217,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     	}
 		DeactivateControls();
 		DeactivateMutations();
+		orbUiManager.Deactivate();
     }
 
 	public void ActivateMutation(int index) {
