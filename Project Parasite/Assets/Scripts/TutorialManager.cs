@@ -112,7 +112,11 @@ public class TutorialManager
         }
         // Respawn NPCs
         npcManager.Restart();
-        detector.Reset();
+        if (characterType == CharacterType.Parasite) {
+            // NPC Infection Detector is only used in Parasite tutorial
+            //  and will log an error if it's Reset in the Hunter tutorial
+            detector.Reset();
+        }
     }
 
     // CLEANUP: this and its associated variables should probably be extracted
