@@ -285,7 +285,7 @@ public class Hunter : Character {
 		// Make sure orb hasn't been recalled already
 		if (orb == null) { return; }
 		orb.gameObject.SetActive(true);
-		FindObjectOfType<CameraFollow>().ShakeScreen(0.3f, 0.1f);
+		FindObjectOfType<CameraFollow>().ShakeScreen(0.3f, 0.1f, orb.transform.position);
 		AlertNpcsInRange(orb.transform.position);
 		orb.SetActive();
 	}

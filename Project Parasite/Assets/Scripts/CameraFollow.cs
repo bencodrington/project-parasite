@@ -13,6 +13,7 @@ public class CameraFollow : MonoBehaviour {
 
 	Coroutine shakingScreen;
 	float screenShakeOffsetDistance;
+	float currentScreenShakeIntensity = 0;
 	
 	#endregion
 
@@ -26,11 +27,18 @@ public class CameraFollow : MonoBehaviour {
 		}
 	}
 
-	public void ShakeScreen(float intensity, float duration) {
+	public void ShakeScreen(float intensity, float duration, Vector2 coordinates) {
+		float distanceFromTarget = Vector2.Distance(target.position, coordinates);
+		intensity = CalculateIntensity(intensity, distanceFromTarget);
 		if (shakingScreen != null) {
+			if (intensity < currentScreenShakeIntensity) {
+				// Don't overwrite screenshakes with less intense ones
+				return;
+			}
 			StopCoroutine(shakingScreen);
 		}
 		shakingScreen = StartCoroutine(ShakingScreen(duration, intensity));
+		currentScreenShakeIntensity = intensity;
 	}
 	
 	#endregion
@@ -64,6 +72,23 @@ public class CameraFollow : MonoBehaviour {
 			yield return null;
 		}
 		screenShakeOffsetDistance = 0;
+		shakingScreen = null;
+	}
+
+	float CalculateIntensity(float fullIntensity, float distance) {
+		if (distance < 5) {
+			return fullIntensity;
+		}
+		if (distance < 10) {
+			return .8f * fullIntensity;
+		}
+		if (distance < 20) {
+			return .6f * fullIntensity;
+		}
+		if (distance < 30) {
+			return .4f * fullIntensity;
+		}
+		return 0;
 	}
 	
 	#endregion

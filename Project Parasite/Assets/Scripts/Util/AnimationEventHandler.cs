@@ -29,7 +29,7 @@ public class AnimationEventHandler: MonoBehaviour
     void PlaySound() {
         source.Play();
         // CLEANUP:
-        FindObjectOfType<CameraFollow>().ShakeScreen(0.07f, 0.2f);
+        FindObjectOfType<CameraFollow>().ShakeScreen(0.07f, 0.2f, transform.position);
     }
     
     #endregion

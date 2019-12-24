@@ -45,7 +45,7 @@ public class BurstIndicator : MonoBehaviour
     public void StopFilling() {
         isFilling = false;
         float progress = Mathf.Min(timeElapsed / timeToFill, 1);
-        FindObjectOfType<CameraFollow>().ShakeScreen(Mathf.Lerp(0, .25f, progress), 0.2f);
+        FindObjectOfType<CameraFollow>().ShakeScreen(Mathf.Lerp(0, .25f, progress), 0.2f, transform.position);
         burstChargeAudioSource.Stop();
     }
     
@@ -76,7 +76,7 @@ public class BurstIndicator : MonoBehaviour
                 }
                 isFull = true;
             } else {
-                FindObjectOfType<CameraFollow>().ShakeScreen(Mathf.Lerp(0, 0.03f, progress), 0.1f);
+                FindObjectOfType<CameraFollow>().ShakeScreen(Mathf.Lerp(0, 0.03f, progress), 0.1f, transform.position);
             }
         } else {
             isFull = false;
