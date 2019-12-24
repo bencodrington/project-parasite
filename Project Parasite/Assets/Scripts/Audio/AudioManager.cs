@@ -39,11 +39,11 @@ public class AudioManager : MonoBehaviour {
 
     #region [MonoBehaviour Callbacks]
     
-    void Start() {
+    void Awake() {
         if (Instance == null) {
             Instance = MatchManager.Instance.GetComponent<AudioManager>();
         } else {
-            Debug.LogError("AudioManager.Start(): Shouldn't be instantiating a second instance of a singleton class.");
+            Debug.LogError("AudioManager.Awake(): Shouldn't be instantiating a second instance of a singleton class.");
         }
     }
     
