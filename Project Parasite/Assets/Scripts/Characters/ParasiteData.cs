@@ -74,6 +74,8 @@ public class ParasiteData
 	}
 
 	public void SetVamparasite() {
+		// Don't activate vamparasite more than once
+		if (isVamparasite) { return; }
 		isVamparasite = true;
 		try {
 			Parasite parasite = (Parasite)owner.GetCharacter();
