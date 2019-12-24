@@ -47,7 +47,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     RoundManager roundManager;
     const int MAX_PLAYERS_PER_ROOM = 4;
     TutorialManager tutorialManager;
-    GameObject localPlayerObject;
+    PlayerObject localPlayerObject;
 
     #endregion
 
@@ -117,6 +117,10 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
         if (roundManager != null) {
             roundManager.EndRound();
         }
+        if (localPlayerObject != null) {
+            Destroy(localPlayerObject.gameObject);
+        }
+        UiManager.Instance.minimap.RemoveTarget();
         // Forget previous character selections
         characterSelectionManager.Reset();
     }
@@ -240,7 +244,7 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
 
     void InstantiatePlayerObject() {
         if (localPlayerObject != null) { return; }
-        localPlayerObject = Instantiate(playerObjectPrefab, Vector3.zero, Quaternion.identity);
+        localPlayerObject = Instantiate(playerObjectPrefab, Vector3.zero, Quaternion.identity).GetComponent<PlayerObject>();
     }
 
     void StartGame() {
