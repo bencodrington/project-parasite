@@ -43,6 +43,10 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 	// The text shown on the game over screen
 	const string HUNTERS_WIN = "HUNTERS WIN!";
 	const string PARASITE_WINS = "PARASITE WINS!";
+	// The number of canvas items that should render above the
+	//	game over screen. Currently:
+	// 	- The escape menu
+	const int GAME_OVER_SCREEN_POSITION = 1;
 	// The colour of the text shown on the game over screen
 	Color WIN_COLOUR = Color.green;
 	Color LOSS_COLOUR = Color.red;
@@ -341,10 +345,12 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 		gameOverScreen = PhotonNetwork.IsMasterClient ?
 			Instantiate(GameOverScreenServerPrefab, canvas.position, Quaternion.identity, canvas) :
 			Instantiate(GameOverScreenPrefab, canvas.position, Quaternion.identity, canvas);
+		// Move the screen below UI elements that should be drawn on top of it
+		gameOverScreen.transform.SetSiblingIndex(canvas.childCount-1 - GAME_OVER_SCREEN_POSITION);
 
 		Transform VictorText = gameOverScreen.transform.Find("Victor");
 		if (VictorText == null) {
-			Debug.LogError("PlayerObject:ShowGameOverScreen: Victor Text not found");
+			Debug.LogError("UiManager:ShowGameOverScreen: Victor Text not found");
 			return;
 		}
 		Text txt = VictorText.GetComponent<Text>();
