@@ -15,6 +15,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
     
     public static UiManager Instance;
 	public OrbUiManager orbUiManager {get; private set;}
+	public Minimap minimap {get; private set;}
 	public GameObject GameOverScreenPrefab;
 	public GameObject GameOverScreenServerPrefab;
     
@@ -265,6 +266,7 @@ public class UiManager : MonoBehaviour, IOnEventCallback
 			}
 		}
 		orbUiManager = FindObjectOfType<OrbUiManager>();
+		minimap = FindObjectOfType<Minimap>();
 		mainMenu.SetActive(false);
 		lobby.SetActive(false);
 		startGameButton.SetActive(false);

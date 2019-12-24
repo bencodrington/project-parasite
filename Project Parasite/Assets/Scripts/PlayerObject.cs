@@ -42,6 +42,8 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 												false,
 												PhotonNetwork.LocalPlayer.NickName);
 					character.gameObject.AddComponent<AudioListener>();
+					UiManager.Instance.minimap.SetTarget(character.transform);
+					UiManager.Instance.minimap.Activate();
 				}
 				break;
 			case EventCodes.Mutation:

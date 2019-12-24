@@ -82,7 +82,7 @@ public class NonPlayerCharacter : Character {
 		// Remember what our input source was before being infected, so that we can go back to
 		// 	it
 		originalInputSource = input;
-		// If parasiteInputSource is null, that means that this is an NPC-controlled infected NPC
+		// If parasiteInputSource is null, that means that this is an NPC-controlled infected NPC,
 		// 	not one controlled by the player. So don't overwrite the input source and don't update
 		// 	visuals
 		if (parasiteInputSource != null) {
@@ -215,6 +215,7 @@ public class NonPlayerCharacter : Character {
 		if (input.ShouldCameraFollowOwner()) {
 			// Only show parasite controls if this client is playing as this parasite
 			UiManager.Instance.ActivateControls(CharacterType.Parasite);
+			UiManager.Instance.minimap.SetTarget(newParasite.transform);
 			newParasite.gameObject.AddComponent<AudioListener>();
 		}
 	}

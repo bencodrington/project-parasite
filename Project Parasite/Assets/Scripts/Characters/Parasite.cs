@@ -265,6 +265,7 @@ public class Parasite : Character {
 		npc.SetCameraFollow(false);
 		npc.SetRenderLayer();
 		UiManager.Instance.ActivateControls(CharacterType.NPC);
+		UiManager.Instance.minimap.SetTarget(npc.transform);
 		npc.gameObject.AddComponent<AudioListener>();
 	}
 

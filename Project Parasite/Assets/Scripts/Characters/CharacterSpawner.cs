@@ -77,6 +77,7 @@ public class CharacterSpawner
 		if (deathHandler != null) {
 			TutorialManager.parasitesStillAlive--;
 		}
+		UiManager.Instance.minimap.RemoveTarget();
     }
 
 	public void SetCharacter(Character newCharacter) {
