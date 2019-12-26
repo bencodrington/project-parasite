@@ -16,6 +16,16 @@ public class PlayerObject : MonoBehaviour, IOnEventCallback {
 
 	#endregion
 
+	#region [Public Methods]
+	
+	public void DestroyCharacter() {
+			if (characterSpawner != null) {
+				characterSpawner.DestroyCharacter();
+			}
+	}
+	
+	#endregion
+
     public void OnEvent(EventData photonEvent)
     {
 		switch (photonEvent.Code) {

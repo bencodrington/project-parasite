@@ -108,7 +108,6 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
     }
 
     public void LeaveGame() {
-        PhotonNetwork.Disconnect();
         // Stop player from toggling the Escape Menu
         UiManager.Instance.SetEscMenuValid(false);
         // Boot to main menu
@@ -118,11 +117,13 @@ public class MatchManager : MonoBehaviourPunCallbacks, IOnEventCallback {
             roundManager.EndRound();
         }
         if (localPlayerObject != null) {
+            localPlayerObject.DestroyCharacter();
             Destroy(localPlayerObject.gameObject);
         }
         UiManager.Instance.minimap.RemoveTarget();
         // Forget previous character selections
         characterSelectionManager.Reset();
+        PhotonNetwork.Disconnect();
     }
     
     #endregion
