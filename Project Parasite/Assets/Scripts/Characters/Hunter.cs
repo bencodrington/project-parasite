@@ -110,7 +110,7 @@ public class Hunter : Character {
 
 		// If up was pressed this frame for the first time and the player is on the ground
 		if (HasAuthority()
-			&& physicsEntity.IsOnGround()
+			&& CanJump()
 			&& (input.isJustPressed(PlayerInput.Key.up)
 				|| input.isJustPressed(PlayerInput.Key.jump))
 			) {
@@ -212,7 +212,15 @@ public class Hunter : Character {
 
 	void Jump() {
 		animator.SetTrigger("startJump");
-		physicsEntity.AddVelocity(0, jumpVelocity);
+		float xVelocity = 0;
+		float yVelocity = jumpVelocity;
+		if (IsClingingToWall) {
+			// Move diagonally away from the wall we're facing
+			xVelocity = isClingingToLeftWall ? jumpVelocity : -jumpVelocity;
+			xVelocity /= 1.6f; // CLEANUP: magic numbers
+			yVelocity *= 1.5f;
+		}
+		physicsEntity.AddVelocity(xVelocity, yVelocity);
 	}
 
 	void HandleWallClinging(bool wasClingingToWall) {
@@ -349,6 +357,10 @@ public class Hunter : Character {
 			trigger = "isPlacingOrb";
 		}
 		animator.SetTrigger(trigger);
+	}
+
+	bool CanJump() {
+		return physicsEntity.IsOnGround() || IsClingingToWall;
 	}
 	
 	#endregion
