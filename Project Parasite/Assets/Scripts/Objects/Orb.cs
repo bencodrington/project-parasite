@@ -14,7 +14,7 @@ public class Orb : MonoBehaviour {
 	#region [Private Variables]
 	
 	const float FORCE = 35f;
-	const float RADIUS = 4f;
+	const float RADIUS = 2.5f;
 	const float FULL_FORCE_CUTOFF_RADIUS = 2f;
 	bool isActive;
 
