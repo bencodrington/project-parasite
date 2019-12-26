@@ -10,7 +10,7 @@ public class HunterAiInputSource : InputSource
     const float TIME_BETWEEN_ORBS = 0.3f;
     // The box size (in game units) centered around the hunter, in which it
     //  can detect a parasite
-    Vector2 AWARENESS_ZONE_SIZE = new Vector2(16, 3);
+    Vector2 AWARENESS_ZONE_SIZE = new Vector2(8, 3);
     int PARASITE_LAYER_MASK = Utility.GetLayerMask(CharacterType.Parasite);
     
     // Used to determine if we are placing/recalling orbs at all, or just waiting
@@ -106,7 +106,12 @@ public class HunterAiInputSource : InputSource
         // Don't interrupt placing/recalling orbs with a change of state
         if (isWaiting || (numOrbsPlaced != numOrbsInData && numOrbsPlaced != 0)) { return; }
         bool oldCanSeeParasite = canSeeParasite;
-        canSeeParasite = (bool)Physics2D.OverlapBox(owner.transform.position, AWARENESS_ZONE_SIZE, 0, PARASITE_LAYER_MASK);
+        // Check in a box to the left of the hunter
+        canSeeParasite = (bool)Physics2D.OverlapBox(owner.transform.position + new Vector3(-AWARENESS_ZONE_SIZE.x / 2, 0, 0),
+                    AWARENESS_ZONE_SIZE,
+                    0,
+                    PARASITE_LAYER_MASK
+                );
         if (canSeeParasite && !oldCanSeeParasite) {
             StartPlacingOrbs();
         } else if (!canSeeParasite && oldCanSeeParasite) {
