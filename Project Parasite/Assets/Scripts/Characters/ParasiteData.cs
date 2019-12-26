@@ -17,12 +17,12 @@ public class ParasiteData
 
 	int MaxHealth {
 		get {
-			return isVamparasite ? 175 : 100;
+			return isVamparasite ? 150 : 100;
 		}
 	}
 	Vector2 HEALTH_ALERT_OFFSET = new Vector2(0, 0.75f);
 	const int HEAL_AMOUNT_DEFAULT = 5;
-	const int HEAL_AMOUNT_VAMPARASITE = 25;
+	const int HEAL_AMOUNT_VAMPARASITE = 20;
 
 	int _parasiteHealth = STARTING_HEALTH;
 	int ParasiteHealth {

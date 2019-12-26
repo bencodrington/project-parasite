@@ -115,9 +115,9 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_text: 'MUTATION
 
-    <align="left"><font="Laconic_Regular SDF"><size=750>+75 MAX HP
+    <align="left"><font="Laconic_Regular SDF"><size=750>+50 MAX HP
 
-    +20 HP ON KILL</size>'
+    +15 HP ON KILL</size>'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 6348e39425d23f945943ce4277cb2bce, type: 2}
   m_sharedMaterial: {fileID: 21389751938658936, guid: 6348e39425d23f945943ce4277cb2bce,
@@ -325,11 +325,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: MutationAlert
       objectReference: {fileID: 0}
-    - target: {fileID: 8237305144963805104, guid: 5b34039ecfeed844aadb625f77ffa998,
-        type: 3}
-      propertyPath: totalLifetime
-      value: 8
-      objectReference: {fileID: 0}
     - target: {fileID: 296580648822321041, guid: 5b34039ecfeed844aadb625f77ffa998,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -384,6 +379,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8237305144963805104, guid: 5b34039ecfeed844aadb625f77ffa998,
+        type: 3}
+      propertyPath: totalLifetime
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 296580648554022629, guid: 5b34039ecfeed844aadb625f77ffa998,
         type: 3}

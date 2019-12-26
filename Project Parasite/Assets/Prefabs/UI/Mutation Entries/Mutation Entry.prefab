@@ -139,7 +139,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_text: +20 HP on Kill
+  m_text: +15 HP on Kill
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0874b82a288339641bd2491e59b4e723, type: 2}
   m_sharedMaterial: {fileID: 21815569476386912, guid: 0874b82a288339641bd2491e59b4e723,
@@ -509,7 +509,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_text: +75 Max HP
+  m_text: +50 Max HP
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0874b82a288339641bd2491e59b4e723, type: 2}
   m_sharedMaterial: {fileID: 21815569476386912, guid: 0874b82a288339641bd2491e59b4e723,
